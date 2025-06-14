@@ -1,0 +1,13 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: qiyuan
+  datasource:
+    url: jdbc:sqlserver://localhost:11433;databaseName=qiyuan;encrypt=true;trustServerCertificate=true;
+    username: sa
+    password: 1qaz@WSX
+    driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
+    hikari:
+      maximum-pool-size: 10  # 可選：調整最大連線池大小
