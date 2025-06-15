@@ -1,0 +1,275 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.qiyuan.web.dao.LanternPurchaseMapper">
+  <resultMap id="BaseResultMap" type="com.qiyuan.web.entity.LanternPurchase">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="lantern_id" jdbcType="CHAR" property="lanternId" />
+    <result column="user_id" jdbcType="CHAR" property="userId" />
+    <result column="name" jdbcType="NVARCHAR" property="name" />
+    <result column="birthday" jdbcType="TIMESTAMP" property="birthday" />
+    <result column="message" jdbcType="NVARCHAR" property="message" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="expired_time" jdbcType="TIMESTAMP" property="expiredTime" />
+    <result column="blessing_times" jdbcType="SMALLINT" property="blessingTimes" />
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause">
+    <where>
+      <foreach collection="example.oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    id, lantern_id, user_id, name, birthday, message, create_time, expired_time, blessing_times
+  </sql>
+  <select id="selectByExample" parameterType="com.qiyuan.web.entity.example.LanternPurchaseExample" resultMap="BaseResultMap">
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from lantern_purchase
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from lantern_purchase
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from lantern_purchase
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.qiyuan.web.entity.example.LanternPurchaseExample">
+    delete from lantern_purchase
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.qiyuan.web.entity.LanternPurchase">
+    insert into lantern_purchase (id, lantern_id, user_id, 
+      name, birthday, message, 
+      create_time, expired_time, blessing_times
+      )
+    values (#{id,jdbcType=INTEGER}, #{lanternId,jdbcType=CHAR}, #{userId,jdbcType=CHAR}, 
+      #{name,jdbcType=NVARCHAR}, #{birthday,jdbcType=TIMESTAMP}, #{message,jdbcType=NVARCHAR}, 
+      #{createTime,jdbcType=TIMESTAMP}, #{expiredTime,jdbcType=TIMESTAMP}, #{blessingTimes,jdbcType=SMALLINT}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.qiyuan.web.entity.LanternPurchase">
+    insert into lantern_purchase
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="lanternId != null">
+        lantern_id,
+      </if>
+      <if test="userId != null">
+        user_id,
+      </if>
+      <if test="name != null">
+        name,
+      </if>
+      <if test="birthday != null">
+        birthday,
+      </if>
+      <if test="message != null">
+        message,
+      </if>
+      <if test="createTime != null">
+        create_time,
+      </if>
+      <if test="expiredTime != null">
+        expired_time,
+      </if>
+      <if test="blessingTimes != null">
+        blessing_times,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="lanternId != null">
+        #{lanternId,jdbcType=CHAR},
+      </if>
+      <if test="userId != null">
+        #{userId,jdbcType=CHAR},
+      </if>
+      <if test="name != null">
+        #{name,jdbcType=NVARCHAR},
+      </if>
+      <if test="birthday != null">
+        #{birthday,jdbcType=TIMESTAMP},
+      </if>
+      <if test="message != null">
+        #{message,jdbcType=NVARCHAR},
+      </if>
+      <if test="createTime != null">
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="expiredTime != null">
+        #{expiredTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="blessingTimes != null">
+        #{blessingTimes,jdbcType=SMALLINT},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.qiyuan.web.entity.example.LanternPurchaseExample" resultType="java.lang.Long">
+    select count(*) from lantern_purchase
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map">
+    update lantern_purchase
+    <set>
+      <if test="record.id != null">
+        id = #{record.id,jdbcType=INTEGER},
+      </if>
+      <if test="record.lanternId != null">
+        lantern_id = #{record.lanternId,jdbcType=CHAR},
+      </if>
+      <if test="record.userId != null">
+        user_id = #{record.userId,jdbcType=CHAR},
+      </if>
+      <if test="record.name != null">
+        name = #{record.name,jdbcType=NVARCHAR},
+      </if>
+      <if test="record.birthday != null">
+        birthday = #{record.birthday,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.message != null">
+        message = #{record.message,jdbcType=NVARCHAR},
+      </if>
+      <if test="record.createTime != null">
+        create_time = #{record.createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.expiredTime != null">
+        expired_time = #{record.expiredTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.blessingTimes != null">
+        blessing_times = #{record.blessingTimes,jdbcType=SMALLINT},
+      </if>
+    </set>
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map">
+    update lantern_purchase
+    set id = #{record.id,jdbcType=INTEGER},
+      lantern_id = #{record.lanternId,jdbcType=CHAR},
+      user_id = #{record.userId,jdbcType=CHAR},
+      name = #{record.name,jdbcType=NVARCHAR},
+      birthday = #{record.birthday,jdbcType=TIMESTAMP},
+      message = #{record.message,jdbcType=NVARCHAR},
+      create_time = #{record.createTime,jdbcType=TIMESTAMP},
+      expired_time = #{record.expiredTime,jdbcType=TIMESTAMP},
+      blessing_times = #{record.blessingTimes,jdbcType=SMALLINT}
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.qiyuan.web.entity.LanternPurchase">
+    update lantern_purchase
+    <set>
+      <if test="lanternId != null">
+        lantern_id = #{lanternId,jdbcType=CHAR},
+      </if>
+      <if test="userId != null">
+        user_id = #{userId,jdbcType=CHAR},
+      </if>
+      <if test="name != null">
+        name = #{name,jdbcType=NVARCHAR},
+      </if>
+      <if test="birthday != null">
+        birthday = #{birthday,jdbcType=TIMESTAMP},
+      </if>
+      <if test="message != null">
+        message = #{message,jdbcType=NVARCHAR},
+      </if>
+      <if test="createTime != null">
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="expiredTime != null">
+        expired_time = #{expiredTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="blessingTimes != null">
+        blessing_times = #{blessingTimes,jdbcType=SMALLINT},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.qiyuan.web.entity.LanternPurchase">
+    update lantern_purchase
+    set lantern_id = #{lanternId,jdbcType=CHAR},
+      user_id = #{userId,jdbcType=CHAR},
+      name = #{name,jdbcType=NVARCHAR},
+      birthday = #{birthday,jdbcType=TIMESTAMP},
+      message = #{message,jdbcType=NVARCHAR},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      expired_time = #{expiredTime,jdbcType=TIMESTAMP},
+      blessing_times = #{blessingTimes,jdbcType=SMALLINT}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

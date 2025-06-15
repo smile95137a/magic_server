@@ -2,13 +2,13 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.qiyuan.web.dao.MasterServiceRequestMapper">
   <resultMap id="BaseResultMap" type="com.qiyuan.web.entity.MasterServiceRequest">
+    <id column="master_code" jdbcType="VARCHAR" property="masterCode" />
     <id column="serial" jdbcType="CHAR" property="serial" />
-    <result column="master_code" jdbcType="VARCHAR" property="masterCode" />
     <result column="name" jdbcType="NVARCHAR" property="name" />
     <result column="phone" jdbcType="VARCHAR" property="phone" />
     <result column="email" jdbcType="VARCHAR" property="email" />
     <result column="line_id" jdbcType="VARCHAR" property="lineId" />
-    <result column="note" jdbcType="VARCHAR" property="note" />
+    <result column="note" jdbcType="NVARCHAR" property="note" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -69,9 +69,9 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    serial, master_code, name, phone, email, line_id, note
+    master_code, serial, name, phone, email, line_id, note
   </sql>
-  <select id="selectByExample" parameterType="com.qiyuan.web.entity.MasterServiceRequestExample" resultMap="BaseResultMap">
+  <select id="selectByExample" parameterType="com.qiyuan.web.entity.example.MasterServiceRequestExample" resultMap="BaseResultMap">
     select
     <if test="distinct">
       distinct
@@ -85,38 +85,40 @@
       order by ${orderByClause}
     </if>
   </select>
-  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+  <select id="selectByPrimaryKey" parameterType="map" resultMap="BaseResultMap">
     select 
     <include refid="Base_Column_List" />
     from master_service_request
-    where serial = #{serial,jdbcType=CHAR}
+    where master_code = #{masterCode,jdbcType=VARCHAR}
+      and serial = #{serial,jdbcType=CHAR}
   </select>
-  <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+  <delete id="deleteByPrimaryKey" parameterType="map">
     delete from master_service_request
-    where serial = #{serial,jdbcType=CHAR}
+    where master_code = #{masterCode,jdbcType=VARCHAR}
+      and serial = #{serial,jdbcType=CHAR}
   </delete>
-  <delete id="deleteByExample" parameterType="com.qiyuan.web.entity.MasterServiceRequestExample">
+  <delete id="deleteByExample" parameterType="com.qiyuan.web.entity.example.MasterServiceRequestExample">
     delete from master_service_request
     <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
     </if>
   </delete>
   <insert id="insert" parameterType="com.qiyuan.web.entity.MasterServiceRequest">
-    insert into master_service_request (serial, master_code, name, 
+    insert into master_service_request (master_code, serial, name, 
       phone, email, line_id, 
       note)
-    values (#{serial,jdbcType=CHAR}, #{masterCode,jdbcType=VARCHAR}, #{name,jdbcType=NVARCHAR}, 
+    values (#{masterCode,jdbcType=VARCHAR}, #{serial,jdbcType=CHAR}, #{name,jdbcType=NVARCHAR}, 
       #{phone,jdbcType=VARCHAR}, #{email,jdbcType=VARCHAR}, #{lineId,jdbcType=VARCHAR}, 
-      #{note,jdbcType=VARCHAR})
+      #{note,jdbcType=NVARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.qiyuan.web.entity.MasterServiceRequest">
     insert into master_service_request
     <trim prefix="(" suffix=")" suffixOverrides=",">
-      <if test="serial != null">
-        serial,
-      </if>
       <if test="masterCode != null">
         master_code,
+      </if>
+      <if test="serial != null">
+        serial,
       </if>
       <if test="name != null">
         name,
@@ -135,11 +137,11 @@
       </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
-      <if test="serial != null">
-        #{serial,jdbcType=CHAR},
-      </if>
       <if test="masterCode != null">
         #{masterCode,jdbcType=VARCHAR},
+      </if>
+      <if test="serial != null">
+        #{serial,jdbcType=CHAR},
       </if>
       <if test="name != null">
         #{name,jdbcType=NVARCHAR},
@@ -154,11 +156,11 @@
         #{lineId,jdbcType=VARCHAR},
       </if>
       <if test="note != null">
-        #{note,jdbcType=VARCHAR},
+        #{note,jdbcType=NVARCHAR},
       </if>
     </trim>
   </insert>
-  <select id="countByExample" parameterType="com.qiyuan.web.entity.MasterServiceRequestExample" resultType="java.lang.Long">
+  <select id="countByExample" parameterType="com.qiyuan.web.entity.example.MasterServiceRequestExample" resultType="java.lang.Long">
     select count(*) from master_service_request
     <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
@@ -167,11 +169,11 @@
   <update id="updateByExampleSelective" parameterType="map">
     update master_service_request
     <set>
-      <if test="record.serial != null">
-        serial = #{record.serial,jdbcType=CHAR},
-      </if>
       <if test="record.masterCode != null">
         master_code = #{record.masterCode,jdbcType=VARCHAR},
+      </if>
+      <if test="record.serial != null">
+        serial = #{record.serial,jdbcType=CHAR},
       </if>
       <if test="record.name != null">
         name = #{record.name,jdbcType=NVARCHAR},
@@ -186,7 +188,7 @@
         line_id = #{record.lineId,jdbcType=VARCHAR},
       </if>
       <if test="record.note != null">
-        note = #{record.note,jdbcType=VARCHAR},
+        note = #{record.note,jdbcType=NVARCHAR},
       </if>
     </set>
     <if test="_parameter != null">
@@ -195,13 +197,13 @@
   </update>
   <update id="updateByExample" parameterType="map">
     update master_service_request
-    set serial = #{record.serial,jdbcType=CHAR},
-      master_code = #{record.masterCode,jdbcType=VARCHAR},
+    set master_code = #{record.masterCode,jdbcType=VARCHAR},
+      serial = #{record.serial,jdbcType=CHAR},
       name = #{record.name,jdbcType=NVARCHAR},
       phone = #{record.phone,jdbcType=VARCHAR},
       email = #{record.email,jdbcType=VARCHAR},
       line_id = #{record.lineId,jdbcType=VARCHAR},
-      note = #{record.note,jdbcType=VARCHAR}
+      note = #{record.note,jdbcType=NVARCHAR}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
     </if>
@@ -209,9 +211,6 @@
   <update id="updateByPrimaryKeySelective" parameterType="com.qiyuan.web.entity.MasterServiceRequest">
     update master_service_request
     <set>
-      <if test="masterCode != null">
-        master_code = #{masterCode,jdbcType=VARCHAR},
-      </if>
       <if test="name != null">
         name = #{name,jdbcType=NVARCHAR},
       </if>
@@ -225,19 +224,20 @@
         line_id = #{lineId,jdbcType=VARCHAR},
       </if>
       <if test="note != null">
-        note = #{note,jdbcType=VARCHAR},
+        note = #{note,jdbcType=NVARCHAR},
       </if>
     </set>
-    where serial = #{serial,jdbcType=CHAR}
+    where master_code = #{masterCode,jdbcType=VARCHAR}
+      and serial = #{serial,jdbcType=CHAR}
   </update>
   <update id="updateByPrimaryKey" parameterType="com.qiyuan.web.entity.MasterServiceRequest">
     update master_service_request
-    set master_code = #{masterCode,jdbcType=VARCHAR},
-      name = #{name,jdbcType=NVARCHAR},
+    set name = #{name,jdbcType=NVARCHAR},
       phone = #{phone,jdbcType=VARCHAR},
       email = #{email,jdbcType=VARCHAR},
       line_id = #{lineId,jdbcType=VARCHAR},
-      note = #{note,jdbcType=VARCHAR}
-    where serial = #{serial,jdbcType=CHAR}
+      note = #{note,jdbcType=NVARCHAR}
+    where master_code = #{masterCode,jdbcType=VARCHAR}
+      and serial = #{serial,jdbcType=CHAR}
   </update>
 </mapper>

@@ -1,7 +1,7 @@
 package com.qiyuan.web.dao;
 
 import com.qiyuan.web.entity.MasterServiceRequest;
-import com.qiyuan.web.entity.MasterServiceRequestExample;
+import com.qiyuan.web.entity.example.MasterServiceRequestExample;
 import java.util.List;
 import org.apache.ibatis.annotations.Param;
 
@@ -10,7 +10,7 @@ public interface MasterServiceRequestMapper {
 
     int deleteByExample(MasterServiceRequestExample example);
 
-    int deleteByPrimaryKey(String serial);
+    int deleteByPrimaryKey(@Param("masterCode") String masterCode, @Param("serial") String serial);
 
     int insert(MasterServiceRequest record);
 
@@ -18,7 +18,7 @@ public interface MasterServiceRequestMapper {
 
     List<MasterServiceRequest> selectByExample(MasterServiceRequestExample example);
 
-    MasterServiceRequest selectByPrimaryKey(String serial);
+    MasterServiceRequest selectByPrimaryKey(@Param("masterCode") String masterCode, @Param("serial") String serial);
 
     int updateByExampleSelective(@Param("record") MasterServiceRequest record, @Param("example") MasterServiceRequestExample example);
 

@@ -70,7 +70,7 @@
   <sql id="Base_Column_List">
     id, image_url, type, order, available_from, available_until
   </sql>
-  <select id="selectByExample" parameterType="com.qiyuan.web.entity.BannerExample" resultMap="BaseResultMap">
+  <select id="selectByExample" parameterType="com.qiyuan.web.entity.example.BannerExample" resultMap="BaseResultMap">
     select
     <if test="distinct">
       distinct
@@ -94,7 +94,7 @@
     delete from banner
     where id = #{id,jdbcType=INTEGER}
   </delete>
-  <delete id="deleteByExample" parameterType="com.qiyuan.web.entity.BannerExample">
+  <delete id="deleteByExample" parameterType="com.qiyuan.web.entity.example.BannerExample">
     delete from banner
     <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
@@ -151,7 +151,7 @@
       </if>
     </trim>
   </insert>
-  <select id="countByExample" parameterType="com.qiyuan.web.entity.BannerExample" resultType="java.lang.Long">
+  <select id="countByExample" parameterType="com.qiyuan.web.entity.example.BannerExample" resultType="java.lang.Long">
     select count(*) from banner
     <if test="_parameter != null">
       <include refid="Example_Where_Clause" />

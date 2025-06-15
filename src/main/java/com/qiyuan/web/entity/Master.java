@@ -17,7 +17,7 @@ public class Master {
 
     private String servicesJson;
 
-    private String status;
+    private Boolean status;
 
     private String imageUrl;
 
@@ -85,11 +85,11 @@ public class Master {
         this.servicesJson = servicesJson;
     }
 
-    public String getStatus() {
+    public Boolean getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(Boolean status) {
         this.status = status;
     }
 

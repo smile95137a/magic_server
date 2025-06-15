@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.qiyuan.web.dao.GodMapper">
-  <resultMap id="BaseResultMap" type="com.qiyuan.web.entity.God">
-    <id column="id" jdbcType="CHAR" property="id" />
-    <result column="name" jdbcType="NVARCHAR" property="name" />
-    <result column="image_code" jdbcType="VARCHAR" property="imageCode" />
-    <result column="description" jdbcType="NVARCHAR" property="description" />
-    <result column="order" jdbcType="TINYINT" property="order" />
+<mapper namespace="com.qiyuan.web.dao.PoeRankMapper">
+  <resultMap id="BaseResultMap" type="com.qiyuan.web.entity.PoeRank">
+    <id column="user_id" jdbcType="CHAR" property="userId" />
+    <result column="times" jdbcType="SMALLINT" property="times" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -67,15 +66,15 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    id, name, image_code, description, order
+    user_id, times, create_time, update_time
   </sql>
-  <select id="selectByExample" parameterType="com.qiyuan.web.entity.example.GodExample" resultMap="BaseResultMap">
+  <select id="selectByExample" parameterType="com.qiyuan.web.entity.example.PoeRankExample" resultMap="BaseResultMap">
     select
     <if test="distinct">
       distinct
     </if>
     <include refid="Base_Column_List" />
-    from god
+    from poe_rank
     <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
     </if>
@@ -86,85 +85,76 @@
   <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
     select 
     <include refid="Base_Column_List" />
-    from god
-    where id = #{id,jdbcType=CHAR}
+    from poe_rank
+    where user_id = #{userId,jdbcType=CHAR}
   </select>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
-    delete from god
-    where id = #{id,jdbcType=CHAR}
+    delete from poe_rank
+    where user_id = #{userId,jdbcType=CHAR}
   </delete>
-  <delete id="deleteByExample" parameterType="com.qiyuan.web.entity.example.GodExample">
-    delete from god
+  <delete id="deleteByExample" parameterType="com.qiyuan.web.entity.example.PoeRankExample">
+    delete from poe_rank
     <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
     </if>
   </delete>
-  <insert id="insert" parameterType="com.qiyuan.web.entity.God">
-    insert into god (id, name, image_code, 
-      description, order)
-    values (#{id,jdbcType=CHAR}, #{name,jdbcType=NVARCHAR}, #{imageCode,jdbcType=VARCHAR}, 
-      #{description,jdbcType=NVARCHAR}, #{order,jdbcType=TINYINT})
+  <insert id="insert" parameterType="com.qiyuan.web.entity.PoeRank">
+    insert into poe_rank (user_id, times, create_time, 
+      update_time)
+    values (#{userId,jdbcType=CHAR}, #{times,jdbcType=SMALLINT}, #{createTime,jdbcType=TIMESTAMP}, 
+      #{updateTime,jdbcType=TIMESTAMP})
   </insert>
-  <insert id="insertSelective" parameterType="com.qiyuan.web.entity.God">
-    insert into god
+  <insert id="insertSelective" parameterType="com.qiyuan.web.entity.PoeRank">
+    insert into poe_rank
     <trim prefix="(" suffix=")" suffixOverrides=",">
-      <if test="id != null">
-        id,
+      <if test="userId != null">
+        user_id,
       </if>
-      <if test="name != null">
-        name,
+      <if test="times != null">
+        times,
       </if>
-      <if test="imageCode != null">
-        image_code,
+      <if test="createTime != null">
+        create_time,
       </if>
-      <if test="description != null">
-        description,
-      </if>
-      <if test="order != null">
-        order,
+      <if test="updateTime != null">
+        update_time,
       </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
-      <if test="id != null">
-        #{id,jdbcType=CHAR},
+      <if test="userId != null">
+        #{userId,jdbcType=CHAR},
       </if>
-      <if test="name != null">
-        #{name,jdbcType=NVARCHAR},
+      <if test="times != null">
+        #{times,jdbcType=SMALLINT},
       </if>
-      <if test="imageCode != null">
-        #{imageCode,jdbcType=VARCHAR},
+      <if test="createTime != null">
+        #{createTime,jdbcType=TIMESTAMP},
       </if>
-      <if test="description != null">
-        #{description,jdbcType=NVARCHAR},
-      </if>
-      <if test="order != null">
-        #{order,jdbcType=TINYINT},
+      <if test="updateTime != null">
+        #{updateTime,jdbcType=TIMESTAMP},
       </if>
     </trim>
   </insert>
-  <select id="countByExample" parameterType="com.qiyuan.web.entity.example.GodExample" resultType="java.lang.Long">
-    select count(*) from god
+  <select id="countByExample" parameterType="com.qiyuan.web.entity.example.PoeRankExample" resultType="java.lang.Long">
+    select count(*) from poe_rank
     <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
     </if>
   </select>
   <update id="updateByExampleSelective" parameterType="map">
-    update god
+    update poe_rank
     <set>
-      <if test="record.id != null">
-        id = #{record.id,jdbcType=CHAR},
+      <if test="record.userId != null">
+        user_id = #{record.userId,jdbcType=CHAR},
       </if>
-      <if test="record.name != null">
-        name = #{record.name,jdbcType=NVARCHAR},
+      <if test="record.times != null">
+        times = #{record.times,jdbcType=SMALLINT},
       </if>
-      <if test="record.imageCode != null">
-        image_code = #{record.imageCode,jdbcType=VARCHAR},
+      <if test="record.createTime != null">
+        create_time = #{record.createTime,jdbcType=TIMESTAMP},
       </if>
-      <if test="record.description != null">
-        description = #{record.description,jdbcType=NVARCHAR},
-      </if>
-      <if test="record.order != null">
-        order = #{record.order,jdbcType=TINYINT},
+      <if test="record.updateTime != null">
+        update_time = #{record.updateTime,jdbcType=TIMESTAMP},
       </if>
     </set>
     <if test="_parameter != null">
@@ -172,40 +162,35 @@
     </if>
   </update>
   <update id="updateByExample" parameterType="map">
-    update god
-    set id = #{record.id,jdbcType=CHAR},
-      name = #{record.name,jdbcType=NVARCHAR},
-      image_code = #{record.imageCode,jdbcType=VARCHAR},
-      description = #{record.description,jdbcType=NVARCHAR},
-      order = #{record.order,jdbcType=TINYINT}
+    update poe_rank
+    set user_id = #{record.userId,jdbcType=CHAR},
+      times = #{record.times,jdbcType=SMALLINT},
+      create_time = #{record.createTime,jdbcType=TIMESTAMP},
+      update_time = #{record.updateTime,jdbcType=TIMESTAMP}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
     </if>
   </update>
-  <update id="updateByPrimaryKeySelective" parameterType="com.qiyuan.web.entity.God">
-    update god
+  <update id="updateByPrimaryKeySelective" parameterType="com.qiyuan.web.entity.PoeRank">
+    update poe_rank
     <set>
-      <if test="name != null">
-        name = #{name,jdbcType=NVARCHAR},
+      <if test="times != null">
+        times = #{times,jdbcType=SMALLINT},
       </if>
-      <if test="imageCode != null">
-        image_code = #{imageCode,jdbcType=VARCHAR},
+      <if test="createTime != null">
+        create_time = #{createTime,jdbcType=TIMESTAMP},
       </if>
-      <if test="description != null">
-        description = #{description,jdbcType=NVARCHAR},
-      </if>
-      <if test="order != null">
-        order = #{order,jdbcType=TINYINT},
+      <if test="updateTime != null">
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
       </if>
     </set>
-    where id = #{id,jdbcType=CHAR}
+    where user_id = #{userId,jdbcType=CHAR}
   </update>
-  <update id="updateByPrimaryKey" parameterType="com.qiyuan.web.entity.God">
-    update god
-    set name = #{name,jdbcType=NVARCHAR},
-      image_code = #{imageCode,jdbcType=VARCHAR},
-      description = #{description,jdbcType=NVARCHAR},
-      order = #{order,jdbcType=TINYINT}
-    where id = #{id,jdbcType=CHAR}
+  <update id="updateByPrimaryKey" parameterType="com.qiyuan.web.entity.PoeRank">
+    update poe_rank
+    set times = #{times,jdbcType=SMALLINT},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP}
+    where user_id = #{userId,jdbcType=CHAR}
   </update>
 </mapper>

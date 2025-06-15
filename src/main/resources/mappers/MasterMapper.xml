@@ -10,7 +10,7 @@
     <result column="experience" jdbcType="NVARCHAR" property="experience" />
     <result column="personal_items" jdbcType="NVARCHAR" property="personalItems" />
     <result column="services_json" jdbcType="NVARCHAR" property="servicesJson" />
-    <result column="status" jdbcType="CHAR" property="status" />
+    <result column="status" jdbcType="BIT" property="status" />
     <result column="image_url" jdbcType="VARCHAR" property="imageUrl" />
   </resultMap>
   <sql id="Example_Where_Clause">
@@ -75,7 +75,7 @@
     code, name, title, main_star, bio, experience, personal_items, services_json, status, 
     image_url
   </sql>
-  <select id="selectByExample" parameterType="com.qiyuan.web.entity.MasterExample" resultMap="BaseResultMap">
+  <select id="selectByExample" parameterType="com.qiyuan.web.entity.example.MasterExample" resultMap="BaseResultMap">
     select
     <if test="distinct">
       distinct
@@ -99,7 +99,7 @@
     delete from master
     where code = #{code,jdbcType=VARCHAR}
   </delete>
-  <delete id="deleteByExample" parameterType="com.qiyuan.web.entity.MasterExample">
+  <delete id="deleteByExample" parameterType="com.qiyuan.web.entity.example.MasterExample">
     delete from master
     <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
@@ -112,7 +112,7 @@
       image_url)
     values (#{code,jdbcType=VARCHAR}, #{name,jdbcType=NVARCHAR}, #{title,jdbcType=NVARCHAR}, 
       #{mainStar,jdbcType=NVARCHAR}, #{bio,jdbcType=NVARCHAR}, #{experience,jdbcType=NVARCHAR}, 
-      #{personalItems,jdbcType=NVARCHAR}, #{servicesJson,jdbcType=NVARCHAR}, #{status,jdbcType=CHAR}, 
+      #{personalItems,jdbcType=NVARCHAR}, #{servicesJson,jdbcType=NVARCHAR}, #{status,jdbcType=BIT}, 
       #{imageUrl,jdbcType=VARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.qiyuan.web.entity.Master">
@@ -175,14 +175,14 @@
         #{servicesJson,jdbcType=NVARCHAR},
       </if>
       <if test="status != null">
-        #{status,jdbcType=CHAR},
+        #{status,jdbcType=BIT},
       </if>
       <if test="imageUrl != null">
         #{imageUrl,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
-  <select id="countByExample" parameterType="com.qiyuan.web.entity.MasterExample" resultType="java.lang.Long">
+  <select id="countByExample" parameterType="com.qiyuan.web.entity.example.MasterExample" resultType="java.lang.Long">
     select count(*) from master
     <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
@@ -216,7 +216,7 @@
         services_json = #{record.servicesJson,jdbcType=NVARCHAR},
       </if>
       <if test="record.status != null">
-        status = #{record.status,jdbcType=CHAR},
+        status = #{record.status,jdbcType=BIT},
       </if>
       <if test="record.imageUrl != null">
         image_url = #{record.imageUrl,jdbcType=VARCHAR},
@@ -236,7 +236,7 @@
       experience = #{record.experience,jdbcType=NVARCHAR},
       personal_items = #{record.personalItems,jdbcType=NVARCHAR},
       services_json = #{record.servicesJson,jdbcType=NVARCHAR},
-      status = #{record.status,jdbcType=CHAR},
+      status = #{record.status,jdbcType=BIT},
       image_url = #{record.imageUrl,jdbcType=VARCHAR}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
@@ -267,7 +267,7 @@
         services_json = #{servicesJson,jdbcType=NVARCHAR},
       </if>
       <if test="status != null">
-        status = #{status,jdbcType=CHAR},
+        status = #{status,jdbcType=BIT},
       </if>
       <if test="imageUrl != null">
         image_url = #{imageUrl,jdbcType=VARCHAR},
@@ -284,7 +284,7 @@
       experience = #{experience,jdbcType=NVARCHAR},
       personal_items = #{personalItems,jdbcType=NVARCHAR},
       services_json = #{servicesJson,jdbcType=NVARCHAR},
-      status = #{status,jdbcType=CHAR},
+      status = #{status,jdbcType=BIT},
       image_url = #{imageUrl,jdbcType=VARCHAR}
     where code = #{code,jdbcType=VARCHAR}
   </update>

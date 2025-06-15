@@ -3,15 +3,25 @@ package com.qiyuan.web;
 import com.chl.enums.TableSelectionMode;
 import com.chl.generator.DatabaseSchemaGenerator;
 import com.chl.results.GenerateResult;
+import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.ComponentScan;
 
 @SpringBootApplication
+@ComponentScan(basePackages = {
+        "com.chl.security",
+        "com.qiyuan.web"
+})
+@MapperScan(basePackages = {
+        "com.qiyuan.web.dao",
+        "com.chl.security.dao"
+})
 public class QiyuanApplication {
 
     public static void main(String[] args) {
         SpringApplication.run(QiyuanApplication.class, args);
-
+//        generateCode();
     }
 
     private static void generateCode() {
@@ -24,7 +34,11 @@ public class QiyuanApplication {
                 .setMapperOutput("com.qiyuan.web.dao")
                 .setXmlOutput("mappers")
                 .enableComments(false)
-                .setTableSelection(TableSelectionMode.INCLUDE, "banner", "god", "master", "master_service_request")
+                .setTableSelection(TableSelectionMode.INCLUDE,
+                        "user", "role", "user_role", "poem",
+                        "lantern", "lantern_purchase", "poe_rank",
+                        "offering", "offering_purchase", "banner", "god", "god_info",
+                        "master", "master_service_request" )
                 .enableToString(false);  // 排除所有視圖;
 
         GenerateResult result = generator.generate();

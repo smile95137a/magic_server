@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.qiyuan.web.dao.GodMapper">
-  <resultMap id="BaseResultMap" type="com.qiyuan.web.entity.God">
+<mapper namespace="com.qiyuan.web.dao.OfferingMapper">
+  <resultMap id="BaseResultMap" type="com.qiyuan.web.entity.Offering">
     <id column="id" jdbcType="CHAR" property="id" />
-    <result column="name" jdbcType="NVARCHAR" property="name" />
-    <result column="image_code" jdbcType="VARCHAR" property="imageCode" />
-    <result column="description" jdbcType="NVARCHAR" property="description" />
-    <result column="order" jdbcType="TINYINT" property="order" />
+    <result column="image_url" jdbcType="VARCHAR" property="imageUrl" />
+    <result column="points" jdbcType="TINYINT" property="points" />
+    <result column="price" jdbcType="TINYINT" property="price" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -67,15 +66,15 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    id, name, image_code, description, order
+    id, image_url, points, price
   </sql>
-  <select id="selectByExample" parameterType="com.qiyuan.web.entity.example.GodExample" resultMap="BaseResultMap">
+  <select id="selectByExample" parameterType="com.qiyuan.web.entity.example.OfferingExample" resultMap="BaseResultMap">
     select
     <if test="distinct">
       distinct
     </if>
     <include refid="Base_Column_List" />
-    from god
+    from offering
     <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
     </if>
@@ -86,85 +85,76 @@
   <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
     select 
     <include refid="Base_Column_List" />
-    from god
+    from offering
     where id = #{id,jdbcType=CHAR}
   </select>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
-    delete from god
+    delete from offering
     where id = #{id,jdbcType=CHAR}
   </delete>
-  <delete id="deleteByExample" parameterType="com.qiyuan.web.entity.example.GodExample">
-    delete from god
+  <delete id="deleteByExample" parameterType="com.qiyuan.web.entity.example.OfferingExample">
+    delete from offering
     <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
     </if>
   </delete>
-  <insert id="insert" parameterType="com.qiyuan.web.entity.God">
-    insert into god (id, name, image_code, 
-      description, order)
-    values (#{id,jdbcType=CHAR}, #{name,jdbcType=NVARCHAR}, #{imageCode,jdbcType=VARCHAR}, 
-      #{description,jdbcType=NVARCHAR}, #{order,jdbcType=TINYINT})
+  <insert id="insert" parameterType="com.qiyuan.web.entity.Offering">
+    insert into offering (id, image_url, points, 
+      price)
+    values (#{id,jdbcType=CHAR}, #{imageUrl,jdbcType=VARCHAR}, #{points,jdbcType=TINYINT}, 
+      #{price,jdbcType=TINYINT})
   </insert>
-  <insert id="insertSelective" parameterType="com.qiyuan.web.entity.God">
-    insert into god
+  <insert id="insertSelective" parameterType="com.qiyuan.web.entity.Offering">
+    insert into offering
     <trim prefix="(" suffix=")" suffixOverrides=",">
       <if test="id != null">
         id,
       </if>
-      <if test="name != null">
-        name,
+      <if test="imageUrl != null">
+        image_url,
       </if>
-      <if test="imageCode != null">
-        image_code,
+      <if test="points != null">
+        points,
       </if>
-      <if test="description != null">
-        description,
-      </if>
-      <if test="order != null">
-        order,
+      <if test="price != null">
+        price,
       </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
         #{id,jdbcType=CHAR},
       </if>
-      <if test="name != null">
-        #{name,jdbcType=NVARCHAR},
+      <if test="imageUrl != null">
+        #{imageUrl,jdbcType=VARCHAR},
       </if>
-      <if test="imageCode != null">
-        #{imageCode,jdbcType=VARCHAR},
+      <if test="points != null">
+        #{points,jdbcType=TINYINT},
       </if>
-      <if test="description != null">
-        #{description,jdbcType=NVARCHAR},
-      </if>
-      <if test="order != null">
-        #{order,jdbcType=TINYINT},
+      <if test="price != null">
+        #{price,jdbcType=TINYINT},
       </if>
     </trim>
   </insert>
-  <select id="countByExample" parameterType="com.qiyuan.web.entity.example.GodExample" resultType="java.lang.Long">
-    select count(*) from god
+  <select id="countByExample" parameterType="com.qiyuan.web.entity.example.OfferingExample" resultType="java.lang.Long">
+    select count(*) from offering
     <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
     </if>
   </select>
   <update id="updateByExampleSelective" parameterType="map">
-    update god
+    update offering
     <set>
       <if test="record.id != null">
         id = #{record.id,jdbcType=CHAR},
       </if>
-      <if test="record.name != null">
-        name = #{record.name,jdbcType=NVARCHAR},
+      <if test="record.imageUrl != null">
+        image_url = #{record.imageUrl,jdbcType=VARCHAR},
       </if>
-      <if test="record.imageCode != null">
-        image_code = #{record.imageCode,jdbcType=VARCHAR},
+      <if test="record.points != null">
+        points = #{record.points,jdbcType=TINYINT},
       </if>
-      <if test="record.description != null">
-        description = #{record.description,jdbcType=NVARCHAR},
-      </if>
-      <if test="record.order != null">
-        order = #{record.order,jdbcType=TINYINT},
+      <if test="record.price != null">
+        price = #{record.price,jdbcType=TINYINT},
       </if>
     </set>
     <if test="_parameter != null">
@@ -172,40 +162,35 @@
     </if>
   </update>
   <update id="updateByExample" parameterType="map">
-    update god
+    update offering
     set id = #{record.id,jdbcType=CHAR},
-      name = #{record.name,jdbcType=NVARCHAR},
-      image_code = #{record.imageCode,jdbcType=VARCHAR},
-      description = #{record.description,jdbcType=NVARCHAR},
-      order = #{record.order,jdbcType=TINYINT}
+      image_url = #{record.imageUrl,jdbcType=VARCHAR},
+      points = #{record.points,jdbcType=TINYINT},
+      price = #{record.price,jdbcType=TINYINT}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
     </if>
   </update>
-  <update id="updateByPrimaryKeySelective" parameterType="com.qiyuan.web.entity.God">
-    update god
+  <update id="updateByPrimaryKeySelective" parameterType="com.qiyuan.web.entity.Offering">
+    update offering
     <set>
-      <if test="name != null">
-        name = #{name,jdbcType=NVARCHAR},
+      <if test="imageUrl != null">
+        image_url = #{imageUrl,jdbcType=VARCHAR},
       </if>
-      <if test="imageCode != null">
-        image_code = #{imageCode,jdbcType=VARCHAR},
+      <if test="points != null">
+        points = #{points,jdbcType=TINYINT},
       </if>
-      <if test="description != null">
-        description = #{description,jdbcType=NVARCHAR},
-      </if>
-      <if test="order != null">
-        order = #{order,jdbcType=TINYINT},
+      <if test="price != null">
+        price = #{price,jdbcType=TINYINT},
       </if>
     </set>
     where id = #{id,jdbcType=CHAR}
   </update>
-  <update id="updateByPrimaryKey" parameterType="com.qiyuan.web.entity.God">
-    update god
-    set name = #{name,jdbcType=NVARCHAR},
-      image_code = #{imageCode,jdbcType=VARCHAR},
-      description = #{description,jdbcType=NVARCHAR},
-      order = #{order,jdbcType=TINYINT}
+  <update id="updateByPrimaryKey" parameterType="com.qiyuan.web.entity.Offering">
+    update offering
+    set image_url = #{imageUrl,jdbcType=VARCHAR},
+      points = #{points,jdbcType=TINYINT},
+      price = #{price,jdbcType=TINYINT}
     where id = #{id,jdbcType=CHAR}
   </update>
 </mapper>

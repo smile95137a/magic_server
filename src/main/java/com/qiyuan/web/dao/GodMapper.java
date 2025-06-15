@@ -1,7 +1,7 @@
 package com.qiyuan.web.dao;
 
 import com.qiyuan.web.entity.God;
-import com.qiyuan.web.entity.GodExample;
+import com.qiyuan.web.entity.example.GodExample;
 import java.util.List;
 import org.apache.ibatis.annotations.Param;
 

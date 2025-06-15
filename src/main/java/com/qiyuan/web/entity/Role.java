@@ -1,15 +1,11 @@
 package com.qiyuan.web.entity;
 
-public class God {
+public class Role {
     private String id;
 
     private String name;
 
-    private String imageCode;
-
     private String description;
-
-    private Byte order;
 
     public String getId() {
         return id;
@@ -27,27 +23,11 @@ public class God {
         this.name = name;
     }
 
-    public String getImageCode() {
-        return imageCode;
-    }
-
-    public void setImageCode(String imageCode) {
-        this.imageCode = imageCode;
-    }
-
     public String getDescription() {
         return description;
     }
 
     public void setDescription(String description) {
         this.description = description;
-    }
-
-    public Byte getOrder() {
-        return order;
-    }
-
-    public void setOrder(Byte order) {
-        this.order = order;
     }
 }

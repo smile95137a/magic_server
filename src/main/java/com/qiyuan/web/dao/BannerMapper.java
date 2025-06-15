@@ -1,7 +1,7 @@
 package com.qiyuan.web.dao;
 
 import com.qiyuan.web.entity.Banner;
-import com.qiyuan.web.entity.BannerExample;
+import com.qiyuan.web.entity.example.BannerExample;
 import java.util.List;
 import org.apache.ibatis.annotations.Param;
 

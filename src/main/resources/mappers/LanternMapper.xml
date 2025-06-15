@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.qiyuan.web.dao.GodMapper">
-  <resultMap id="BaseResultMap" type="com.qiyuan.web.entity.God">
+<mapper namespace="com.qiyuan.web.dao.LanternMapper">
+  <resultMap id="BaseResultMap" type="com.qiyuan.web.entity.Lantern">
     <id column="id" jdbcType="CHAR" property="id" />
     <result column="name" jdbcType="NVARCHAR" property="name" />
-    <result column="image_code" jdbcType="VARCHAR" property="imageCode" />
-    <result column="description" jdbcType="NVARCHAR" property="description" />
-    <result column="order" jdbcType="TINYINT" property="order" />
+    <result column="subtitle" jdbcType="NVARCHAR" property="subtitle" />
+    <result column="icon_name" jdbcType="VARCHAR" property="iconName" />
+    <result column="label_right" jdbcType="NVARCHAR" property="labelRight" />
+    <result column="qa_json" jdbcType="NVARCHAR" property="qaJson" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -67,15 +68,15 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    id, name, image_code, description, order
+    id, name, subtitle, icon_name, label_right, qa_json
   </sql>
-  <select id="selectByExample" parameterType="com.qiyuan.web.entity.example.GodExample" resultMap="BaseResultMap">
+  <select id="selectByExample" parameterType="com.qiyuan.web.entity.example.LanternExample" resultMap="BaseResultMap">
     select
     <if test="distinct">
       distinct
     </if>
     <include refid="Base_Column_List" />
-    from god
+    from lantern
     <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
     </if>
@@ -86,27 +87,29 @@
   <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
     select 
     <include refid="Base_Column_List" />
-    from god
+    from lantern
     where id = #{id,jdbcType=CHAR}
   </select>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
-    delete from god
+    delete from lantern
     where id = #{id,jdbcType=CHAR}
   </delete>
-  <delete id="deleteByExample" parameterType="com.qiyuan.web.entity.example.GodExample">
-    delete from god
+  <delete id="deleteByExample" parameterType="com.qiyuan.web.entity.example.LanternExample">
+    delete from lantern
     <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
     </if>
   </delete>
-  <insert id="insert" parameterType="com.qiyuan.web.entity.God">
-    insert into god (id, name, image_code, 
-      description, order)
-    values (#{id,jdbcType=CHAR}, #{name,jdbcType=NVARCHAR}, #{imageCode,jdbcType=VARCHAR}, 
-      #{description,jdbcType=NVARCHAR}, #{order,jdbcType=TINYINT})
+  <insert id="insert" parameterType="com.qiyuan.web.entity.Lantern">
+    insert into lantern (id, name, subtitle, 
+      icon_name, label_right, qa_json
+      )
+    values (#{id,jdbcType=CHAR}, #{name,jdbcType=NVARCHAR}, #{subtitle,jdbcType=NVARCHAR}, 
+      #{iconName,jdbcType=VARCHAR}, #{labelRight,jdbcType=NVARCHAR}, #{qaJson,jdbcType=NVARCHAR}
+      )
   </insert>
-  <insert id="insertSelective" parameterType="com.qiyuan.web.entity.God">
-    insert into god
+  <insert id="insertSelective" parameterType="com.qiyuan.web.entity.Lantern">
+    insert into lantern
     <trim prefix="(" suffix=")" suffixOverrides=",">
       <if test="id != null">
         id,
@@ -114,14 +117,17 @@
       <if test="name != null">
         name,
       </if>
-      <if test="imageCode != null">
-        image_code,
+      <if test="subtitle != null">
+        subtitle,
       </if>
-      <if test="description != null">
-        description,
+      <if test="iconName != null">
+        icon_name,
       </if>
-      <if test="order != null">
-        order,
+      <if test="labelRight != null">
+        label_right,
+      </if>
+      <if test="qaJson != null">
+        qa_json,
       </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
@@ -131,25 +137,28 @@
       <if test="name != null">
         #{name,jdbcType=NVARCHAR},
       </if>
-      <if test="imageCode != null">
-        #{imageCode,jdbcType=VARCHAR},
+      <if test="subtitle != null">
+        #{subtitle,jdbcType=NVARCHAR},
       </if>
-      <if test="description != null">
-        #{description,jdbcType=NVARCHAR},
+      <if test="iconName != null">
+        #{iconName,jdbcType=VARCHAR},
       </if>
-      <if test="order != null">
-        #{order,jdbcType=TINYINT},
+      <if test="labelRight != null">
+        #{labelRight,jdbcType=NVARCHAR},
+      </if>
+      <if test="qaJson != null">
+        #{qaJson,jdbcType=NVARCHAR},
       </if>
     </trim>
   </insert>
-  <select id="countByExample" parameterType="com.qiyuan.web.entity.example.GodExample" resultType="java.lang.Long">
-    select count(*) from god
+  <select id="countByExample" parameterType="com.qiyuan.web.entity.example.LanternExample" resultType="java.lang.Long">
+    select count(*) from lantern
     <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
     </if>
   </select>
   <update id="updateByExampleSelective" parameterType="map">
-    update god
+    update lantern
     <set>
       <if test="record.id != null">
         id = #{record.id,jdbcType=CHAR},
@@ -157,14 +166,17 @@
       <if test="record.name != null">
         name = #{record.name,jdbcType=NVARCHAR},
       </if>
-      <if test="record.imageCode != null">
-        image_code = #{record.imageCode,jdbcType=VARCHAR},
+      <if test="record.subtitle != null">
+        subtitle = #{record.subtitle,jdbcType=NVARCHAR},
       </if>
-      <if test="record.description != null">
-        description = #{record.description,jdbcType=NVARCHAR},
+      <if test="record.iconName != null">
+        icon_name = #{record.iconName,jdbcType=VARCHAR},
       </if>
-      <if test="record.order != null">
-        order = #{record.order,jdbcType=TINYINT},
+      <if test="record.labelRight != null">
+        label_right = #{record.labelRight,jdbcType=NVARCHAR},
+      </if>
+      <if test="record.qaJson != null">
+        qa_json = #{record.qaJson,jdbcType=NVARCHAR},
       </if>
     </set>
     <if test="_parameter != null">
@@ -172,40 +184,45 @@
     </if>
   </update>
   <update id="updateByExample" parameterType="map">
-    update god
+    update lantern
     set id = #{record.id,jdbcType=CHAR},
       name = #{record.name,jdbcType=NVARCHAR},
-      image_code = #{record.imageCode,jdbcType=VARCHAR},
-      description = #{record.description,jdbcType=NVARCHAR},
-      order = #{record.order,jdbcType=TINYINT}
+      subtitle = #{record.subtitle,jdbcType=NVARCHAR},
+      icon_name = #{record.iconName,jdbcType=VARCHAR},
+      label_right = #{record.labelRight,jdbcType=NVARCHAR},
+      qa_json = #{record.qaJson,jdbcType=NVARCHAR}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
     </if>
   </update>
-  <update id="updateByPrimaryKeySelective" parameterType="com.qiyuan.web.entity.God">
-    update god
+  <update id="updateByPrimaryKeySelective" parameterType="com.qiyuan.web.entity.Lantern">
+    update lantern
     <set>
       <if test="name != null">
         name = #{name,jdbcType=NVARCHAR},
       </if>
-      <if test="imageCode != null">
-        image_code = #{imageCode,jdbcType=VARCHAR},
+      <if test="subtitle != null">
+        subtitle = #{subtitle,jdbcType=NVARCHAR},
       </if>
-      <if test="description != null">
-        description = #{description,jdbcType=NVARCHAR},
+      <if test="iconName != null">
+        icon_name = #{iconName,jdbcType=VARCHAR},
       </if>
-      <if test="order != null">
-        order = #{order,jdbcType=TINYINT},
+      <if test="labelRight != null">
+        label_right = #{labelRight,jdbcType=NVARCHAR},
+      </if>
+      <if test="qaJson != null">
+        qa_json = #{qaJson,jdbcType=NVARCHAR},
       </if>
     </set>
     where id = #{id,jdbcType=CHAR}
   </update>
-  <update id="updateByPrimaryKey" parameterType="com.qiyuan.web.entity.God">
-    update god
+  <update id="updateByPrimaryKey" parameterType="com.qiyuan.web.entity.Lantern">
+    update lantern
     set name = #{name,jdbcType=NVARCHAR},
-      image_code = #{imageCode,jdbcType=VARCHAR},
-      description = #{description,jdbcType=NVARCHAR},
-      order = #{order,jdbcType=TINYINT}
+      subtitle = #{subtitle,jdbcType=NVARCHAR},
+      icon_name = #{iconName,jdbcType=VARCHAR},
+      label_right = #{labelRight,jdbcType=NVARCHAR},
+      qa_json = #{qaJson,jdbcType=NVARCHAR}
     where id = #{id,jdbcType=CHAR}
   </update>
 </mapper>
