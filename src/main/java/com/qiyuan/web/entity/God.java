@@ -9,7 +9,7 @@ public class God {
 
     private String description;
 
-    private Byte order;
+    private Byte sort;
 
     public String getId() {
         return id;
@@ -43,11 +43,11 @@ public class God {
         this.description = description;
     }
 
-    public Byte getOrder() {
-        return order;
+    public Byte getSort() {
+        return sort;
     }
 
-    public void setOrder(Byte order) {
-        this.order = order;
+    public void setSort(Byte sort) {
+        this.sort = sort;
     }
 }

@@ -5,7 +5,7 @@
     <id column="id" jdbcType="INTEGER" property="id" />
     <result column="image_url" jdbcType="VARCHAR" property="imageUrl" />
     <result column="type" jdbcType="CHAR" property="type" />
-    <result column="order" jdbcType="SMALLINT" property="order" />
+    <result column="sort" jdbcType="SMALLINT" property="sort" />
     <result column="available_from" jdbcType="TIMESTAMP" property="availableFrom" />
     <result column="available_until" jdbcType="TIMESTAMP" property="availableUntil" />
   </resultMap>
@@ -68,7 +68,7 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    id, image_url, type, order, available_from, available_until
+    id, image_url, type, sort, available_from, available_until
   </sql>
   <select id="selectByExample" parameterType="com.qiyuan.web.entity.example.BannerExample" resultMap="BaseResultMap">
     select
@@ -102,10 +102,10 @@
   </delete>
   <insert id="insert" parameterType="com.qiyuan.web.entity.Banner">
     insert into banner (id, image_url, type, 
-      order, available_from, available_until
+      sort, available_from, available_until
       )
     values (#{id,jdbcType=INTEGER}, #{imageUrl,jdbcType=VARCHAR}, #{type,jdbcType=CHAR}, 
-      #{order,jdbcType=SMALLINT}, #{availableFrom,jdbcType=TIMESTAMP}, #{availableUntil,jdbcType=TIMESTAMP}
+      #{sort,jdbcType=SMALLINT}, #{availableFrom,jdbcType=TIMESTAMP}, #{availableUntil,jdbcType=TIMESTAMP}
       )
   </insert>
   <insert id="insertSelective" parameterType="com.qiyuan.web.entity.Banner">
@@ -120,8 +120,8 @@
       <if test="type != null">
         type,
       </if>
-      <if test="order != null">
-        order,
+      <if test="sort != null">
+        sort,
       </if>
       <if test="availableFrom != null">
         available_from,
@@ -140,8 +140,8 @@
       <if test="type != null">
         #{type,jdbcType=CHAR},
       </if>
-      <if test="order != null">
-        #{order,jdbcType=SMALLINT},
+      <if test="sort != null">
+        #{sort,jdbcType=SMALLINT},
       </if>
       <if test="availableFrom != null">
         #{availableFrom,jdbcType=TIMESTAMP},
@@ -169,8 +169,8 @@
       <if test="record.type != null">
         type = #{record.type,jdbcType=CHAR},
       </if>
-      <if test="record.order != null">
-        order = #{record.order,jdbcType=SMALLINT},
+      <if test="record.sort != null">
+        sort = #{record.sort,jdbcType=SMALLINT},
       </if>
       <if test="record.availableFrom != null">
         available_from = #{record.availableFrom,jdbcType=TIMESTAMP},
@@ -188,7 +188,7 @@
     set id = #{record.id,jdbcType=INTEGER},
       image_url = #{record.imageUrl,jdbcType=VARCHAR},
       type = #{record.type,jdbcType=CHAR},
-      order = #{record.order,jdbcType=SMALLINT},
+      sort = #{record.sort,jdbcType=SMALLINT},
       available_from = #{record.availableFrom,jdbcType=TIMESTAMP},
       available_until = #{record.availableUntil,jdbcType=TIMESTAMP}
     <if test="_parameter != null">
@@ -204,8 +204,8 @@
       <if test="type != null">
         type = #{type,jdbcType=CHAR},
       </if>
-      <if test="order != null">
-        order = #{order,jdbcType=SMALLINT},
+      <if test="sort != null">
+        sort = #{sort,jdbcType=SMALLINT},
       </if>
       <if test="availableFrom != null">
         available_from = #{availableFrom,jdbcType=TIMESTAMP},
@@ -220,7 +220,7 @@
     update banner
     set image_url = #{imageUrl,jdbcType=VARCHAR},
       type = #{type,jdbcType=CHAR},
-      order = #{order,jdbcType=SMALLINT},
+      sort = #{sort,jdbcType=SMALLINT},
       available_from = #{availableFrom,jdbcType=TIMESTAMP},
       available_until = #{availableUntil,jdbcType=TIMESTAMP}
     where id = #{id,jdbcType=INTEGER}

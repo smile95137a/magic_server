@@ -19,7 +19,7 @@ public class Poem {
 
     private String explanation;
 
-    private Byte order;
+    private Byte sort;
 
     public String getSequence() {
         return sequence;
@@ -93,11 +93,11 @@ public class Poem {
         this.explanation = explanation;
     }
 
-    public Byte getOrder() {
-        return order;
+    public Byte getSort() {
+        return sort;
     }
 
-    public void setOrder(Byte order) {
-        this.order = order;
+    public void setSort(Byte sort) {
+        this.sort = sort;
     }
 }

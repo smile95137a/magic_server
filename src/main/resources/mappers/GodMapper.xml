@@ -6,7 +6,7 @@
     <result column="name" jdbcType="NVARCHAR" property="name" />
     <result column="image_code" jdbcType="VARCHAR" property="imageCode" />
     <result column="description" jdbcType="NVARCHAR" property="description" />
-    <result column="order" jdbcType="TINYINT" property="order" />
+    <result column="sort" jdbcType="TINYINT" property="sort" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -67,7 +67,7 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    id, name, image_code, description, order
+    id, name, image_code, description, sort
   </sql>
   <select id="selectByExample" parameterType="com.qiyuan.web.entity.example.GodExample" resultMap="BaseResultMap">
     select
@@ -101,9 +101,9 @@
   </delete>
   <insert id="insert" parameterType="com.qiyuan.web.entity.God">
     insert into god (id, name, image_code, 
-      description, order)
+      description, sort)
     values (#{id,jdbcType=CHAR}, #{name,jdbcType=NVARCHAR}, #{imageCode,jdbcType=VARCHAR}, 
-      #{description,jdbcType=NVARCHAR}, #{order,jdbcType=TINYINT})
+      #{description,jdbcType=NVARCHAR}, #{sort,jdbcType=TINYINT})
   </insert>
   <insert id="insertSelective" parameterType="com.qiyuan.web.entity.God">
     insert into god
@@ -120,8 +120,8 @@
       <if test="description != null">
         description,
       </if>
-      <if test="order != null">
-        order,
+      <if test="sort != null">
+        sort,
       </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
@@ -137,8 +137,8 @@
       <if test="description != null">
         #{description,jdbcType=NVARCHAR},
       </if>
-      <if test="order != null">
-        #{order,jdbcType=TINYINT},
+      <if test="sort != null">
+        #{sort,jdbcType=TINYINT},
       </if>
     </trim>
   </insert>
@@ -163,8 +163,8 @@
       <if test="record.description != null">
         description = #{record.description,jdbcType=NVARCHAR},
       </if>
-      <if test="record.order != null">
-        order = #{record.order,jdbcType=TINYINT},
+      <if test="record.sort != null">
+        sort = #{record.sort,jdbcType=TINYINT},
       </if>
     </set>
     <if test="_parameter != null">
@@ -177,7 +177,7 @@
       name = #{record.name,jdbcType=NVARCHAR},
       image_code = #{record.imageCode,jdbcType=VARCHAR},
       description = #{record.description,jdbcType=NVARCHAR},
-      order = #{record.order,jdbcType=TINYINT}
+      sort = #{record.sort,jdbcType=TINYINT}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
     </if>
@@ -194,8 +194,8 @@
       <if test="description != null">
         description = #{description,jdbcType=NVARCHAR},
       </if>
-      <if test="order != null">
-        order = #{order,jdbcType=TINYINT},
+      <if test="sort != null">
+        sort = #{sort,jdbcType=TINYINT},
       </if>
     </set>
     where id = #{id,jdbcType=CHAR}
@@ -205,7 +205,7 @@
     set name = #{name,jdbcType=NVARCHAR},
       image_code = #{imageCode,jdbcType=VARCHAR},
       description = #{description,jdbcType=NVARCHAR},
-      order = #{order,jdbcType=TINYINT}
+      sort = #{sort,jdbcType=TINYINT}
     where id = #{id,jdbcType=CHAR}
   </update>
 </mapper>

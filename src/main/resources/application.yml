@@ -11,6 +11,9 @@ spring:
     driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
     hikari:
       maximum-pool-size: 10  # 可選：調整最大連線池大小
+  web:
+    resources:
+      add-mappings: false
 
 springdoc:
   api-docs:
@@ -24,6 +27,7 @@ security:
     - /auth/refresh
     - /swagger-ui/**
     - /v3/api-docs/**
+    - /banner/**
 
 mybatis:
   mapper-locations: classpath:/mappers/*.xml

@@ -11,7 +11,7 @@
     <result column="dongponote" jdbcType="NVARCHAR" property="dongponote" />
     <result column="bixiannote" jdbcType="NVARCHAR" property="bixiannote" />
     <result column="explanation" jdbcType="NVARCHAR" property="explanation" />
-    <result column="order" jdbcType="TINYINT" property="order" />
+    <result column="sort" jdbcType="TINYINT" property="sort" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -73,7 +73,7 @@
   </sql>
   <sql id="Base_Column_List">
     sequence, title, zodiac, fortune, poem, meaning, dongponote, bixiannote, explanation, 
-    order
+    sort
   </sql>
   <select id="selectByExample" parameterType="com.qiyuan.web.entity.example.PoemExample" resultMap="BaseResultMap">
     select
@@ -109,11 +109,11 @@
     insert into poem (sequence, title, zodiac, 
       fortune, poem, meaning, 
       dongponote, bixiannote, explanation, 
-      order)
+      sort)
     values (#{sequence,jdbcType=NVARCHAR}, #{title,jdbcType=NVARCHAR}, #{zodiac,jdbcType=NVARCHAR}, 
       #{fortune,jdbcType=NVARCHAR}, #{poem,jdbcType=NVARCHAR}, #{meaning,jdbcType=NVARCHAR}, 
       #{dongponote,jdbcType=NVARCHAR}, #{bixiannote,jdbcType=NVARCHAR}, #{explanation,jdbcType=NVARCHAR}, 
-      #{order,jdbcType=TINYINT})
+      #{sort,jdbcType=TINYINT})
   </insert>
   <insert id="insertSelective" parameterType="com.qiyuan.web.entity.Poem">
     insert into poem
@@ -145,8 +145,8 @@
       <if test="explanation != null">
         explanation,
       </if>
-      <if test="order != null">
-        order,
+      <if test="sort != null">
+        sort,
       </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
@@ -177,8 +177,8 @@
       <if test="explanation != null">
         #{explanation,jdbcType=NVARCHAR},
       </if>
-      <if test="order != null">
-        #{order,jdbcType=TINYINT},
+      <if test="sort != null">
+        #{sort,jdbcType=TINYINT},
       </if>
     </trim>
   </insert>
@@ -218,8 +218,8 @@
       <if test="record.explanation != null">
         explanation = #{record.explanation,jdbcType=NVARCHAR},
       </if>
-      <if test="record.order != null">
-        order = #{record.order,jdbcType=TINYINT},
+      <if test="record.sort != null">
+        sort = #{record.sort,jdbcType=TINYINT},
       </if>
     </set>
     <if test="_parameter != null">
@@ -237,7 +237,7 @@
       dongponote = #{record.dongponote,jdbcType=NVARCHAR},
       bixiannote = #{record.bixiannote,jdbcType=NVARCHAR},
       explanation = #{record.explanation,jdbcType=NVARCHAR},
-      order = #{record.order,jdbcType=TINYINT}
+      sort = #{record.sort,jdbcType=TINYINT}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
     </if>
@@ -269,8 +269,8 @@
       <if test="explanation != null">
         explanation = #{explanation,jdbcType=NVARCHAR},
       </if>
-      <if test="order != null">
-        order = #{order,jdbcType=TINYINT},
+      <if test="sort != null">
+        sort = #{sort,jdbcType=TINYINT},
       </if>
     </set>
     where sequence = #{sequence,jdbcType=NVARCHAR}
@@ -285,7 +285,7 @@
       dongponote = #{dongponote,jdbcType=NVARCHAR},
       bixiannote = #{bixiannote,jdbcType=NVARCHAR},
       explanation = #{explanation,jdbcType=NVARCHAR},
-      order = #{order,jdbcType=TINYINT}
+      sort = #{sort,jdbcType=TINYINT}
     where sequence = #{sequence,jdbcType=NVARCHAR}
   </update>
 </mapper>

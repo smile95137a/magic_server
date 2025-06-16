@@ -384,63 +384,63 @@ public class GodExample {
             return (Criteria) this;
         }
 
-        public Criteria andOrderIsNull() {
-            addCriterion("order is null");
+        public Criteria andSortIsNull() {
+            addCriterion("sort is null");
             return (Criteria) this;
         }
 
-        public Criteria andOrderIsNotNull() {
-            addCriterion("order is not null");
+        public Criteria andSortIsNotNull() {
+            addCriterion("sort is not null");
             return (Criteria) this;
         }
 
-        public Criteria andOrderEqualTo(Byte value) {
-            addCriterion("order =", value, "order");
+        public Criteria andSortEqualTo(Byte value) {
+            addCriterion("sort =", value, "sort");
             return (Criteria) this;
         }
 
-        public Criteria andOrderNotEqualTo(Byte value) {
-            addCriterion("order <>", value, "order");
+        public Criteria andSortNotEqualTo(Byte value) {
+            addCriterion("sort <>", value, "sort");
             return (Criteria) this;
         }
 
-        public Criteria andOrderGreaterThan(Byte value) {
-            addCriterion("order >", value, "order");
+        public Criteria andSortGreaterThan(Byte value) {
+            addCriterion("sort >", value, "sort");
             return (Criteria) this;
         }
 
-        public Criteria andOrderGreaterThanOrEqualTo(Byte value) {
-            addCriterion("order >=", value, "order");
+        public Criteria andSortGreaterThanOrEqualTo(Byte value) {
+            addCriterion("sort >=", value, "sort");
             return (Criteria) this;
         }
 
-        public Criteria andOrderLessThan(Byte value) {
-            addCriterion("order <", value, "order");
+        public Criteria andSortLessThan(Byte value) {
+            addCriterion("sort <", value, "sort");
             return (Criteria) this;
         }
 
-        public Criteria andOrderLessThanOrEqualTo(Byte value) {
-            addCriterion("order <=", value, "order");
+        public Criteria andSortLessThanOrEqualTo(Byte value) {
+            addCriterion("sort <=", value, "sort");
             return (Criteria) this;
         }
 
-        public Criteria andOrderIn(List<Byte> values) {
-            addCriterion("order in", values, "order");
+        public Criteria andSortIn(List<Byte> values) {
+            addCriterion("sort in", values, "sort");
             return (Criteria) this;
         }
 
-        public Criteria andOrderNotIn(List<Byte> values) {
-            addCriterion("order not in", values, "order");
+        public Criteria andSortNotIn(List<Byte> values) {
+            addCriterion("sort not in", values, "sort");
             return (Criteria) this;
         }
 
-        public Criteria andOrderBetween(Byte value1, Byte value2) {
-            addCriterion("order between", value1, value2, "order");
+        public Criteria andSortBetween(Byte value1, Byte value2) {
+            addCriterion("sort between", value1, value2, "sort");
             return (Criteria) this;
         }
 
-        public Criteria andOrderNotBetween(Byte value1, Byte value2) {
-            addCriterion("order not between", value1, value2, "order");
+        public Criteria andSortNotBetween(Byte value1, Byte value2) {
+            addCriterion("sort not between", value1, value2, "sort");
             return (Criteria) this;
         }
     }
