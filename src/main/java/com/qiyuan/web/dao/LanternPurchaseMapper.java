@@ -1,5 +1,6 @@
 package com.qiyuan.web.dao;
 
+import com.qiyuan.web.dto.LanternBlessingDTO;
 import com.qiyuan.web.entity.LanternPurchase;
 import com.qiyuan.web.entity.example.LanternPurchaseExample;
 import java.util.List;
@@ -17,6 +18,9 @@ public interface LanternPurchaseMapper {
     int insertSelective(LanternPurchase record);
 
     List<LanternPurchase> selectByExample(LanternPurchaseExample example);
+    List<LanternBlessingDTO> selectLimitByExample(@Param("example") LanternPurchaseExample example, @Param("limit") int limit);
+
+    List<LanternBlessingDTO> selectDistinctLimitByExample(@Param("example") LanternPurchaseExample example, @Param("limit") int limit);
 
     LanternPurchase selectByPrimaryKey(Integer id);
 

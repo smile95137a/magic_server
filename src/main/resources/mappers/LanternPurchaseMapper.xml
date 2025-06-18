@@ -12,6 +12,17 @@
     <result column="expired_time" jdbcType="TIMESTAMP" property="expiredTime" />
     <result column="blessing_times" jdbcType="SMALLINT" property="blessingTimes" />
   </resultMap>
+  <resultMap id="LanternBlessingResultMap" type="com.qiyuan.web.dto.LanternBlessingDTO">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="lantern_code" jdbcType="VARCHAR" property="lanternCode" />
+    <result column="user_id" jdbcType="CHAR" property="userId" />
+    <result column="name" jdbcType="NVARCHAR" property="name" />
+    <result column="birthday" jdbcType="TIMESTAMP" property="birthday" />
+    <result column="message" jdbcType="NVARCHAR" property="message" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="expired_time" jdbcType="TIMESTAMP" property="expiredTime" />
+    <result column="blessing_times" jdbcType="SMALLINT" property="blessingTimes" />
+  </resultMap>
   <sql id="Example_Where_Clause">
     <where>
       <foreach collection="oredCriteria" item="criteria" separator="or">
@@ -73,6 +84,11 @@
   <sql id="Base_Column_List">
     id, lantern_id, user_id, name, birthday, message, create_time, expired_time, blessing_times
   </sql>
+
+  <sql id="Bind_With_Lantern_Table">
+    p.id as id, l.icon_name as lantern_code, user_id, p.name as name, birthday, message, p.create_time as create_time, expired_time, blessing_times
+  </sql>
+
   <select id="selectByExample" parameterType="com.qiyuan.web.entity.example.LanternPurchaseExample" resultMap="BaseResultMap">
     select
     <if test="distinct">
@@ -87,6 +103,35 @@
       order by ${orderByClause}
     </if>
   </select>
+  <select id="selectLimitByExample" parameterType="com.qiyuan.web.entity.example.LanternPurchaseExample" resultMap="LanternBlessingResultMap">
+    select TOP ${limit}
+    <if test="example.distinct">
+      distinct
+    </if>
+    <include refid="Bind_With_Lantern_Table" />
+    from lantern_purchase p
+    LEFT JOIN lantern l ON p.lantern_id = l.id
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+    <if test="example.orderByClause != null">
+      order by ${example.orderByClause}
+    </if>
+  </select>
+  <select id="selectDistinctLimitByExample" parameterType="com.qiyuan.web.entity.example.LanternPurchaseExample" resultMap="LanternBlessingResultMap">
+    SELECT DISTINCT TOP (${limit}) p.lantern_id,
+
+    <include refid="Bind_With_Lantern_Table" />
+    from lantern_purchase p
+    LEFT JOIN lantern l ON p.lantern_id = l.id
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+    <if test="example.orderByClause != null">
+      order by ${example.orderByClause}
+    </if>
+  </select>
+
   <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
     select 
     <include refid="Base_Column_List" />
