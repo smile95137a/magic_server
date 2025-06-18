@@ -1,12 +1,19 @@
 package com.qiyuan.web;
 
+import com.chl.enums.ExcelColumn;
 import com.chl.enums.TableSelectionMode;
 import com.chl.generator.DatabaseSchemaGenerator;
 import com.chl.results.GenerateResult;
+import com.chl.util.Excel2ObjectParser;
+import com.qiyuan.web.entity.Poem;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.IntStream;
 
 @SpringBootApplication
 @ComponentScan(basePackages = {
@@ -22,7 +29,9 @@ public class QiyuanApplication {
     public static void main(String[] args) {
         SpringApplication.run(QiyuanApplication.class, args);
 //        generateCode05();
+//        generatePoems();
     }
+
 
     private static void generateCode() {
 

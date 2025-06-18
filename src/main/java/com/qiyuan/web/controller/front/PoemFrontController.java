@@ -21,4 +21,11 @@ public class PoemFrontController {
     public List<Poem> getPoemList() {
         return poemService.getPoemList();
     }
+
+
+    @PostMapping(value = "/init", produces = MediaType.APPLICATION_JSON_VALUE)
+    public void init() {
+        poemService.init();
+    }
+
 }
