@@ -2,6 +2,7 @@ package com.qiyuan.web.service;
 
 import com.qiyuan.web.dao.MasterMapper;
 import com.qiyuan.web.entity.Master;
+import com.qiyuan.web.entity.MasterServiceRequest;
 import com.qiyuan.web.entity.example.MasterExample;
 import com.qiyuan.web.util.FileUtil;
 import com.qiyuan.web.util.JsonUtil;

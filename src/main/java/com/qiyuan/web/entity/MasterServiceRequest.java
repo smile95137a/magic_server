@@ -1,5 +1,8 @@
 package com.qiyuan.web.entity;
 
+import lombok.Builder;
+
+@Builder
 public class MasterServiceRequest {
     private String masterCode;
 
@@ -14,6 +17,8 @@ public class MasterServiceRequest {
     private String lineId;
 
     private String note;
+
+    private String service;
 
     public String getMasterCode() {
         return masterCode;
@@ -69,5 +74,13 @@ public class MasterServiceRequest {
 
     public void setNote(String note) {
         this.note = note;
+    }
+
+    public String getService() {
+        return service;
+    }
+
+    public void setService(String service) {
+        this.service = service;
     }
 }

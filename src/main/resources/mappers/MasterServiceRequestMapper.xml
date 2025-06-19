@@ -9,6 +9,7 @@
     <result column="email" jdbcType="VARCHAR" property="email" />
     <result column="line_id" jdbcType="VARCHAR" property="lineId" />
     <result column="note" jdbcType="NVARCHAR" property="note" />
+    <result column="service" jdbcType="NVARCHAR" property="service" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -69,7 +70,7 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    master_code, serial, name, phone, email, line_id, note
+    master_code, serial, name, phone, email, line_id, note, service
   </sql>
   <select id="selectByExample" parameterType="com.qiyuan.web.entity.example.MasterServiceRequestExample" resultMap="BaseResultMap">
     select
@@ -106,10 +107,10 @@
   <insert id="insert" parameterType="com.qiyuan.web.entity.MasterServiceRequest">
     insert into master_service_request (master_code, serial, name, 
       phone, email, line_id, 
-      note)
+      note, service)
     values (#{masterCode,jdbcType=VARCHAR}, #{serial,jdbcType=CHAR}, #{name,jdbcType=NVARCHAR}, 
       #{phone,jdbcType=VARCHAR}, #{email,jdbcType=VARCHAR}, #{lineId,jdbcType=VARCHAR}, 
-      #{note,jdbcType=NVARCHAR})
+      #{note,jdbcType=NVARCHAR}, #{service,jdbcType=NVARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.qiyuan.web.entity.MasterServiceRequest">
     insert into master_service_request
@@ -135,6 +136,9 @@
       <if test="note != null">
         note,
       </if>
+      <if test="service != null">
+        service,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="masterCode != null">
@@ -157,6 +161,9 @@
       </if>
       <if test="note != null">
         #{note,jdbcType=NVARCHAR},
+      </if>
+      <if test="service != null">
+        #{service,jdbcType=NVARCHAR},
       </if>
     </trim>
   </insert>
@@ -190,6 +197,9 @@
       <if test="record.note != null">
         note = #{record.note,jdbcType=NVARCHAR},
       </if>
+      <if test="record.service != null">
+        service = #{record.service,jdbcType=NVARCHAR},
+      </if>
     </set>
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
@@ -203,7 +213,8 @@
       phone = #{record.phone,jdbcType=VARCHAR},
       email = #{record.email,jdbcType=VARCHAR},
       line_id = #{record.lineId,jdbcType=VARCHAR},
-      note = #{record.note,jdbcType=NVARCHAR}
+      note = #{record.note,jdbcType=NVARCHAR},
+      service = #{record.service,jdbcType=NVARCHAR}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
     </if>
@@ -226,6 +237,9 @@
       <if test="note != null">
         note = #{note,jdbcType=NVARCHAR},
       </if>
+      <if test="service != null">
+        service = #{service,jdbcType=NVARCHAR},
+      </if>
     </set>
     where master_code = #{masterCode,jdbcType=VARCHAR}
       and serial = #{serial,jdbcType=CHAR}
@@ -236,7 +250,8 @@
       phone = #{phone,jdbcType=VARCHAR},
       email = #{email,jdbcType=VARCHAR},
       line_id = #{lineId,jdbcType=VARCHAR},
-      note = #{note,jdbcType=NVARCHAR}
+      note = #{note,jdbcType=NVARCHAR},
+      service = #{service,jdbcType=NVARCHAR}
     where master_code = #{masterCode,jdbcType=VARCHAR}
       and serial = #{serial,jdbcType=CHAR}
   </update>
