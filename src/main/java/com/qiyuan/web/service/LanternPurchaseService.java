@@ -1,18 +1,23 @@
 package com.qiyuan.web.service;
 
+import com.qiyuan.web.dao.LanternMapper;
 import com.qiyuan.web.dao.LanternPurchaseMapper;
-import com.qiyuan.web.dao.SystemConfigMapper;
 import com.qiyuan.web.dto.LanternBlessingDTO;
+import com.qiyuan.web.entity.Lantern;
 import com.qiyuan.web.entity.LanternPurchase;
-import com.qiyuan.web.entity.SystemConfig;
-import com.qiyuan.web.entity.SystemConfigExample;
 import com.qiyuan.web.entity.example.LanternPurchaseExample;
+import com.qiyuan.web.request.LanternPurchaseRequest;
+import com.qiyuan.web.util.DateConverterUtil;
+import com.qiyuan.web.util.DateUtil;
 import com.qiyuan.web.vo.LanternBlessingVO;
+import com.qiyuan.web.vo.LanternVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -22,7 +27,22 @@ public class LanternPurchaseService {
     private LanternPurchaseMapper lanternPurchaseMapper;
 
     @Autowired
-    private SystemConfigMapper systemConfigMapper;
+    private SystemConfigService systemConfigService;
+
+    @Autowired
+    private LanternService lanternService;
+
+    public List<LanternPurchase> getByLanternId(String lanternId) {
+        LanternPurchaseExample e = new LanternPurchaseExample();
+        e.createCriteria().andLanternIdEqualTo(lanternId);
+        return lanternPurchaseMapper.selectByExample(e);
+    }
+
+    public long countByLanternId(String lanternId) {
+        LanternPurchaseExample e = new LanternPurchaseExample();
+        e.createCriteria().andLanternIdEqualTo(lanternId);
+        return lanternPurchaseMapper.countByExample(e);
+    }
 
     public List<LanternBlessingVO> getLatestLanternBlessing(int num) {
         LanternPurchaseExample e = new LanternPurchaseExample();
@@ -42,17 +62,14 @@ public class LanternPurchaseService {
     }
 
     public List<LanternBlessingVO> getRecommendation(int num) {
-        SystemConfigExample e = new SystemConfigExample();
-        e.createCriteria().andConfigKeyEqualTo("promotion_lantern");
-        List<SystemConfig> configs = systemConfigMapper.selectByExample(e);
-        LanternPurchaseExample e2 = new LanternPurchaseExample();
-        if (!configs.isEmpty()) {
-            String lanternIds = configs.get(0).getConfigValue();
-            e2.createCriteria().andLanternIdIn(Arrays.stream(lanternIds.split(",")).collect(Collectors.toList()));
+        LanternPurchaseExample e = new LanternPurchaseExample();
+        List<String> lanternIds = systemConfigService.getLanternPromotion();
+        if (!lanternIds.isEmpty()) {
+            e.createCriteria().andLanternIdIn(lanternIds);
         }
-        e2.setOrderByClause("create_time ASC");
-        List<LanternBlessingDTO> list = lanternPurchaseMapper.selectDistinctLimitByExample(e2, num);
-        
+        e.setOrderByClause("create_time ASC");
+        List<LanternBlessingDTO> list = lanternPurchaseMapper.selectDistinctLimitByExample(e, num);
+
         if (list.isEmpty()) {
             LanternPurchaseExample e3 = new LanternPurchaseExample();
             list = lanternPurchaseMapper.selectDistinctLimitByExample(e3, num);
@@ -75,5 +92,27 @@ public class LanternPurchaseService {
                     .collect(Collectors.toList());
         }
         return Collections.EMPTY_LIST;
+    }
+
+    @Transactional
+    public boolean addLanternPurchaseRecord(LanternPurchaseRequest req) {
+        String userId = req.getUserId();
+        String lanternCode = req.getLanternCode();
+        Lantern lantern = lanternService.getLanternByCode(lanternCode);
+        Calendar now = Calendar.getInstance();
+        req.getList()
+                .stream()
+                .map(lpi ->
+                        LanternPurchase.builder()
+                                .name(lpi.getName())
+                                .message(lpi.getMessage())
+                                .birthday(DateUtil.parseStringToDate(lpi.getBirthday()))
+                                .createTime(now.getTime())
+                                .expiredTime(DateUtil.adjustDate(now, 365, Date.class))
+                                .lanternId(lantern.getId())
+                                .userId(userId)
+                                .build()
+                ).forEach(l -> lanternPurchaseMapper.insertSelective(l));
+        return true;
     }
 }
