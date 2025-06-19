@@ -5,12 +5,11 @@ import com.qiyuan.web.dao.LanternPurchaseMapper;
 import com.qiyuan.web.dto.LanternBlessingDTO;
 import com.qiyuan.web.entity.Lantern;
 import com.qiyuan.web.entity.LanternPurchase;
+import com.qiyuan.web.entity.example.LanternExample;
 import com.qiyuan.web.entity.example.LanternPurchaseExample;
 import com.qiyuan.web.request.LanternPurchaseRequest;
-import com.qiyuan.web.util.DateConverterUtil;
 import com.qiyuan.web.util.DateUtil;
 import com.qiyuan.web.vo.LanternBlessingVO;
-import com.qiyuan.web.vo.LanternVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,7 +29,7 @@ public class LanternPurchaseService {
     private SystemConfigService systemConfigService;
 
     @Autowired
-    private LanternService lanternService;
+    private LanternMapper lanternMapper;
 
     public List<LanternPurchase> getByLanternId(String lanternId) {
         LanternPurchaseExample e = new LanternPurchaseExample();
@@ -98,7 +97,11 @@ public class LanternPurchaseService {
     public boolean addLanternPurchaseRecord(LanternPurchaseRequest req) {
         String userId = req.getUserId();
         String lanternCode = req.getLanternCode();
-        Lantern lantern = lanternService.getLanternByCode(lanternCode);
+
+        LanternExample e = new LanternExample();
+        e.createCriteria().andIconNameEqualTo(lanternCode);
+        List<Lantern> lanterns = lanternMapper.selectByExample(e);
+        Lantern lantern = lanterns.get(0);
         Calendar now = Calendar.getInstance();
         req.getList()
                 .stream()

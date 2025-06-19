@@ -34,6 +34,7 @@ security:
     - /poem/**
     - /god/**
     - /lantern/**
+    - /master/**
 
 mybatis:
   mapper-locations: classpath:/mappers/*.xml
