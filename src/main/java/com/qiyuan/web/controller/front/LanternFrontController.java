@@ -1,12 +1,12 @@
 package com.qiyuan.web.controller.front;
 
 import com.qiyuan.web.entity.Lantern;
-import com.qiyuan.web.request.CountRequest;
-import com.qiyuan.web.request.LanternPurchaseRequest;
+import com.qiyuan.web.dto.request.CountRequest;
+import com.qiyuan.web.dto.request.LanternPurchaseRequest;
 import com.qiyuan.web.service.LanternPurchaseService;
 import com.qiyuan.web.service.LanternService;
-import com.qiyuan.web.vo.LanternBlessingVO;
-import com.qiyuan.web.vo.LanternVO;
+import com.qiyuan.web.dto.response.LanternBlessingVO;
+import com.qiyuan.web.dto.response.LanternVO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;

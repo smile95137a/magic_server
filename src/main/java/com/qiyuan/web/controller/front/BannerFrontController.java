@@ -1,7 +1,7 @@
 package com.qiyuan.web.controller.front;
 
 import com.qiyuan.web.service.BannerService;
-import com.qiyuan.web.vo.BannerVO;
+import com.qiyuan.web.dto.response.BannerVO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;

@@ -1,10 +1,10 @@
 package com.qiyuan.web.controller.front;
 
 import com.chl.security.response.ApiResponse;
-import com.qiyuan.web.request.MasterServiceRequest;
+import com.qiyuan.web.dto.request.MasterServiceRequest;
 import com.qiyuan.web.service.MasterRequestService;
 import com.qiyuan.web.service.MasterService;
-import com.qiyuan.web.vo.MasterVO;
+import com.qiyuan.web.dto.response.MasterVO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.validation.annotation.Validated;

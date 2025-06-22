@@ -1,4 +1,4 @@
-package com.qiyuan.web.request;
+package com.qiyuan.web.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;

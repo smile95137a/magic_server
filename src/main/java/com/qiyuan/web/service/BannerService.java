@@ -4,7 +4,7 @@ import com.qiyuan.web.dao.BannerMapper;
 import com.qiyuan.web.entity.Banner;
 import com.qiyuan.web.entity.example.BannerExample;
 import com.qiyuan.web.util.FileUtil;
-import com.qiyuan.web.vo.BannerVO;
+import com.qiyuan.web.dto.response.BannerVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

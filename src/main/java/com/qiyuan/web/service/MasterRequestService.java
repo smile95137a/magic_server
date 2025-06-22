@@ -29,7 +29,7 @@ public class MasterRequestService {
     }
 
     @Transactional
-    public String addMasterRequest(com.qiyuan.web.request.MasterServiceRequest req) {
+    public String addMasterRequest(com.qiyuan.web.dto.request.MasterServiceRequest req) {
         MasterExample e = new MasterExample();
         e.createCriteria().andStatusEqualTo(true).andCodeEqualTo(req.getMasterCode());
         List<Master> masters = masterMapper.selectByExample(e);

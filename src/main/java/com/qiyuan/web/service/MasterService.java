@@ -2,12 +2,11 @@ package com.qiyuan.web.service;
 
 import com.qiyuan.web.dao.MasterMapper;
 import com.qiyuan.web.entity.Master;
-import com.qiyuan.web.entity.MasterServiceRequest;
 import com.qiyuan.web.entity.example.MasterExample;
 import com.qiyuan.web.util.FileUtil;
 import com.qiyuan.web.util.JsonUtil;
-import com.qiyuan.web.vo.MasterVO;
-import com.qiyuan.web.vo.QaItemVO;
+import com.qiyuan.web.dto.response.MasterVO;
+import com.qiyuan.web.dto.response.QaItemVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

@@ -79,7 +79,7 @@
       distinct
     </if>
     <include refid="Base_Column_List" />
-    from user
+    from users
     <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
     </if>
@@ -90,22 +90,22 @@
   <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
     select 
     <include refid="Base_Column_List" />
-    from user
+    from users
     where id = #{id,jdbcType=CHAR}
   </select>
 
   <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
-    delete from user
+    delete from users
     where id = #{id,jdbcType=CHAR}
   </delete>
   <delete id="deleteByExample" parameterType="com.qiyuan.web.entity.example.UserExample">
-    delete from user
+    delete from users
     <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
     </if>
   </delete>
   <insert id="insert" parameterType="com.qiyuan.web.entity.User">
-    insert into user (id, password,
+    insert into users (id, password,
       email, phone, nickname, 
       line_id, address_name, address, 
       receipt_type)
@@ -115,7 +115,7 @@
       #{receiptType,jdbcType=VARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.qiyuan.web.entity.User">
-    insert into user
+    insert into users
     <trim prefix="(" suffix=")" suffixOverrides=",">
       <if test="id != null">
         id,
@@ -176,13 +176,13 @@
     </trim>
   </insert>
   <select id="countByExample" parameterType="com.qiyuan.web.entity.example.UserExample" resultType="java.lang.Long">
-    select count(*) from user
+    select count(*) from users
     <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
     </if>
   </select>
   <update id="updateByExampleSelective" parameterType="map">
-    update user
+    update users
     <set>
       <if test="record.id != null">
         id = #{record.id,jdbcType=CHAR},
@@ -217,7 +217,7 @@
     </if>
   </update>
   <update id="updateByExample" parameterType="map">
-    update user
+    update users
     set id = #{record.id,jdbcType=CHAR},
       password = #{record.password,jdbcType=VARCHAR},
       email = #{record.email,jdbcType=VARCHAR},
@@ -232,7 +232,7 @@
     </if>
   </update>
   <update id="updateByPrimaryKeySelective" parameterType="com.qiyuan.web.entity.User">
-    update user
+    update users
     <set>
       <if test="password != null">
         password = #{password,jdbcType=VARCHAR},
@@ -262,7 +262,7 @@
     where id = #{id,jdbcType=CHAR}
   </update>
   <update id="updateByPrimaryKey" parameterType="com.qiyuan.web.entity.User">
-    update user
+    update users
     set
       password = #{password,jdbcType=VARCHAR},
       email = #{email,jdbcType=VARCHAR},

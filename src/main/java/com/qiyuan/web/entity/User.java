@@ -1,5 +1,8 @@
 package com.qiyuan.web.entity;
 
+import lombok.Builder;
+
+@Builder
 public class User {
     private String id;
 

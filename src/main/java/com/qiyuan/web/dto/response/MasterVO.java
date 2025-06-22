@@ -1,4 +1,4 @@
-package com.qiyuan.web.vo;
+package com.qiyuan.web.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
