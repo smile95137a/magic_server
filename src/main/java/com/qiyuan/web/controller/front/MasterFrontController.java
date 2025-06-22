@@ -1,5 +1,6 @@
 package com.qiyuan.web.controller.front;
 
+import com.chl.security.response.ApiResponse;
 import com.qiyuan.web.request.MasterServiceRequest;
 import com.qiyuan.web.service.MasterRequestService;
 import com.qiyuan.web.service.MasterService;
@@ -34,8 +35,8 @@ public class MasterFrontController {
 
     @Operation(summary = "預約老師服務", description = "送出預約資料，回傳預約是否成功")
     @PostMapping("/reservation")
-    public String reservation(@Validated @RequestBody MasterServiceRequest req) {
-        return masterRequestService.addMasterRequest(req);
+    public ApiResponse<String> reservation(@Validated @RequestBody MasterServiceRequest req) {
+        return ApiResponse.success("執行成功", masterRequestService.addMasterRequest(req)) ;
     }
 
 }
