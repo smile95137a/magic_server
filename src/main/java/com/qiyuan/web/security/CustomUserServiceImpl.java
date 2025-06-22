@@ -8,7 +8,6 @@ import com.qiyuan.web.dao.UserRoleMapper;
 import com.qiyuan.web.dto.UserWithRoles;
 import com.qiyuan.web.entity.User;
 import com.qiyuan.web.entity.UserRole;
-import com.qiyuan.web.entity.example.UserExample;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -30,11 +29,7 @@ public class CustomUserServiceImpl
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        UserExample e = new UserExample();
-        e.createCriteria().andEmailEqualTo(username);
-
-        List<User> users = userMapper.selectByExample(e);
-        User user = users.isEmpty() ? null : users.get(0);
+        User user = userMapper.selectByUsername(username);
         if (user == null) {
             throw new UsernameNotFoundException("無此使用者: " + username);
         }

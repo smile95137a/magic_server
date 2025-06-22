@@ -1,9 +1,9 @@
 package com.qiyuan.web.service;
 
+import com.chl.security.exception.ApiException;
 import com.qiyuan.web.dao.LanternMapper;
 import com.qiyuan.web.entity.Lantern;
 import com.qiyuan.web.entity.example.LanternExample;
-import com.qiyuan.web.exception.ApiException;
 import com.qiyuan.web.dto.response.LanternVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

@@ -1,23 +1,26 @@
 package com.qiyuan.web.service;
 
+import com.chl.security.exception.ApiException;
 import com.chl.security.service.TokenStorageService;
 import com.chl.security.service.UserService;
-import com.chl.security.service.impl.DatabaseTokenStorageService;
 import com.chl.security.util.JwtTokenUtil;
 import com.qiyuan.web.dao.UserMapper;
+import com.qiyuan.web.dao.UserRoleMapper;
 import com.qiyuan.web.dto.request.UserLoginRequest;
+import com.qiyuan.web.dto.request.UserProfileModifyRequest;
 import com.qiyuan.web.dto.request.UserRegisterRequest;
 import com.qiyuan.web.dto.response.LoginResponse;
+import com.qiyuan.web.dto.response.UserProfileResponse;
 import com.qiyuan.web.entity.User;
-import com.qiyuan.web.entity.example.UserExample;
-import com.qiyuan.web.exception.ApiException;
+import com.qiyuan.web.entity.UserRole;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
-import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 
@@ -25,12 +28,14 @@ import java.util.UUID;
 public class AuthService {
 
     private final UserMapper userMapper;
+    private final UserRoleMapper userRoleMapper;
     private final UserService userService;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenUtil jwtTokenUtil;
     private final TokenStorageService tokenStorageService;
 
     public AuthService(UserService userService,
+                       UserRoleMapper userRoleMapper,
                        PasswordEncoder passwordEncoder,
                        JwtTokenUtil jwtTokenUtil,
                        UserMapper userMapper,
@@ -40,20 +45,23 @@ public class AuthService {
         this.jwtTokenUtil = jwtTokenUtil;
         this.userMapper = userMapper;
         this.tokenStorageService = tokenStorageService;
+        this.userRoleMapper = userRoleMapper;
     }
 
     /**
      * 使用者註冊
      */
+    @Transactional
     public boolean register(UserRegisterRequest req) {
         // 檢查帳號重複
-        User exist = getUserByEmail(req.getEmail());
+        User exist = userMapper.selectByUsername(req.getEmail());
         if (exist != null) {
             throw new ApiException("帳號已存在");
         }
 
+        String userId = UUID.randomUUID().toString().replace("-", "").toUpperCase(Locale.ROOT);
         User newUser = User.builder()
-                .id(UUID.randomUUID().toString().replace("-", "").toUpperCase(Locale.ROOT))
+                .id(userId)
                 .email(req.getEmail())
                 .password(req.getPassword())
                 .phone(req.getPhone())
@@ -69,7 +77,16 @@ public class AuthService {
             newUser.setAddress(req.getAddress());
         }
 
-        return userMapper.insertSelective(newUser) > 0;
+        UserRole userRole = UserRole
+                .builder()
+                .roleId("USER")
+                .userId(userId)
+                .build();
+
+        if (userMapper.insertSelective(newUser) == 0 || userRoleMapper.insertSelective(userRole) == 0) {
+            throw new ApiException("系統發生錯誤，請聯繫客服！");
+        }
+        return true;
     }
 
     public LoginResponse login(UserLoginRequest req) {
@@ -92,7 +109,6 @@ public class AuthService {
     }
 
     public LoginResponse refreshToken(String refreshToken) {
-        // 驗證 refresh token 格式與有效性
         if (!tokenStorageService.isTokenValid(refreshToken) || !jwtTokenUtil.isRefreshToken(refreshToken)) {
             throw new ApiException("Refresh Token 無效或已過期");
         }
@@ -113,16 +129,31 @@ public class AuthService {
                 .build();
     }
 
-
-    public User getUserByEmail(String userEmail) {
-        UserExample e = new UserExample();
-        e.createCriteria().andEmailEqualTo(userEmail);
-
-        List<User> users = userMapper.selectByExample(e);
-        if (users.isEmpty()) {
-            return null;
-        }
-        return users.get(0);
+    public boolean modifyUser(UserProfileModifyRequest req) {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = userMapper.selectByUsername(username);
+        if (user == null) return false;
+        user.setNickname(req.getNickName());
+        user.setAddressName(req.getAddressName());
+        user.setLineId(req.getLineId());
+        user.setPhone(req.getPhone());
+        user.setAddress(req.getAddress());
+        return userMapper.updateByPrimaryKeySelective(user) > 0;
     }
+
+    public UserProfileResponse getProfile() {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = userMapper.selectByUsername(username);
+        if (user == null) throw new ApiException("查無會員資料");
+
+        UserProfileResponse resp = new UserProfileResponse();
+        resp.setNickName(user.getNickname());
+        resp.setAddressName(user.getAddressName());
+        resp.setLineId(user.getLineId());
+        resp.setPhone(user.getPhone());
+        resp.setAddress(user.getAddress());
+        return resp;
+    }
+
 
 }

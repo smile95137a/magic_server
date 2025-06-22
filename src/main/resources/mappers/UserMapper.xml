@@ -3,8 +3,9 @@
 <mapper namespace="com.qiyuan.web.dao.UserMapper">
   <resultMap id="BaseResultMap" type="com.qiyuan.web.entity.User">
     <id column="id" jdbcType="CHAR" property="id" />
-    <result column="password" jdbcType="VARCHAR" property="password" />
+    <result column="username" jdbcType="VARCHAR" property="username" />
     <result column="email" jdbcType="VARCHAR" property="email" />
+    <result column="password" jdbcType="VARCHAR" property="password" />
     <result column="phone" jdbcType="VARCHAR" property="phone" />
     <result column="nickname" jdbcType="NVARCHAR" property="nickname" />
     <result column="line_id" jdbcType="VARCHAR" property="lineId" />
@@ -71,7 +72,7 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    id, password, email, phone, nickname, line_id, address_name, address, receipt_type
+    id, password, username, email, phone, nickname, line_id, address_name, address, receipt_type
   </sql>
   <select id="selectByExample" parameterType="com.qiyuan.web.entity.example.UserExample" resultMap="BaseResultMap">
     select
@@ -94,6 +95,13 @@
     where id = #{id,jdbcType=CHAR}
   </select>
 
+  <select id="selectByUsername" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from users
+    where username = #{username,jdbcType=VARCHAR}
+  </select>
+
   <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
     delete from users
     where id = #{id,jdbcType=CHAR}
@@ -105,11 +113,11 @@
     </if>
   </delete>
   <insert id="insert" parameterType="com.qiyuan.web.entity.User">
-    insert into users (id, password,
+    insert into users (id, password, username,
       email, phone, nickname, 
       line_id, address_name, address, 
       receipt_type)
-    values (#{id,jdbcType=CHAR}, #{password,jdbcType=VARCHAR},
+    values (#{id,jdbcType=CHAR}, #{password,jdbcType=VARCHAR}, #{username,jdbcType=VARCHAR},
       #{email,jdbcType=VARCHAR}, #{phone,jdbcType=VARCHAR}, #{nickname,jdbcType=NVARCHAR}, 
       #{lineId,jdbcType=VARCHAR}, #{addressName,jdbcType=NVARCHAR}, #{address,jdbcType=NVARCHAR}, 
       #{receiptType,jdbcType=VARCHAR})
@@ -122,6 +130,9 @@
       </if>
       <if test="password != null">
         password,
+      </if>
+      <if test="username != null">
+        username,
       </if>
       <if test="email != null">
         email,
@@ -151,6 +162,9 @@
       </if>
       <if test="password != null">
         #{password,jdbcType=VARCHAR},
+      </if>
+      <if test="username != null">
+        #{username,jdbcType=VARCHAR},
       </if>
       <if test="email != null">
         #{email,jdbcType=VARCHAR},
@@ -184,14 +198,8 @@
   <update id="updateByExampleSelective" parameterType="map">
     update users
     <set>
-      <if test="record.id != null">
-        id = #{record.id,jdbcType=CHAR},
-      </if>
       <if test="record.password != null">
         password = #{record.password,jdbcType=VARCHAR},
-      </if>
-      <if test="record.email != null">
-        email = #{record.email,jdbcType=VARCHAR},
       </if>
       <if test="record.phone != null">
         phone = #{record.phone,jdbcType=VARCHAR},
@@ -218,9 +226,8 @@
   </update>
   <update id="updateByExample" parameterType="map">
     update users
-    set id = #{record.id,jdbcType=CHAR},
+    set
       password = #{record.password,jdbcType=VARCHAR},
-      email = #{record.email,jdbcType=VARCHAR},
       phone = #{record.phone,jdbcType=VARCHAR},
       nickname = #{record.nickname,jdbcType=NVARCHAR},
       line_id = #{record.lineId,jdbcType=VARCHAR},
@@ -236,9 +243,6 @@
     <set>
       <if test="password != null">
         password = #{password,jdbcType=VARCHAR},
-      </if>
-      <if test="email != null">
-        email = #{email,jdbcType=VARCHAR},
       </if>
       <if test="phone != null">
         phone = #{phone,jdbcType=VARCHAR},
@@ -265,7 +269,6 @@
     update users
     set
       password = #{password,jdbcType=VARCHAR},
-      email = #{email,jdbcType=VARCHAR},
       phone = #{phone,jdbcType=VARCHAR},
       nickname = #{nickname,jdbcType=NVARCHAR},
       line_id = #{lineId,jdbcType=VARCHAR},
