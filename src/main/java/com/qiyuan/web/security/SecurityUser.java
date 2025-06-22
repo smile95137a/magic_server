@@ -32,7 +32,7 @@ public class SecurityUser
 
     @Override
     public String getUsername() {
-        return user.getUser().getUsername();
+        return user.getUser().getEmail();
     }
 
     @Override

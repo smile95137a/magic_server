@@ -3,7 +3,6 @@
 <mapper namespace="com.qiyuan.web.dao.UserMapper">
   <resultMap id="BaseResultMap" type="com.qiyuan.web.entity.User">
     <id column="id" jdbcType="CHAR" property="id" />
-    <result column="username" jdbcType="VARCHAR" property="username" />
     <result column="password" jdbcType="VARCHAR" property="password" />
     <result column="email" jdbcType="VARCHAR" property="email" />
     <result column="phone" jdbcType="VARCHAR" property="phone" />
@@ -72,7 +71,7 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    id, username, password, email, phone, nickname, line_id, address_name, address, receipt_type
+    id, password, email, phone, nickname, line_id, address_name, address, receipt_type
   </sql>
   <select id="selectByExample" parameterType="com.qiyuan.web.entity.example.UserExample" resultMap="BaseResultMap">
     select
@@ -95,12 +94,6 @@
     where id = #{id,jdbcType=CHAR}
   </select>
 
-  <select id="selectByUsername" parameterType="java.lang.String" resultMap="BaseResultMap">
-    select
-    <include refid="Base_Column_List" />
-    from user
-    where username = #{username,jdbcType=VARCHAR}
-  </select>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
     delete from user
     where id = #{id,jdbcType=CHAR}
@@ -112,11 +105,11 @@
     </if>
   </delete>
   <insert id="insert" parameterType="com.qiyuan.web.entity.User">
-    insert into user (id, username, password, 
+    insert into user (id, password,
       email, phone, nickname, 
       line_id, address_name, address, 
       receipt_type)
-    values (#{id,jdbcType=CHAR}, #{username,jdbcType=VARCHAR}, #{password,jdbcType=VARCHAR}, 
+    values (#{id,jdbcType=CHAR}, #{password,jdbcType=VARCHAR},
       #{email,jdbcType=VARCHAR}, #{phone,jdbcType=VARCHAR}, #{nickname,jdbcType=NVARCHAR}, 
       #{lineId,jdbcType=VARCHAR}, #{addressName,jdbcType=NVARCHAR}, #{address,jdbcType=NVARCHAR}, 
       #{receiptType,jdbcType=VARCHAR})
@@ -126,9 +119,6 @@
     <trim prefix="(" suffix=")" suffixOverrides=",">
       <if test="id != null">
         id,
-      </if>
-      <if test="username != null">
-        username,
       </if>
       <if test="password != null">
         password,
@@ -158,9 +148,6 @@
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
         #{id,jdbcType=CHAR},
-      </if>
-      <if test="username != null">
-        #{username,jdbcType=VARCHAR},
       </if>
       <if test="password != null">
         #{password,jdbcType=VARCHAR},
@@ -200,9 +187,6 @@
       <if test="record.id != null">
         id = #{record.id,jdbcType=CHAR},
       </if>
-      <if test="record.username != null">
-        username = #{record.username,jdbcType=VARCHAR},
-      </if>
       <if test="record.password != null">
         password = #{record.password,jdbcType=VARCHAR},
       </if>
@@ -235,7 +219,6 @@
   <update id="updateByExample" parameterType="map">
     update user
     set id = #{record.id,jdbcType=CHAR},
-      username = #{record.username,jdbcType=VARCHAR},
       password = #{record.password,jdbcType=VARCHAR},
       email = #{record.email,jdbcType=VARCHAR},
       phone = #{record.phone,jdbcType=VARCHAR},
@@ -251,9 +234,6 @@
   <update id="updateByPrimaryKeySelective" parameterType="com.qiyuan.web.entity.User">
     update user
     <set>
-      <if test="username != null">
-        username = #{username,jdbcType=VARCHAR},
-      </if>
       <if test="password != null">
         password = #{password,jdbcType=VARCHAR},
       </if>
@@ -283,7 +263,7 @@
   </update>
   <update id="updateByPrimaryKey" parameterType="com.qiyuan.web.entity.User">
     update user
-    set username = #{username,jdbcType=VARCHAR},
+    set
       password = #{password,jdbcType=VARCHAR},
       email = #{email,jdbcType=VARCHAR},
       phone = #{phone,jdbcType=VARCHAR},

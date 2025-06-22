@@ -29,7 +29,7 @@ public class CustomUserServiceImpl
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userMapper.selectByUsername(username);
+        User user = userMapper.selectByPrimaryKey(username);
         if (user == null) {
             throw new UsernameNotFoundException("無此使用者: " + username);
         }
