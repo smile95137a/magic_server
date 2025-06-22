@@ -2,30 +2,28 @@ package com.qiyuan.web.controller.front;
 
 import com.qiyuan.web.entity.Poem;
 import com.qiyuan.web.service.PoemService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
 
 @RestController
 @RequestMapping("/poem")
+@Tag(name = "前台詩籤", description = "前台詩籤抽取")
 public class PoemFrontController {
 
-    @Autowired
-    private PoemService poemService;
+    private final PoemService poemService;
 
-    @PostMapping(value = "/list", produces = MediaType.APPLICATION_JSON_VALUE)
-    public List<Poem> getPoemList() {
-        return poemService.getPoemList();
+    public PoemFrontController(PoemService poemService) {
+        this.poemService = poemService;
     }
 
-
-    @PostMapping(value = "/init", produces = MediaType.APPLICATION_JSON_VALUE)
-    public void init() {
-        poemService.init();
+    @Operation(summary = "隨機抽取詩籤", description = "取得隨機一首詩籤")
+    @PostMapping("/drawing")
+    public Poem getRandomPoem() {
+        return poemService.getRandomPoem();
     }
 
 }

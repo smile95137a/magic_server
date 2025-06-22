@@ -10,7 +10,7 @@ public interface MasterServiceRequestMapper {
 
     int deleteByExample(MasterServiceRequestExample example);
 
-    int deleteByPrimaryKey(@Param("masterCode") String masterCode, @Param("serial") String serial);
+    int deleteByPrimaryKey(Integer serial);
 
     int insert(MasterServiceRequest record);
 
@@ -18,7 +18,7 @@ public interface MasterServiceRequestMapper {
 
     List<MasterServiceRequest> selectByExample(MasterServiceRequestExample example);
 
-    MasterServiceRequest selectByPrimaryKey(@Param("masterCode") String masterCode, @Param("serial") String serial);
+    MasterServiceRequest selectByPrimaryKey(Integer serial);
 
     int updateByExampleSelective(@Param("record") MasterServiceRequest record, @Param("example") MasterServiceRequestExample example);
 

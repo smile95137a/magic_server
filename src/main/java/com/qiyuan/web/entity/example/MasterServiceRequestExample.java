@@ -104,6 +104,66 @@ public class MasterServiceRequestExample {
             criteria.add(new Criterion(condition, value1, value2));
         }
 
+        public Criteria andSerialIsNull() {
+            addCriterion("serial is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andSerialIsNotNull() {
+            addCriterion("serial is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andSerialEqualTo(Integer value) {
+            addCriterion("serial =", value, "serial");
+            return (Criteria) this;
+        }
+
+        public Criteria andSerialNotEqualTo(Integer value) {
+            addCriterion("serial <>", value, "serial");
+            return (Criteria) this;
+        }
+
+        public Criteria andSerialGreaterThan(Integer value) {
+            addCriterion("serial >", value, "serial");
+            return (Criteria) this;
+        }
+
+        public Criteria andSerialGreaterThanOrEqualTo(Integer value) {
+            addCriterion("serial >=", value, "serial");
+            return (Criteria) this;
+        }
+
+        public Criteria andSerialLessThan(Integer value) {
+            addCriterion("serial <", value, "serial");
+            return (Criteria) this;
+        }
+
+        public Criteria andSerialLessThanOrEqualTo(Integer value) {
+            addCriterion("serial <=", value, "serial");
+            return (Criteria) this;
+        }
+
+        public Criteria andSerialIn(List<Integer> values) {
+            addCriterion("serial in", values, "serial");
+            return (Criteria) this;
+        }
+
+        public Criteria andSerialNotIn(List<Integer> values) {
+            addCriterion("serial not in", values, "serial");
+            return (Criteria) this;
+        }
+
+        public Criteria andSerialBetween(Integer value1, Integer value2) {
+            addCriterion("serial between", value1, value2, "serial");
+            return (Criteria) this;
+        }
+
+        public Criteria andSerialNotBetween(Integer value1, Integer value2) {
+            addCriterion("serial not between", value1, value2, "serial");
+            return (Criteria) this;
+        }
+
         public Criteria andMasterCodeIsNull() {
             addCriterion("master_code is null");
             return (Criteria) this;
@@ -171,76 +231,6 @@ public class MasterServiceRequestExample {
 
         public Criteria andMasterCodeNotBetween(String value1, String value2) {
             addCriterion("master_code not between", value1, value2, "masterCode");
-            return (Criteria) this;
-        }
-
-        public Criteria andSerialIsNull() {
-            addCriterion("serial is null");
-            return (Criteria) this;
-        }
-
-        public Criteria andSerialIsNotNull() {
-            addCriterion("serial is not null");
-            return (Criteria) this;
-        }
-
-        public Criteria andSerialEqualTo(String value) {
-            addCriterion("serial =", value, "serial");
-            return (Criteria) this;
-        }
-
-        public Criteria andSerialNotEqualTo(String value) {
-            addCriterion("serial <>", value, "serial");
-            return (Criteria) this;
-        }
-
-        public Criteria andSerialGreaterThan(String value) {
-            addCriterion("serial >", value, "serial");
-            return (Criteria) this;
-        }
-
-        public Criteria andSerialGreaterThanOrEqualTo(String value) {
-            addCriterion("serial >=", value, "serial");
-            return (Criteria) this;
-        }
-
-        public Criteria andSerialLessThan(String value) {
-            addCriterion("serial <", value, "serial");
-            return (Criteria) this;
-        }
-
-        public Criteria andSerialLessThanOrEqualTo(String value) {
-            addCriterion("serial <=", value, "serial");
-            return (Criteria) this;
-        }
-
-        public Criteria andSerialLike(String value) {
-            addCriterion("serial like", value, "serial");
-            return (Criteria) this;
-        }
-
-        public Criteria andSerialNotLike(String value) {
-            addCriterion("serial not like", value, "serial");
-            return (Criteria) this;
-        }
-
-        public Criteria andSerialIn(List<String> values) {
-            addCriterion("serial in", values, "serial");
-            return (Criteria) this;
-        }
-
-        public Criteria andSerialNotIn(List<String> values) {
-            addCriterion("serial not in", values, "serial");
-            return (Criteria) this;
-        }
-
-        public Criteria andSerialBetween(String value1, String value2) {
-            addCriterion("serial between", value1, value2, "serial");
-            return (Criteria) this;
-        }
-
-        public Criteria andSerialNotBetween(String value1, String value2) {
-            addCriterion("serial not between", value1, value2, "serial");
             return (Criteria) this;
         }
 

@@ -4,9 +4,9 @@ import lombok.Builder;
 
 @Builder
 public class MasterServiceRequest {
-    private String masterCode;
+    private Integer serial;
 
-    private String serial;
+    private String masterCode;
 
     private String name;
 
@@ -20,20 +20,20 @@ public class MasterServiceRequest {
 
     private String service;
 
+    public Integer getSerial() {
+        return serial;
+    }
+
+    public void setSerial(Integer serial) {
+        this.serial = serial;
+    }
+
     public String getMasterCode() {
         return masterCode;
     }
 
     public void setMasterCode(String masterCode) {
         this.masterCode = masterCode;
-    }
-
-    public String getSerial() {
-        return serial;
-    }
-
-    public void setSerial(String serial) {
-        this.serial = serial;
     }
 
     public String getName() {

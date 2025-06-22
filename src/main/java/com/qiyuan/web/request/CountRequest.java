@@ -10,6 +10,6 @@ import lombok.Data;
 public class CountRequest {
     @NotNull(message = "count 不能為空")
     @Min(value = 1, message = "最少要 1 筆")
-    @Max(value = 20, message = "最多只能請求 20 筆資料")
+    @Max(value = 20, message = "最多只能請求 20 筆")
     private int count;
 }
