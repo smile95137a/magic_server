@@ -1,6 +1,5 @@
 package com.qiyuan.web.dto.response;
 
-import com.qiyuan.web.entity.Offering;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -23,7 +22,7 @@ public class GodInfoVO {
     @Schema(description = "是否為金牌神明", example = "true")
     private boolean isGolden;
     @Schema(description = "供品列表")
-    private List<Offering> offerings;
+    private List<OfferingVO> offerings;
     @Schema(description = "上架時間", type = "string", format = "date-time", example = "2025-06-23T12:00:00Z")
     private Date onshelfTime;
     @Schema(description = "下架時間", type = "string", format = "date-time", example = "2025-07-01T12:00:00Z")

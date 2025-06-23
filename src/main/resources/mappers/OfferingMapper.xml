@@ -5,7 +5,7 @@
     <id column="id" jdbcType="CHAR" property="id" />
     <result column="image_url" jdbcType="VARCHAR" property="imageUrl" />
     <result column="points" jdbcType="TINYINT" property="points" />
-    <result column="price" jdbcType="TINYINT" property="price" />
+    <result column="price" jdbcType="SMALLINT" property="price" />
     <result column="name" jdbcType="NVARCHAR" property="name" />
   </resultMap>
   <sql id="Example_Where_Clause">
@@ -103,7 +103,7 @@
     insert into offering (id, image_url, points, 
       price, name)
     values (#{id,jdbcType=CHAR}, #{imageUrl,jdbcType=VARCHAR}, #{points,jdbcType=TINYINT}, 
-      #{price,jdbcType=TINYINT}, #{name,jdbcType=NVARCHAR})
+      #{price,jdbcType=SMALLINT}, #{name,jdbcType=NVARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.qiyuan.web.entity.Offering">
     insert into offering
@@ -135,7 +135,7 @@
         #{points,jdbcType=TINYINT},
       </if>
       <if test="price != null">
-        #{price,jdbcType=TINYINT},
+        #{price,jdbcType=SMALLINT},
       </if>
       <if test="name != null">
         #{name,jdbcType=NVARCHAR},
@@ -161,7 +161,7 @@
         points = #{record.points,jdbcType=TINYINT},
       </if>
       <if test="record.price != null">
-        price = #{record.price,jdbcType=TINYINT},
+        price = #{record.price,jdbcType=SMALLINT},
       </if>
       <if test="record.name != null">
         name = #{record.name,jdbcType=NVARCHAR},
@@ -176,7 +176,7 @@
     set id = #{record.id,jdbcType=CHAR},
       image_url = #{record.imageUrl,jdbcType=VARCHAR},
       points = #{record.points,jdbcType=TINYINT},
-      price = #{record.price,jdbcType=TINYINT},
+      price = #{record.price,jdbcType=SMALLINT},
       name = #{record.name,jdbcType=NVARCHAR}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
@@ -192,7 +192,7 @@
         points = #{points,jdbcType=TINYINT},
       </if>
       <if test="price != null">
-        price = #{price,jdbcType=TINYINT},
+        price = #{price,jdbcType=SMALLINT},
       </if>
       <if test="name != null">
         name = #{name,jdbcType=NVARCHAR},
@@ -204,7 +204,7 @@
     update offering
     set image_url = #{imageUrl,jdbcType=VARCHAR},
       points = #{points,jdbcType=TINYINT},
-      price = #{price,jdbcType=TINYINT},
+      price = #{price,jdbcType=SMALLINT},
       name = #{name,jdbcType=NVARCHAR}
     where id = #{id,jdbcType=CHAR}
   </update>

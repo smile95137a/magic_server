@@ -2,15 +2,17 @@ package com.qiyuan.web.service;
 
 import com.qiyuan.web.dao.OfferingMapper;
 import com.qiyuan.web.dao.OfferingPurchaseMapper;
+import com.qiyuan.web.dto.response.OfferingVO;
 import com.qiyuan.web.entity.Offering;
 import com.qiyuan.web.entity.OfferingPurchase;
 import com.qiyuan.web.entity.example.OfferingExample;
 import com.qiyuan.web.util.DateUtil;
-import com.qiyuan.web.util.RandomGenerator;
+import com.qiyuan.web.util.FileUtil;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class OfferingService {
@@ -32,9 +34,10 @@ public class OfferingService {
         return offeringMapper.selectByExample(e);
     }
 
-    public List<Offering> getOffering() {
+    public List<OfferingVO> getOfferingVo() {
         OfferingExample e = new OfferingExample();
-        return offeringMapper.selectByExample(e);
+        List<Offering> offeringList = offeringMapper.selectByExample(e);
+        return offeringList.stream().map(this::convertToVo).collect(Collectors.toList());
     }
 
     @Transactional
@@ -46,6 +49,16 @@ public class OfferingService {
                 .createTime(DateUtil.getCurrentDate())
                 .build();
         return offeringPurchaseMapper.insertSelective(purchase) > 0;
+    }
+
+    public OfferingVO convertToVo(Offering o) {
+        return OfferingVO.builder()
+                .name(o.getName())
+                .price(o.getPrice())
+                .points(o.getPoints())
+                .id(o.getId())
+                .imageBase64(FileUtil.imageToBase64(o.getImageUrl()))
+                .build();
     }
 
 }

@@ -7,7 +7,7 @@ public class Offering {
 
     private Byte points;
 
-    private Byte price;
+    private Short price;
 
     private String name;
 
@@ -35,11 +35,11 @@ public class Offering {
         this.points = points;
     }
 
-    public Byte getPrice() {
+    public Short getPrice() {
         return price;
     }
 
-    public void setPrice(Byte price) {
+    public void setPrice(Short price) {
         this.price = price;
     }
 

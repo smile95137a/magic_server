@@ -5,6 +5,7 @@ import com.qiyuan.web.dao.GodMapper;
 import com.qiyuan.web.dao.UserMapper;
 import com.qiyuan.web.dto.request.PresentOfferingRequest;
 import com.qiyuan.web.dto.response.GodInfoVO;
+import com.qiyuan.web.dto.response.OfferingVO;
 import com.qiyuan.web.entity.God;
 import com.qiyuan.web.entity.GodInfo;
 import com.qiyuan.web.entity.Offering;
@@ -80,10 +81,11 @@ public class GodService {
         boolean isGolden = godInfo.getGoldenExpiration() != null
                 && godInfo.getGoldenExpiration().after(DateUtil.getCurrentDate());
         String offeringStr = godInfo.getOfferingList();
-        List<Offering> offeringList = Collections.EMPTY_LIST;
+        List<OfferingVO> offeringVOList = Collections.EMPTY_LIST;
         if (StringUtils.isNotBlank(offeringStr) && offeringStr.indexOf(",") > 0) {
             List<String> offeringIds = Arrays.asList(offeringStr.split(","));
-            offeringList = offeringService.getOfferingByIds(offeringIds);
+            List<Offering> offeringList = offeringService.getOfferingByIds(offeringIds);
+            offeringVOList = offeringList.stream().map(offeringService::convertToVo).collect(Collectors.toList());
         }
 
         return GodInfoVO.builder()
@@ -93,7 +95,7 @@ public class GodService {
                 .cooldownTime(godInfo.getCooldownTime())
                 .onshelfTime(godInfo.getOnshelfTime())
                 .offshelfTime(godInfo.getOffshelfTime())
-                .offerings(offeringList)
+                .offerings(offeringVOList)
                 .build();
     }
 
@@ -114,27 +116,32 @@ public class GodService {
     @Transactional
     public GodInfoVO addOffering(PresentOfferingRequest param) {
         String godCode = param.getGodCode();
-        String prevOfferingId = param.getPrevOfferingId().toLowerCase(Locale.ROOT);
+        String prevOfferingId = param.getPrevOfferingId() == null ? null : param.getPrevOfferingId().toLowerCase(Locale.ROOT);
         String newOfferingId = param.getNewOfferingId().toLowerCase(Locale.ROOT);
         String username = SecurityUtils.getCurrentUsername();
         User user = userMapper.selectByUsername(username);
         God god = getGodByCode(godCode);
         GodInfo godInfo = godInfoService.getGodInfo(user.getId(), god.getId());
-        List<String> offeringList = Arrays.asList(godInfo.getOfferingList().split(","));
-        if (StringUtils.isNoneBlank(prevOfferingId, godInfo.getOfferingList()) && godInfo.getOfferingList().contains(prevOfferingId)) {
-            int replacementTarget = offeringList.indexOf(prevOfferingId);
-            offeringList.set(replacementTarget, newOfferingId);
-            godInfo.setOfferingList(offeringList.stream().collect(Collectors.joining(",")));
-        } else {
-            if (offeringList.size() > 2) {
-                throw new ApiException("購買供品發生系統錯誤，請聯繫客服！");
-            }
-            String newOfferingList = Stream.concat(
-                    offeringList.stream(),
-                    Stream.of(newOfferingId)
-            ).collect(Collectors.joining(","));
-            godInfo.setOfferingList(newOfferingList);
 
+        if (StringUtils.isBlank(godInfo.getOfferingList())) {
+            godInfo.setOfferingList(newOfferingId);
+        } else {
+            List<String> offeringList = Arrays.asList(godInfo.getOfferingList().split(","));
+            if (StringUtils.isNoneBlank(prevOfferingId, godInfo.getOfferingList()) && godInfo.getOfferingList().contains(prevOfferingId)) {
+                int replacementTarget = offeringList.indexOf(prevOfferingId);
+                offeringList.set(replacementTarget, newOfferingId);
+                godInfo.setOfferingList(offeringList.stream().collect(Collectors.joining(",")));
+            } else {
+                if (offeringList.size() > 2) {
+                    throw new ApiException("購買供品發生系統錯誤，請聯繫客服！");
+                }
+                String newOfferingList = Stream.concat(
+                        offeringList.stream(),
+                        Stream.of(newOfferingId)
+                ).collect(Collectors.joining(","));
+                godInfo.setOfferingList(newOfferingList);
+
+            }
         }
 
         Offering offering = offeringService.getOfferingById(newOfferingId);
@@ -146,6 +153,8 @@ public class GodService {
             isGolden = true;
             godInfo.setLevel((byte) 1);
             godInfo.setGoldenExpiration(DateUtil.adjustDate(DateUtil.getCurrentDate(), 1, Date.class));
+        } else {
+            godInfo.setLevel((byte) newGodLevel);
         }
         newExp = newExp % 10;
         godInfo.setExp((byte) newExp);
@@ -158,8 +167,10 @@ public class GodService {
 
         List<String> offeringIds  = Arrays.asList(godInfo.getOfferingList().split(","))
                 .stream()
-                .filter(String::isBlank)
+                .filter(id -> StringUtils.isNotBlank(id))
                 .collect(Collectors.toList());
+
+        List<Offering> offerings = offeringService.getOfferingByIds(offeringIds);
 
         return GodInfoVO.builder()
                 .imageCode(god.getImageCode())
@@ -168,7 +179,7 @@ public class GodService {
                 .cooldownTime(godInfo.getCooldownTime())
                 .onshelfTime(godInfo.getOnshelfTime())
                 .offshelfTime(godInfo.getOffshelfTime())
-                .offerings(offeringService.getOfferingByIds(offeringIds))
+                .offerings(offerings.stream().map(offeringService::convertToVo).collect(Collectors.toList()))
                 .build();
     }
 
