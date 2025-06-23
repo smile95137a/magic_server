@@ -16,6 +16,19 @@ spring:
       add-mappings: false
     mvc:
       throw-exception-if-no-handler-found: true
+  mail:
+    host: smtp.gmail.com     # SMTP 伺服器（範例使用 Gmail）
+    port: 587                # SMTP Port
+    username: yurisuha951@gmail.com      # 發信帳號
+    password: your_app_password         # 密碼/應用程式密碼
+    protocol: smtp
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+        debug: true
 
 
 springdoc:
@@ -37,6 +50,7 @@ security:
     - /user/login
     - /user/refresh
     - /user/register
+    - /user/**
   response:
     exclude-paths:
       - /v3/api-docs
