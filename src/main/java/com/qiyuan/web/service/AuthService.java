@@ -13,6 +13,7 @@ import com.qiyuan.web.dto.response.LoginResponse;
 import com.qiyuan.web.dto.response.UserProfileResponse;
 import com.qiyuan.web.entity.User;
 import com.qiyuan.web.entity.UserRole;
+import com.qiyuan.web.util.DateUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -101,7 +102,7 @@ public class AuthService {
         tokenStorageService.cleanupExpiredTokens();
         Date expiration = jwtTokenUtil.getExpirationFromToken(refreshToken);
         tokenStorageService.revokeTokensByUsername(userDetails.getUsername());
-        tokenStorageService.saveRefreshToken(userDetails.getUsername(), refreshToken, expiration.toInstant());
+        tokenStorageService.saveRefreshToken(userDetails.getUsername(), refreshToken, DateUtil.toLocalDateTime(expiration));
         return LoginResponse.builder()
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
@@ -121,7 +122,7 @@ public class AuthService {
         tokenStorageService.revokeToken(refreshToken);
 
         Date expiration = jwtTokenUtil.getExpirationFromToken(newRefreshToken);
-        tokenStorageService.saveRefreshToken(username, newRefreshToken, expiration.toInstant());
+        tokenStorageService.saveRefreshToken(username, newRefreshToken, DateUtil.toLocalDateTime(expiration));
 
         return LoginResponse.builder()
                 .accessToken(newAccessToken)

@@ -1,11 +1,14 @@
 package com.qiyuan.web.entity;
 
+import lombok.Builder;
+
 import java.util.Date;
 
+@Builder
 public class PoeRank {
     private String userId;
 
-    private Short times;
+    private int times;
 
     private Date createTime;
 
@@ -19,11 +22,11 @@ public class PoeRank {
         this.userId = userId;
     }
 
-    public Short getTimes() {
+    public int getTimes() {
         return times;
     }
 
-    public void setTimes(Short times) {
+    public void setTimes(int times) {
         this.times = times;
     }
 

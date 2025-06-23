@@ -3,7 +3,7 @@
 <mapper namespace="com.qiyuan.web.dao.PoeRankMapper">
   <resultMap id="BaseResultMap" type="com.qiyuan.web.entity.PoeRank">
     <id column="user_id" jdbcType="CHAR" property="userId" />
-    <result column="times" jdbcType="SMALLINT" property="times" />
+    <result column="times" jdbcType="INTEGER" property="times" />
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
     <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
   </resultMap>
@@ -82,6 +82,22 @@
       order by ${orderByClause}
     </if>
   </select>
+  <select id="selectTopByExample" parameterType="map" resultMap="BaseResultMap">
+    select
+    <choose>
+      <when test="num != null">
+        TOP ${num}
+      </when>
+    </choose>
+    <include refid="Base_Column_List" />
+    from poe_rank
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+    <if test="example.orderByClause != null">
+      order by ${example.orderByClause}
+    </if>
+  </select>
   <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
     select 
     <include refid="Base_Column_List" />
@@ -101,7 +117,7 @@
   <insert id="insert" parameterType="com.qiyuan.web.entity.PoeRank">
     insert into poe_rank (user_id, times, create_time, 
       update_time)
-    values (#{userId,jdbcType=CHAR}, #{times,jdbcType=SMALLINT}, #{createTime,jdbcType=TIMESTAMP}, 
+    values (#{userId,jdbcType=CHAR}, #{times,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP},
       #{updateTime,jdbcType=TIMESTAMP})
   </insert>
   <insert id="insertSelective" parameterType="com.qiyuan.web.entity.PoeRank">
@@ -125,7 +141,7 @@
         #{userId,jdbcType=CHAR},
       </if>
       <if test="times != null">
-        #{times,jdbcType=SMALLINT},
+        #{times,jdbcType=INTEGER},
       </if>
       <if test="createTime != null">
         #{createTime,jdbcType=TIMESTAMP},
@@ -148,7 +164,7 @@
         user_id = #{record.userId,jdbcType=CHAR},
       </if>
       <if test="record.times != null">
-        times = #{record.times,jdbcType=SMALLINT},
+        times = #{record.times,jdbcType=INTEGER},
       </if>
       <if test="record.createTime != null">
         create_time = #{record.createTime,jdbcType=TIMESTAMP},
@@ -164,7 +180,7 @@
   <update id="updateByExample" parameterType="map">
     update poe_rank
     set user_id = #{record.userId,jdbcType=CHAR},
-      times = #{record.times,jdbcType=SMALLINT},
+      times = #{record.times,jdbcType=INTEGER},
       create_time = #{record.createTime,jdbcType=TIMESTAMP},
       update_time = #{record.updateTime,jdbcType=TIMESTAMP}
     <if test="_parameter != null">
@@ -175,7 +191,7 @@
     update poe_rank
     <set>
       <if test="times != null">
-        times = #{times,jdbcType=SMALLINT},
+        times = #{times,jdbcType=INTEGER},
       </if>
       <if test="createTime != null">
         create_time = #{createTime,jdbcType=TIMESTAMP},
@@ -188,7 +204,7 @@
   </update>
   <update id="updateByPrimaryKey" parameterType="com.qiyuan.web.entity.PoeRank">
     update poe_rank
-    set times = #{times,jdbcType=SMALLINT},
+    set times = #{times,jdbcType=INTEGER},
       create_time = #{createTime,jdbcType=TIMESTAMP},
       update_time = #{updateTime,jdbcType=TIMESTAMP}
     where user_id = #{userId,jdbcType=CHAR}

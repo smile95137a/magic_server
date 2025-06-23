@@ -18,6 +18,8 @@ public interface PoeRankMapper {
 
     List<PoeRank> selectByExample(PoeRankExample example);
 
+    List<PoeRank> selectTopByExample(@Param("example")PoeRankExample example, @Param("num") int num);
+
     PoeRank selectByPrimaryKey(String userId);
 
     int updateByExampleSelective(@Param("record") PoeRank record, @Param("example") PoeRankExample example);
