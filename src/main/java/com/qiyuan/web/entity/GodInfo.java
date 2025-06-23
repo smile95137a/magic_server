@@ -1,7 +1,10 @@
 package com.qiyuan.web.entity;
 
+import lombok.Builder;
+
 import java.util.Date;
 
+@Builder
 public class GodInfo {
     private String userId;
 

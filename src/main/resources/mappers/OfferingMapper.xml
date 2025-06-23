@@ -6,6 +6,7 @@
     <result column="image_url" jdbcType="VARCHAR" property="imageUrl" />
     <result column="points" jdbcType="TINYINT" property="points" />
     <result column="price" jdbcType="TINYINT" property="price" />
+    <result column="name" jdbcType="NVARCHAR" property="name" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -66,7 +67,7 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    id, image_url, points, price
+    id, image_url, points, price, name
   </sql>
   <select id="selectByExample" parameterType="com.qiyuan.web.entity.example.OfferingExample" resultMap="BaseResultMap">
     select
@@ -100,9 +101,9 @@
   </delete>
   <insert id="insert" parameterType="com.qiyuan.web.entity.Offering">
     insert into offering (id, image_url, points, 
-      price)
+      price, name)
     values (#{id,jdbcType=CHAR}, #{imageUrl,jdbcType=VARCHAR}, #{points,jdbcType=TINYINT}, 
-      #{price,jdbcType=TINYINT})
+      #{price,jdbcType=TINYINT}, #{name,jdbcType=NVARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.qiyuan.web.entity.Offering">
     insert into offering
@@ -119,6 +120,9 @@
       <if test="price != null">
         price,
       </if>
+      <if test="name != null">
+        name,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -132,6 +136,9 @@
       </if>
       <if test="price != null">
         #{price,jdbcType=TINYINT},
+      </if>
+      <if test="name != null">
+        #{name,jdbcType=NVARCHAR},
       </if>
     </trim>
   </insert>
@@ -156,6 +163,9 @@
       <if test="record.price != null">
         price = #{record.price,jdbcType=TINYINT},
       </if>
+      <if test="record.name != null">
+        name = #{record.name,jdbcType=NVARCHAR},
+      </if>
     </set>
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
@@ -166,7 +176,8 @@
     set id = #{record.id,jdbcType=CHAR},
       image_url = #{record.imageUrl,jdbcType=VARCHAR},
       points = #{record.points,jdbcType=TINYINT},
-      price = #{record.price,jdbcType=TINYINT}
+      price = #{record.price,jdbcType=TINYINT},
+      name = #{record.name,jdbcType=NVARCHAR}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
     </if>
@@ -183,6 +194,9 @@
       <if test="price != null">
         price = #{price,jdbcType=TINYINT},
       </if>
+      <if test="name != null">
+        name = #{name,jdbcType=NVARCHAR},
+      </if>
     </set>
     where id = #{id,jdbcType=CHAR}
   </update>
@@ -190,7 +204,8 @@
     update offering
     set image_url = #{imageUrl,jdbcType=VARCHAR},
       points = #{points,jdbcType=TINYINT},
-      price = #{price,jdbcType=TINYINT}
+      price = #{price,jdbcType=TINYINT},
+      name = #{name,jdbcType=NVARCHAR}
     where id = #{id,jdbcType=CHAR}
   </update>
 </mapper>

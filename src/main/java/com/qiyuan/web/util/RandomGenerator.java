@@ -1,8 +1,15 @@
 package com.qiyuan.web.util;
 
+import java.util.Locale;
+import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class RandomGenerator {
+
+    public static String getUUID() {
+        return UUID.randomUUID().toString().replace("-", "").toLowerCase(Locale.ROOT);
+    }
+
     /**
      * 產生一個 [start, end] 範圍內的隨機整數，機率幾乎均等。
      * @param start 起始值（包含）

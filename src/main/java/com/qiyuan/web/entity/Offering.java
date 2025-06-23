@@ -9,6 +9,8 @@ public class Offering {
 
     private Byte price;
 
+    private String name;
+
     public String getId() {
         return id;
     }
@@ -39,5 +41,13 @@ public class Offering {
 
     public void setPrice(Byte price) {
         this.price = price;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 }
