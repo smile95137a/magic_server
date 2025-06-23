@@ -75,4 +75,67 @@ public class FileUtil {
         if (lower.endsWith(".gif")) return "image/gif";
         return "image/*";
     }
+
+    public static String base64ToImage(String base64Str, String destDir, String originalFilename) {
+        if (base64Str == null || destDir == null || originalFilename == null) return null;
+        try {
+            // 處理 data:image/xxx;base64, 前綴
+            String contentType = "image/png";
+            String pureBase64 = base64Str;
+
+            if (base64Str.startsWith("data:")) {
+                int commaIdx = base64Str.indexOf(',');
+                if (commaIdx > 0) {
+                    String header = base64Str.substring(0, commaIdx);
+                    pureBase64 = base64Str.substring(commaIdx + 1);
+                    int semiIdx = header.indexOf(';');
+                    if (header.startsWith("data:") && semiIdx > 0) {
+                        contentType = header.substring(5, semiIdx);
+                    }
+                }
+            }
+
+            // 原始檔名副檔名
+            String ext = "";
+            int dotIdx = originalFilename.lastIndexOf(".");
+            if (dotIdx >= 0) {
+                ext = originalFilename.substring(dotIdx);
+            } else {
+                // 沒有副檔名才用 contentType
+                switch (contentType) {
+                    case "image/jpeg":
+                    case "image/jpg": ext = ".jpg"; break;
+                    case "image/gif": ext = ".gif"; break;
+                    case "image/png":
+                    default: ext = ".png"; break;
+                }
+            }
+
+            // 檢查資料夾
+            File dir = new File(destDir);
+            if (!dir.exists()) {
+                if (!dir.mkdirs()) return null;
+            }
+
+            // 取得檔名本身
+            String fileNameOnly = originalFilename;
+            if (dotIdx > 0) fileNameOnly = originalFilename.substring(0, dotIdx);
+
+            // 避免重複加副檔名
+            String filename = fileNameOnly + ext;
+            File file = new File(dir, filename);
+
+            // decode & 存檔
+            byte[] imageBytes = Base64.getDecoder().decode(pureBase64);
+            try (OutputStream out = new FileOutputStream(file)) {
+                out.write(imageBytes);
+            }
+
+            return file.getAbsolutePath();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
 }

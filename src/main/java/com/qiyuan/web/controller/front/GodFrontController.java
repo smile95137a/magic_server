@@ -45,6 +45,7 @@ public class GodFrontController {
 
     @PostMapping("/descend")
     @PreAuthorize(RoleExpressions.ONLY_USER)
+    @Operation(summary = "神明降臨", description = "讓指定神明降臨，需傳入神明代碼")
     public boolean godDescend(@RequestBody @Validated GodInfoRequest req) {
         String godCode = req.getGodCode().toLowerCase(Locale.ROOT);
         return godService.godDescend(godCode);
@@ -52,6 +53,7 @@ public class GodFrontController {
 
     @PostMapping("/info")
     @PreAuthorize(RoleExpressions.ONLY_USER)
+    @Operation(summary = "查詢神明資訊", description = "取得指定神明的詳細資訊")
     public ApiResponse<GodInfoVO> getGodInfo(@RequestBody @Validated GodInfoRequest req) {
         String godCode = req.getGodCode().toLowerCase(Locale.ROOT);
         GodInfoVO info = godService.getGodInfo(godCode);
@@ -64,17 +66,20 @@ public class GodFrontController {
 
     @PostMapping("/extend")
     @PreAuthorize(RoleExpressions.ONLY_USER)
+    @Operation(summary = "延長神明降臨期間", description = "延長指定神明降臨的天數")
     public boolean extendDescendPeriod(@Validated @RequestBody GodExtendPeriodRequest req) {
         return godService.extendGodPeriod(req.getGodCode(), Integer.parseInt(req.getDay()));
     }
 
     @PostMapping("/offering/list")
     @PreAuthorize(RoleExpressions.ONLY_USER)
+    @Operation(summary = "取得供品列表", description = "回傳所有可用的供品資訊")
     public List<OfferingVO> getOfferingList() {
         return offeringService.getOfferingVo();
     }
 
     @PostMapping("/offering/present")
+    @Operation(summary = "供奉供品", description = "提供供品給指定神明")
     @PreAuthorize(RoleExpressions.ONLY_USER)
     public GodInfoVO presentOffering(@Validated @RequestBody PresentOfferingRequest req) {
         return godService.addOffering(req);
