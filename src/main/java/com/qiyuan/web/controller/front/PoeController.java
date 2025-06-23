@@ -2,7 +2,9 @@ package com.qiyuan.web.controller.front;
 
 import com.qiyuan.web.dto.request.CountRequest;
 import com.qiyuan.web.dto.response.PoeRankVO;
+import com.qiyuan.web.security.RoleExpressions;
 import com.qiyuan.web.service.PoeService;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -27,6 +29,7 @@ public class PoeController {
     }
 
     @PostMapping("/siunn")
+    @PreAuthorize(RoleExpressions.ONLY_USER)
     public boolean addSiunnPoe(@RequestBody @Validated CountRequest req) {
         return poeService.addSiunnPoe(req.getCount());
     }

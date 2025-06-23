@@ -6,11 +6,13 @@ import com.qiyuan.web.dto.request.UserProfileModifyRequest;
 import com.qiyuan.web.dto.request.UserRegisterRequest;
 import com.qiyuan.web.dto.response.LoginResponse;
 import com.qiyuan.web.dto.response.UserProfileResponse;
+import com.qiyuan.web.security.RoleExpressions;
 import com.qiyuan.web.service.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -43,6 +45,7 @@ public class UserFrontController {
     }
 
     @PostMapping("/modify")
+    @PreAuthorize(RoleExpressions.ONLY_USER)
     @SecurityRequirement(name = "bearerAuth")
     @Operation(summary = "會員資料修改", description = "需帶 Bearer JWT token")
     public boolean modifyUser(@RequestBody UserProfileModifyRequest req) {
@@ -51,6 +54,7 @@ public class UserFrontController {
 
     @PostMapping("/me")
     @SecurityRequirement(name = "bearerAuth")
+    @PreAuthorize(RoleExpressions.ONLY_USER)
     @Operation(summary = "取得會員資料",description = "依據 JWT token 取得當前會員個人資料。")
     public UserProfileResponse getProfile() {
         return authService.getProfile();
