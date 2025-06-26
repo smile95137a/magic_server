@@ -7,6 +7,17 @@ import java.util.Base64;
 
 public class FileUtil {
 
+    public static String concatFilePath(String prev, String suf) {
+        String sep = File.separator;
+        if (prev.endsWith(sep) && suf.startsWith(sep)) {
+            return prev.concat(suf.substring(1));
+        } else if (prev.endsWith(sep) || suf.startsWith(sep)) {
+            return prev.concat(suf);
+        } else {
+            return prev.concat(sep).concat(suf);
+        }
+    }
+
     /**
      * 將圖片 URL（本地或遠端）轉換成 Base64 字串
      *

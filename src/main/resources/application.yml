@@ -60,4 +60,7 @@ security:
       - /swagger-ui.html
 
 upload:
-  banner-path: C:\Users\Public\workspace\banners
+  image-path:
+    banner: C:\Users\Public\test\banner
+    master: C:\Users\Public\test\master
+    offering: C:\Users\Public\test\offering

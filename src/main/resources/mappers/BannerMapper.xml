@@ -3,12 +3,12 @@
 <mapper namespace="com.qiyuan.web.dao.BannerMapper">
   <resultMap id="BaseResultMap" type="com.qiyuan.web.entity.Banner">
     <id column="id" jdbcType="INTEGER" property="id" />
-    <result column="image_url" jdbcType="VARCHAR" property="imageUrl" />
+    <result column="image_name" jdbcType="VARCHAR" property="imageName" />
     <result column="type" jdbcType="CHAR" property="type" />
     <result column="sort" jdbcType="SMALLINT" property="sort" />
     <result column="available_from" jdbcType="TIMESTAMP" property="availableFrom" />
     <result column="available_until" jdbcType="TIMESTAMP" property="availableUntil" />
-    <result column="desc" jdbcType="NVARCHAR" property="desc" />
+    <result column="description" jdbcType="NVARCHAR" property="description" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -69,7 +69,7 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    id, image_url, type, sort, available_from, available_until, desc
+    id, image_name, type, sort, available_from, available_until, description
   </sql>
   <select id="selectByExample" parameterType="com.qiyuan.web.entity.example.BannerExample" resultMap="BaseResultMap">
     select
@@ -102,12 +102,12 @@
     </if>
   </delete>
   <insert id="insert" parameterType="com.qiyuan.web.entity.Banner">
-    insert into banner (id, image_url, type, 
+    insert into banner (id, image_name, type, 
       sort, available_from, available_until, 
-      desc)
-    values (#{id,jdbcType=INTEGER}, #{imageUrl,jdbcType=VARCHAR}, #{type,jdbcType=CHAR}, 
+      description)
+    values (#{id,jdbcType=INTEGER}, #{imageName,jdbcType=VARCHAR}, #{type,jdbcType=CHAR}, 
       #{sort,jdbcType=SMALLINT}, #{availableFrom,jdbcType=TIMESTAMP}, #{availableUntil,jdbcType=TIMESTAMP}, 
-      #{desc,jdbcType=NVARCHAR})
+      #{description,jdbcType=NVARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.qiyuan.web.entity.Banner">
     insert into banner
@@ -115,8 +115,8 @@
       <if test="id != null">
         id,
       </if>
-      <if test="imageUrl != null">
-        image_url,
+      <if test="imageName != null">
+        image_name,
       </if>
       <if test="type != null">
         type,
@@ -130,16 +130,16 @@
       <if test="availableUntil != null">
         available_until,
       </if>
-      <if test="desc != null">
-        desc,
+      <if test="description != null">
+        description,
       </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
         #{id,jdbcType=INTEGER},
       </if>
-      <if test="imageUrl != null">
-        #{imageUrl,jdbcType=VARCHAR},
+      <if test="imageName != null">
+        #{imageName,jdbcType=VARCHAR},
       </if>
       <if test="type != null">
         #{type,jdbcType=CHAR},
@@ -153,8 +153,8 @@
       <if test="availableUntil != null">
         #{availableUntil,jdbcType=TIMESTAMP},
       </if>
-      <if test="desc != null">
-        #{desc,jdbcType=NVARCHAR},
+      <if test="description != null">
+        #{description,jdbcType=NVARCHAR},
       </if>
     </trim>
   </insert>
@@ -170,8 +170,8 @@
       <if test="record.id != null">
         id = #{record.id,jdbcType=INTEGER},
       </if>
-      <if test="record.imageUrl != null">
-        image_url = #{record.imageUrl,jdbcType=VARCHAR},
+      <if test="record.imageName != null">
+        image_name = #{record.imageName,jdbcType=VARCHAR},
       </if>
       <if test="record.type != null">
         type = #{record.type,jdbcType=CHAR},
@@ -185,8 +185,8 @@
       <if test="record.availableUntil != null">
         available_until = #{record.availableUntil,jdbcType=TIMESTAMP},
       </if>
-      <if test="record.desc != null">
-        desc = #{record.desc,jdbcType=NVARCHAR},
+      <if test="record.description != null">
+        description = #{record.description,jdbcType=NVARCHAR},
       </if>
     </set>
     <if test="_parameter != null">
@@ -196,12 +196,12 @@
   <update id="updateByExample" parameterType="map">
     update banner
     set id = #{record.id,jdbcType=INTEGER},
-      image_url = #{record.imageUrl,jdbcType=VARCHAR},
+      image_name = #{record.imageName,jdbcType=VARCHAR},
       type = #{record.type,jdbcType=CHAR},
       sort = #{record.sort,jdbcType=SMALLINT},
       available_from = #{record.availableFrom,jdbcType=TIMESTAMP},
       available_until = #{record.availableUntil,jdbcType=TIMESTAMP},
-      desc = #{record.desc,jdbcType=NVARCHAR}
+      description = #{record.description,jdbcType=NVARCHAR}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
     </if>
@@ -209,8 +209,8 @@
   <update id="updateByPrimaryKeySelective" parameterType="com.qiyuan.web.entity.Banner">
     update banner
     <set>
-      <if test="imageUrl != null">
-        image_url = #{imageUrl,jdbcType=VARCHAR},
+      <if test="imageName != null">
+        image_name = #{imageName,jdbcType=VARCHAR},
       </if>
       <if test="type != null">
         type = #{type,jdbcType=CHAR},
@@ -224,20 +224,20 @@
       <if test="availableUntil != null">
         available_until = #{availableUntil,jdbcType=TIMESTAMP},
       </if>
-      <if test="desc != null">
-        desc = #{desc,jdbcType=NVARCHAR},
+      <if test="description != null">
+        description = #{description,jdbcType=NVARCHAR},
       </if>
     </set>
     where id = #{id,jdbcType=INTEGER}
   </update>
   <update id="updateByPrimaryKey" parameterType="com.qiyuan.web.entity.Banner">
     update banner
-    set image_url = #{imageUrl,jdbcType=VARCHAR},
+    set image_name = #{imageName,jdbcType=VARCHAR},
       type = #{type,jdbcType=CHAR},
       sort = #{sort,jdbcType=SMALLINT},
       available_from = #{availableFrom,jdbcType=TIMESTAMP},
       available_until = #{availableUntil,jdbcType=TIMESTAMP},
-      desc = #{desc,jdbcType=NVARCHAR}
+      description = #{description,jdbcType=NVARCHAR}
     where id = #{id,jdbcType=INTEGER}
   </update>
 </mapper>

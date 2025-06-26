@@ -12,7 +12,7 @@ import java.util.Date;
 public class Banner {
     private Integer id;
 
-    private String imageUrl;
+    private String imageName;
 
     private String type;
 
@@ -22,7 +22,7 @@ public class Banner {
 
     private Date availableUntil;
 
-    private String desc;
+    private String description;
 
     public Integer getId() {
         return id;
@@ -32,12 +32,12 @@ public class Banner {
         this.id = id;
     }
 
-    public String getImageUrl() {
-        return imageUrl;
+    public String getImageName() {
+        return imageName;
     }
 
-    public void setImageUrl(String imageUrl) {
-        this.imageUrl = imageUrl;
+    public void setImageName(String imageName) {
+        this.imageName = imageName;
     }
 
     public String getType() {
@@ -72,11 +72,11 @@ public class Banner {
         this.availableUntil = availableUntil;
     }
 
-    public String getDesc() {
-        return desc;
+    public String getDescription() {
+        return description;
     }
 
-    public void setDesc(String desc) {
-        this.desc = desc;
+    public void setDescription(String description) {
+        this.description = description;
     }
 }

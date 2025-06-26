@@ -8,14 +8,20 @@ import com.qiyuan.web.entity.OfferingPurchase;
 import com.qiyuan.web.entity.example.OfferingExample;
 import com.qiyuan.web.util.DateUtil;
 import com.qiyuan.web.util.FileUtil;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.Collectors;
 
 @Service
 public class OfferingService {
+
+    @Value("${upload.image-path.offering}")
+    private String offeringDir;
+
     private final OfferingMapper offeringMapper;
     private final OfferingPurchaseMapper offeringPurchaseMapper;
 
@@ -57,7 +63,7 @@ public class OfferingService {
                 .price(o.getPrice())
                 .points(o.getPoints())
                 .id(o.getId())
-                .imageBase64(FileUtil.imageToBase64(o.getImageUrl()))
+                .imageBase64(FileUtil.imageToBase64(FileUtil.concatFilePath(offeringDir, String.format("%s.%s", o.getId(), o.getImageExt().toLowerCase(Locale.ROOT)))))
                 .build();
     }
 

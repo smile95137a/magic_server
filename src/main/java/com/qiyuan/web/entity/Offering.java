@@ -3,7 +3,7 @@ package com.qiyuan.web.entity;
 public class Offering {
     private String id;
 
-    private String imageUrl;
+    private String imageExt;
 
     private Byte points;
 
@@ -19,12 +19,12 @@ public class Offering {
         this.id = id;
     }
 
-    public String getImageUrl() {
-        return imageUrl;
+    public String getImageExt() {
+        return imageExt;
     }
 
-    public void setImageUrl(String imageUrl) {
-        this.imageUrl = imageUrl;
+    public void setImageExt(String imageExt) {
+        this.imageExt = imageExt;
     }
 
     public Byte getPoints() {

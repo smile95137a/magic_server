@@ -11,7 +11,7 @@
     <result column="personal_items" jdbcType="NVARCHAR" property="personalItems" />
     <result column="services_json" jdbcType="NVARCHAR" property="servicesJson" />
     <result column="status" jdbcType="BIT" property="status" />
-    <result column="image_url" jdbcType="VARCHAR" property="imageUrl" />
+    <result column="image_ext" jdbcType="VARCHAR" property="imageExt" />
     <result column="sort" jdbcType="TINYINT" property="sort" />
   </resultMap>
   <sql id="Example_Where_Clause">
@@ -74,7 +74,7 @@
   </sql>
   <sql id="Base_Column_List">
     code, name, title, main_star, bio, experience, personal_items, services_json, status, 
-    image_url, sort
+    image_ext, sort
   </sql>
   <select id="selectByExample" parameterType="com.qiyuan.web.entity.example.MasterExample" resultMap="BaseResultMap">
     select
@@ -110,11 +110,11 @@
     insert into master (code, name, title, 
       main_star, bio, experience, 
       personal_items, services_json, status, 
-      image_url, sort)
+      image_ext, sort)
     values (#{code,jdbcType=VARCHAR}, #{name,jdbcType=NVARCHAR}, #{title,jdbcType=NVARCHAR}, 
       #{mainStar,jdbcType=NVARCHAR}, #{bio,jdbcType=NVARCHAR}, #{experience,jdbcType=NVARCHAR}, 
       #{personalItems,jdbcType=NVARCHAR}, #{servicesJson,jdbcType=NVARCHAR}, #{status,jdbcType=BIT}, 
-      #{imageUrl,jdbcType=VARCHAR}, #{sort,jdbcType=TINYINT})
+      #{imageExt,jdbcType=VARCHAR}, #{sort,jdbcType=TINYINT})
   </insert>
   <insert id="insertSelective" parameterType="com.qiyuan.web.entity.Master">
     insert into master
@@ -146,8 +146,8 @@
       <if test="status != null">
         status,
       </if>
-      <if test="imageUrl != null">
-        image_url,
+      <if test="imageExt != null">
+        image_ext,
       </if>
       <if test="sort != null">
         sort,
@@ -181,8 +181,8 @@
       <if test="status != null">
         #{status,jdbcType=BIT},
       </if>
-      <if test="imageUrl != null">
-        #{imageUrl,jdbcType=VARCHAR},
+      <if test="imageExt != null">
+        #{imageExt,jdbcType=VARCHAR},
       </if>
       <if test="sort != null">
         #{sort,jdbcType=TINYINT},
@@ -225,8 +225,8 @@
       <if test="record.status != null">
         status = #{record.status,jdbcType=BIT},
       </if>
-      <if test="record.imageUrl != null">
-        image_url = #{record.imageUrl,jdbcType=VARCHAR},
+      <if test="record.imageExt != null">
+        image_ext = #{record.imageExt,jdbcType=VARCHAR},
       </if>
       <if test="record.sort != null">
         sort = #{record.sort,jdbcType=TINYINT},
@@ -247,7 +247,7 @@
       personal_items = #{record.personalItems,jdbcType=NVARCHAR},
       services_json = #{record.servicesJson,jdbcType=NVARCHAR},
       status = #{record.status,jdbcType=BIT},
-      image_url = #{record.imageUrl,jdbcType=VARCHAR},
+      image_ext = #{record.imageExt,jdbcType=VARCHAR},
       sort = #{record.sort,jdbcType=TINYINT}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
@@ -280,8 +280,8 @@
       <if test="status != null">
         status = #{status,jdbcType=BIT},
       </if>
-      <if test="imageUrl != null">
-        image_url = #{imageUrl,jdbcType=VARCHAR},
+      <if test="imageExt != null">
+        image_ext = #{imageExt,jdbcType=VARCHAR},
       </if>
       <if test="sort != null">
         sort = #{sort,jdbcType=TINYINT},
@@ -299,7 +299,7 @@
       personal_items = #{personalItems,jdbcType=NVARCHAR},
       services_json = #{servicesJson,jdbcType=NVARCHAR},
       status = #{status,jdbcType=BIT},
-      image_url = #{imageUrl,jdbcType=VARCHAR},
+      image_ext = #{imageExt,jdbcType=VARCHAR},
       sort = #{sort,jdbcType=TINYINT}
     where code = #{code,jdbcType=VARCHAR}
   </update>

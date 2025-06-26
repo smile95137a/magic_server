@@ -174,73 +174,73 @@ public class OfferingExample {
             return (Criteria) this;
         }
 
-        public Criteria andImageUrlIsNull() {
-            addCriterion("image_url is null");
+        public Criteria andImageExtIsNull() {
+            addCriterion("image_ext is null");
             return (Criteria) this;
         }
 
-        public Criteria andImageUrlIsNotNull() {
-            addCriterion("image_url is not null");
+        public Criteria andImageExtIsNotNull() {
+            addCriterion("image_ext is not null");
             return (Criteria) this;
         }
 
-        public Criteria andImageUrlEqualTo(String value) {
-            addCriterion("image_url =", value, "imageUrl");
+        public Criteria andImageExtEqualTo(String value) {
+            addCriterion("image_ext =", value, "imageExt");
             return (Criteria) this;
         }
 
-        public Criteria andImageUrlNotEqualTo(String value) {
-            addCriterion("image_url <>", value, "imageUrl");
+        public Criteria andImageExtNotEqualTo(String value) {
+            addCriterion("image_ext <>", value, "imageExt");
             return (Criteria) this;
         }
 
-        public Criteria andImageUrlGreaterThan(String value) {
-            addCriterion("image_url >", value, "imageUrl");
+        public Criteria andImageExtGreaterThan(String value) {
+            addCriterion("image_ext >", value, "imageExt");
             return (Criteria) this;
         }
 
-        public Criteria andImageUrlGreaterThanOrEqualTo(String value) {
-            addCriterion("image_url >=", value, "imageUrl");
+        public Criteria andImageExtGreaterThanOrEqualTo(String value) {
+            addCriterion("image_ext >=", value, "imageExt");
             return (Criteria) this;
         }
 
-        public Criteria andImageUrlLessThan(String value) {
-            addCriterion("image_url <", value, "imageUrl");
+        public Criteria andImageExtLessThan(String value) {
+            addCriterion("image_ext <", value, "imageExt");
             return (Criteria) this;
         }
 
-        public Criteria andImageUrlLessThanOrEqualTo(String value) {
-            addCriterion("image_url <=", value, "imageUrl");
+        public Criteria andImageExtLessThanOrEqualTo(String value) {
+            addCriterion("image_ext <=", value, "imageExt");
             return (Criteria) this;
         }
 
-        public Criteria andImageUrlLike(String value) {
-            addCriterion("image_url like", value, "imageUrl");
+        public Criteria andImageExtLike(String value) {
+            addCriterion("image_ext like", value, "imageExt");
             return (Criteria) this;
         }
 
-        public Criteria andImageUrlNotLike(String value) {
-            addCriterion("image_url not like", value, "imageUrl");
+        public Criteria andImageExtNotLike(String value) {
+            addCriterion("image_ext not like", value, "imageExt");
             return (Criteria) this;
         }
 
-        public Criteria andImageUrlIn(List<String> values) {
-            addCriterion("image_url in", values, "imageUrl");
+        public Criteria andImageExtIn(List<String> values) {
+            addCriterion("image_ext in", values, "imageExt");
             return (Criteria) this;
         }
 
-        public Criteria andImageUrlNotIn(List<String> values) {
-            addCriterion("image_url not in", values, "imageUrl");
+        public Criteria andImageExtNotIn(List<String> values) {
+            addCriterion("image_ext not in", values, "imageExt");
             return (Criteria) this;
         }
 
-        public Criteria andImageUrlBetween(String value1, String value2) {
-            addCriterion("image_url between", value1, value2, "imageUrl");
+        public Criteria andImageExtBetween(String value1, String value2) {
+            addCriterion("image_ext between", value1, value2, "imageExt");
             return (Criteria) this;
         }
 
-        public Criteria andImageUrlNotBetween(String value1, String value2) {
-            addCriterion("image_url not between", value1, value2, "imageUrl");
+        public Criteria andImageExtNotBetween(String value1, String value2) {
+            addCriterion("image_ext not between", value1, value2, "imageExt");
             return (Criteria) this;
         }
 
@@ -314,52 +314,52 @@ public class OfferingExample {
             return (Criteria) this;
         }
 
-        public Criteria andPriceEqualTo(Byte value) {
+        public Criteria andPriceEqualTo(Short value) {
             addCriterion("price =", value, "price");
             return (Criteria) this;
         }
 
-        public Criteria andPriceNotEqualTo(Byte value) {
+        public Criteria andPriceNotEqualTo(Short value) {
             addCriterion("price <>", value, "price");
             return (Criteria) this;
         }
 
-        public Criteria andPriceGreaterThan(Byte value) {
+        public Criteria andPriceGreaterThan(Short value) {
             addCriterion("price >", value, "price");
             return (Criteria) this;
         }
 
-        public Criteria andPriceGreaterThanOrEqualTo(Byte value) {
+        public Criteria andPriceGreaterThanOrEqualTo(Short value) {
             addCriterion("price >=", value, "price");
             return (Criteria) this;
         }
 
-        public Criteria andPriceLessThan(Byte value) {
+        public Criteria andPriceLessThan(Short value) {
             addCriterion("price <", value, "price");
             return (Criteria) this;
         }
 
-        public Criteria andPriceLessThanOrEqualTo(Byte value) {
+        public Criteria andPriceLessThanOrEqualTo(Short value) {
             addCriterion("price <=", value, "price");
             return (Criteria) this;
         }
 
-        public Criteria andPriceIn(List<Byte> values) {
+        public Criteria andPriceIn(List<Short> values) {
             addCriterion("price in", values, "price");
             return (Criteria) this;
         }
 
-        public Criteria andPriceNotIn(List<Byte> values) {
+        public Criteria andPriceNotIn(List<Short> values) {
             addCriterion("price not in", values, "price");
             return (Criteria) this;
         }
 
-        public Criteria andPriceBetween(Byte value1, Byte value2) {
+        public Criteria andPriceBetween(Short value1, Short value2) {
             addCriterion("price between", value1, value2, "price");
             return (Criteria) this;
         }
 
-        public Criteria andPriceNotBetween(Byte value1, Byte value2) {
+        public Criteria andPriceNotBetween(Short value1, Short value2) {
             addCriterion("price not between", value1, value2, "price");
             return (Criteria) this;
         }

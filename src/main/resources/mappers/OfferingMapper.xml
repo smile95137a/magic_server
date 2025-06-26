@@ -3,7 +3,7 @@
 <mapper namespace="com.qiyuan.web.dao.OfferingMapper">
   <resultMap id="BaseResultMap" type="com.qiyuan.web.entity.Offering">
     <id column="id" jdbcType="CHAR" property="id" />
-    <result column="image_url" jdbcType="VARCHAR" property="imageUrl" />
+    <result column="image_ext" jdbcType="VARCHAR" property="imageExt" />
     <result column="points" jdbcType="TINYINT" property="points" />
     <result column="price" jdbcType="SMALLINT" property="price" />
     <result column="name" jdbcType="NVARCHAR" property="name" />
@@ -67,7 +67,7 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    id, image_url, points, price, name
+    id, image_ext, points, price, name
   </sql>
   <select id="selectByExample" parameterType="com.qiyuan.web.entity.example.OfferingExample" resultMap="BaseResultMap">
     select
@@ -100,9 +100,9 @@
     </if>
   </delete>
   <insert id="insert" parameterType="com.qiyuan.web.entity.Offering">
-    insert into offering (id, image_url, points, 
+    insert into offering (id, image_ext, points, 
       price, name)
-    values (#{id,jdbcType=CHAR}, #{imageUrl,jdbcType=VARCHAR}, #{points,jdbcType=TINYINT}, 
+    values (#{id,jdbcType=CHAR}, #{imageExt,jdbcType=VARCHAR}, #{points,jdbcType=TINYINT}, 
       #{price,jdbcType=SMALLINT}, #{name,jdbcType=NVARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.qiyuan.web.entity.Offering">
@@ -111,8 +111,8 @@
       <if test="id != null">
         id,
       </if>
-      <if test="imageUrl != null">
-        image_url,
+      <if test="imageExt != null">
+        image_ext,
       </if>
       <if test="points != null">
         points,
@@ -128,8 +128,8 @@
       <if test="id != null">
         #{id,jdbcType=CHAR},
       </if>
-      <if test="imageUrl != null">
-        #{imageUrl,jdbcType=VARCHAR},
+      <if test="imageExt != null">
+        #{imageExt,jdbcType=VARCHAR},
       </if>
       <if test="points != null">
         #{points,jdbcType=TINYINT},
@@ -154,8 +154,8 @@
       <if test="record.id != null">
         id = #{record.id,jdbcType=CHAR},
       </if>
-      <if test="record.imageUrl != null">
-        image_url = #{record.imageUrl,jdbcType=VARCHAR},
+      <if test="record.imageExt != null">
+        image_ext = #{record.imageExt,jdbcType=VARCHAR},
       </if>
       <if test="record.points != null">
         points = #{record.points,jdbcType=TINYINT},
@@ -174,7 +174,7 @@
   <update id="updateByExample" parameterType="map">
     update offering
     set id = #{record.id,jdbcType=CHAR},
-      image_url = #{record.imageUrl,jdbcType=VARCHAR},
+      image_ext = #{record.imageExt,jdbcType=VARCHAR},
       points = #{record.points,jdbcType=TINYINT},
       price = #{record.price,jdbcType=SMALLINT},
       name = #{record.name,jdbcType=NVARCHAR}
@@ -185,8 +185,8 @@
   <update id="updateByPrimaryKeySelective" parameterType="com.qiyuan.web.entity.Offering">
     update offering
     <set>
-      <if test="imageUrl != null">
-        image_url = #{imageUrl,jdbcType=VARCHAR},
+      <if test="imageExt != null">
+        image_ext = #{imageExt,jdbcType=VARCHAR},
       </if>
       <if test="points != null">
         points = #{points,jdbcType=TINYINT},
@@ -202,7 +202,7 @@
   </update>
   <update id="updateByPrimaryKey" parameterType="com.qiyuan.web.entity.Offering">
     update offering
-    set image_url = #{imageUrl,jdbcType=VARCHAR},
+    set image_ext = #{imageExt,jdbcType=VARCHAR},
       points = #{points,jdbcType=TINYINT},
       price = #{price,jdbcType=SMALLINT},
       name = #{name,jdbcType=NVARCHAR}

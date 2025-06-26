@@ -19,7 +19,7 @@ public class Master {
 
     private Boolean status;
 
-    private String imageUrl;
+    private String imageExt;
 
     private Byte sort;
 
@@ -95,12 +95,12 @@ public class Master {
         this.status = status;
     }
 
-    public String getImageUrl() {
-        return imageUrl;
+    public String getImageExt() {
+        return imageExt;
     }
 
-    public void setImageUrl(String imageUrl) {
-        this.imageUrl = imageUrl;
+    public void setImageExt(String imageExt) {
+        this.imageExt = imageExt;
     }
 
     public Byte getSort() {
