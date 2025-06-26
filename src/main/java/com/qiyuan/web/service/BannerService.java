@@ -7,7 +7,6 @@ import com.qiyuan.web.entity.Banner;
 import com.qiyuan.web.entity.example.BannerExample;
 import com.qiyuan.web.util.FileUtil;
 import com.qiyuan.web.dto.response.BannerVO;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -15,7 +14,6 @@ import org.springframework.stereotype.Service;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 import java.util.stream.Collectors;
 
 @Service
@@ -53,7 +51,7 @@ public class BannerService {
 
     public boolean addNewBanner(BannerRequest banner) {
         BannerExample e = new BannerExample();
-        e.createCriteria().andTypeEqualTo(banner.getType()).andOrderEqualTo(banner.getSort());
+        e.createCriteria().andTypeEqualTo(banner.getType()).andSortEqualTo(banner.getSort());
         List<Banner> existed = bannerMapper.selectByExample(e);
         if (existed != null && !existed.isEmpty()) {
             throw new ApiException("請勿重複設定相同的序列");

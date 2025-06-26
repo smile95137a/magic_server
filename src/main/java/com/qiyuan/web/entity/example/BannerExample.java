@@ -305,63 +305,63 @@ public class BannerExample {
             return (Criteria) this;
         }
 
-        public Criteria andOrderIsNull() {
-            addCriterion("order is null");
+        public Criteria andSortIsNull() {
+            addCriterion("sort is null");
             return (Criteria) this;
         }
 
-        public Criteria andOrderIsNotNull() {
-            addCriterion("order is not null");
+        public Criteria andSortIsNotNull() {
+            addCriterion("sort is not null");
             return (Criteria) this;
         }
 
-        public Criteria andOrderEqualTo(Short value) {
-            addCriterion("order =", value, "order");
+        public Criteria andSortEqualTo(Short value) {
+            addCriterion("sort =", value, "sort");
             return (Criteria) this;
         }
 
-        public Criteria andOrderNotEqualTo(Short value) {
-            addCriterion("order <>", value, "order");
+        public Criteria andSortNotEqualTo(Short value) {
+            addCriterion("sort <>", value, "sort");
             return (Criteria) this;
         }
 
-        public Criteria andOrderGreaterThan(Short value) {
-            addCriterion("order >", value, "order");
+        public Criteria andSortGreaterThan(Short value) {
+            addCriterion("sort >", value, "sort");
             return (Criteria) this;
         }
 
-        public Criteria andOrderGreaterThanOrEqualTo(Short value) {
-            addCriterion("order >=", value, "order");
+        public Criteria andSortGreaterThanOrEqualTo(Short value) {
+            addCriterion("sort >=", value, "sort");
             return (Criteria) this;
         }
 
-        public Criteria andOrderLessThan(Short value) {
-            addCriterion("order <", value, "order");
+        public Criteria andSortLessThan(Short value) {
+            addCriterion("sort <", value, "sort");
             return (Criteria) this;
         }
 
-        public Criteria andOrderLessThanOrEqualTo(Short value) {
-            addCriterion("order <=", value, "order");
+        public Criteria andSortLessThanOrEqualTo(Short value) {
+            addCriterion("sort <=", value, "sort");
             return (Criteria) this;
         }
 
-        public Criteria andOrderIn(List<Short> values) {
-            addCriterion("order in", values, "order");
+        public Criteria andSortIn(List<Short> values) {
+            addCriterion("sort in", values, "sort");
             return (Criteria) this;
         }
 
-        public Criteria andOrderNotIn(List<Short> values) {
-            addCriterion("order not in", values, "order");
+        public Criteria andSortNotIn(List<Short> values) {
+            addCriterion("sort not in", values, "sort");
             return (Criteria) this;
         }
 
-        public Criteria andOrderBetween(Short value1, Short value2) {
-            addCriterion("order between", value1, value2, "order");
+        public Criteria andSortBetween(Short value1, Short value2) {
+            addCriterion("sort between", value1, value2, "sort");
             return (Criteria) this;
         }
 
-        public Criteria andOrderNotBetween(Short value1, Short value2) {
-            addCriterion("order not between", value1, value2, "order");
+        public Criteria andSortNotBetween(Short value1, Short value2) {
+            addCriterion("sort not between", value1, value2, "sort");
             return (Criteria) this;
         }
 
@@ -482,6 +482,76 @@ public class BannerExample {
 
         public Criteria andAvailableUntilNotBetween(Date value1, Date value2) {
             addCriterion("available_until not between", value1, value2, "availableUntil");
+            return (Criteria) this;
+        }
+
+        public Criteria andDescIsNull() {
+            addCriterion("desc is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andDescIsNotNull() {
+            addCriterion("desc is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andDescEqualTo(String value) {
+            addCriterion("desc =", value, "desc");
+            return (Criteria) this;
+        }
+
+        public Criteria andDescNotEqualTo(String value) {
+            addCriterion("desc <>", value, "desc");
+            return (Criteria) this;
+        }
+
+        public Criteria andDescGreaterThan(String value) {
+            addCriterion("desc >", value, "desc");
+            return (Criteria) this;
+        }
+
+        public Criteria andDescGreaterThanOrEqualTo(String value) {
+            addCriterion("desc >=", value, "desc");
+            return (Criteria) this;
+        }
+
+        public Criteria andDescLessThan(String value) {
+            addCriterion("desc <", value, "desc");
+            return (Criteria) this;
+        }
+
+        public Criteria andDescLessThanOrEqualTo(String value) {
+            addCriterion("desc <=", value, "desc");
+            return (Criteria) this;
+        }
+
+        public Criteria andDescLike(String value) {
+            addCriterion("desc like", value, "desc");
+            return (Criteria) this;
+        }
+
+        public Criteria andDescNotLike(String value) {
+            addCriterion("desc not like", value, "desc");
+            return (Criteria) this;
+        }
+
+        public Criteria andDescIn(List<String> values) {
+            addCriterion("desc in", values, "desc");
+            return (Criteria) this;
+        }
+
+        public Criteria andDescNotIn(List<String> values) {
+            addCriterion("desc not in", values, "desc");
+            return (Criteria) this;
+        }
+
+        public Criteria andDescBetween(String value1, String value2) {
+            addCriterion("desc between", value1, value2, "desc");
+            return (Criteria) this;
+        }
+
+        public Criteria andDescNotBetween(String value1, String value2) {
+            addCriterion("desc not between", value1, value2, "desc");
             return (Criteria) this;
         }
     }
