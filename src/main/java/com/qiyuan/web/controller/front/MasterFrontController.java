@@ -1,6 +1,6 @@
 package com.qiyuan.web.controller.front;
 
-import com.chl.security.response.ApiResponse;
+import com.qiyuan.security.response.ApiResponse;
 import com.qiyuan.web.dto.request.MasterServiceRequest;
 import com.qiyuan.web.service.MasterRequestService;
 import com.qiyuan.web.service.MasterService;

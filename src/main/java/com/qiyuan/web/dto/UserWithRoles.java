@@ -1,6 +1,6 @@
 package com.qiyuan.web.dto;
 
-import com.chl.security.enums.RoleType;
+import com.qiyuan.security.enums.RoleType;
 import com.qiyuan.web.entity.User;
 import lombok.Data;
 

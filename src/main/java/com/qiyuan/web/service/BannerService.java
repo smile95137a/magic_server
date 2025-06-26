@@ -1,6 +1,6 @@
 package com.qiyuan.web.service;
 
-import com.chl.security.exception.ApiException;
+import com.qiyuan.security.exception.ApiException;
 import com.qiyuan.web.dao.BannerMapper;
 import com.qiyuan.web.dto.request.BannerRequest;
 import com.qiyuan.web.entity.Banner;

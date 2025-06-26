@@ -1,28 +1,21 @@
 package com.qiyuan.web;
 
-import com.chl.enums.ExcelColumn;
 import com.chl.enums.TableSelectionMode;
 import com.chl.generator.DatabaseSchemaGenerator;
 import com.chl.results.GenerateResult;
-import com.chl.util.Excel2ObjectParser;
-import com.qiyuan.web.entity.Poem;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.IntStream;
-
 @SpringBootApplication
 @ComponentScan(basePackages = {
-        "com.chl.security",
+        "com.qiyuan.security",
         "com.qiyuan.web"
 })
 @MapperScan(basePackages = {
         "com.qiyuan.web.dao",
-        "com.chl.security.dao"
+        "com.qiyuan.security.dao"
 })
 public class QiyuanApplication {
 
@@ -71,7 +64,7 @@ public class QiyuanApplication {
                 .setXmlOutput("mappers")
                 .enableComments(false)
                 .setTableSelection(TableSelectionMode.INCLUDE,
-                        "lantern", "master")
+                        "banner")
                 .enableToString(false);  // 排除所有視圖;
 
         GenerateResult result = generator.generate();
@@ -83,30 +76,6 @@ public class QiyuanApplication {
         }
     }
 
-
-
-    private static void generateCode04() {
-
-        DatabaseSchemaGenerator generator = new DatabaseSchemaGenerator()
-                .setDatabase("com.microsoft.sqlserver.jdbc.SQLServerDriver",
-                        "jdbc:sqlserver://localhost:11433;databaseName=qiyuan;encrypt=true;trustServerCertificate=true;",
-                        "sa", "1qaz@WSX")
-                .setModelOutput("com.qiyuan.web.entity")
-                .setMapperOutput("com.qiyuan.web.dao")
-                .setXmlOutput("mappers")
-                .enableComments(false)
-                .setTableSelection(TableSelectionMode.INCLUDE,
-                         "poem", "god")
-                .enableToString(false);  // 排除所有視圖;
-
-        GenerateResult result = generator.generate();
-
-        if (result.isSuccess()) {
-            result.getGeneratedFiles().forEach(System.out::println);
-        } else {
-            System.err.println("✘ 生成失敗：");
-        }
-    }
 
 
 }

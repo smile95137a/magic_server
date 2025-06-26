@@ -18,7 +18,7 @@
 
     <!-- 日誌級別配置 -->
     <logger name="org.springframework.web" level="INFO"/>
-    <logger name="com.chl.security" level="DEBUG"/>
+    <logger name="com.qiyuan.security" level="DEBUG"/>
 
     <!-- 根日誌設置 -->
     <root level="INFO">

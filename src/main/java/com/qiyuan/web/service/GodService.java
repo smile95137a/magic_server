@@ -1,6 +1,6 @@
 package com.qiyuan.web.service;
 
-import com.chl.security.exception.ApiException;
+import com.qiyuan.security.exception.ApiException;
 import com.qiyuan.web.dao.GodMapper;
 import com.qiyuan.web.dao.UserMapper;
 import com.qiyuan.web.dto.request.PresentOfferingRequest;

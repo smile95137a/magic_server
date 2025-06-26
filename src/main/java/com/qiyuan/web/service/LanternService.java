@@ -1,6 +1,6 @@
 package com.qiyuan.web.service;
 
-import com.chl.security.exception.ApiException;
+import com.qiyuan.security.exception.ApiException;
 import com.qiyuan.web.dao.LanternMapper;
 import com.qiyuan.web.entity.Lantern;
 import com.qiyuan.web.entity.example.LanternExample;

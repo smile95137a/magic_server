@@ -1,6 +1,6 @@
 package com.qiyuan.web.controller.front;
 
-import com.chl.security.response.ApiResponse;
+import com.qiyuan.security.response.ApiResponse;
 import com.qiyuan.web.dto.request.GodInfoRequest;
 import com.qiyuan.web.dto.request.GodExtendPeriodRequest;
 import com.qiyuan.web.dto.request.PresentOfferingRequest;

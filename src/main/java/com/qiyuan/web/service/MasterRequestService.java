@@ -1,6 +1,6 @@
 package com.qiyuan.web.service;
 
-import com.chl.security.exception.ApiException;
+import com.qiyuan.security.exception.ApiException;
 import com.qiyuan.web.dao.MasterMapper;
 import com.qiyuan.web.dao.MasterServiceRequestMapper;
 import com.qiyuan.web.entity.Master;

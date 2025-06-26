@@ -3,10 +3,10 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.chl.security.dao.TokenMapper">
+<mapper namespace="com.qiyuan.security.dao.TokenMapper">
 
     <!-- Result mapping -->
-    <resultMap id="TokenResultMap" type="com.chl.security.entity.Token">
+    <resultMap id="TokenResultMap" type="com.qiyuan.security.entity.Token">
         <id property="id" column="id"/>
         <result property="username" column="username"/>
         <result property="token" column="token"/>
@@ -15,7 +15,7 @@
     </resultMap>
 
     <!-- 插入 token -->
-    <insert id="insert" parameterType="com.chl.security.entity.Token">
+    <insert id="insert" parameterType="com.qiyuan.security.entity.Token">
         INSERT INTO token (username, token, type, expiration_time, revoked, create_time)
         VALUES (#{username}, #{token}, 'refresh',#{expirationTime}, #{revoked}, GETDATE())
     </insert>
