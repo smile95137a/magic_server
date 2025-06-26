@@ -12,18 +12,17 @@ import java.util.Date;
 
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 @Data
 public class BannerRequest {
     @Schema(description = "檔名", example = "banner2025.xxx")
     private String filename;
-    @Schema(description = "圖片Base64編碼", example = "data:xxx;base64,/9j/4AAQSk...")
-    private String imageBase64;
 
-    @Pattern(regexp = "A|B", message = "格式錯誤")
-    private String type;
     @Schema(description = "排序", example = "1")
     private Short sort;
+
+    @Pattern(regexp = "A|B", message = "格式錯誤")
+    @Schema(description = "banner類型", example = "A:主banner;B:會員好康")
+    private String type;
 
     @Schema(description = "上架日期(yyyy-MM-dd)", example = "2025-06-23")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")

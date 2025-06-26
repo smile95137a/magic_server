@@ -3,6 +3,9 @@ package com.qiyuan.web.service;
 import com.qiyuan.security.exception.ApiException;
 import com.qiyuan.web.dao.BannerMapper;
 import com.qiyuan.web.dto.request.BannerRequest;
+import com.qiyuan.web.dto.request.ModifyBannerRequest;
+import com.qiyuan.web.dto.request.NewBannerRequest;
+import com.qiyuan.web.dto.response.BannerAdminVO;
 import com.qiyuan.web.entity.Banner;
 import com.qiyuan.web.entity.example.BannerExample;
 import com.qiyuan.web.util.FileUtil;
@@ -46,20 +49,33 @@ public class BannerService {
                 .collect(Collectors.toList());
     }
 
-    public List<Banner> getAllBannerByType(String type) {
+    public List<BannerAdminVO> getAllBannerByType(String type) {
         BannerExample e = new BannerExample();
         e.createCriteria().andTypeEqualTo(type);
-        e.setOrderByClause("[order] DESC");
-        return bannerMapper.selectByExample(e);
+        e.setOrderByClause("[sort] DESC");
+        List<Banner> banners = bannerMapper.selectByExample(e);
+        return banners.stream()
+                .map(b -> BannerAdminVO.builder()
+                        .id(b.getId())
+                        .type(b.getType())
+                        .description(b.getDescription())
+                        .imageName(b.getImageName())
+                        .imageBase64(FileUtil.imageToBase64(FileUtil.concatFilePath(bannerDir, b.getImageName())))
+                        .availableFrom(b.getAvailableFrom())
+                        .availableUntil(b.getAvailableUntil())
+                        .sort(b.getSort())
+                        .build()
+                ).collect(Collectors.toList());
     }
 
-    public boolean addNewBanner(BannerRequest banner) {
+    public boolean addNewBanner(NewBannerRequest banner) {
         BannerExample e = new BannerExample();
         e.createCriteria().andTypeEqualTo(banner.getType()).andSortEqualTo(banner.getSort());
         List<Banner> existed = bannerMapper.selectByExample(e);
         if (existed != null && !existed.isEmpty()) {
             throw new ApiException("請勿重複設定相同的序列");
         }
+        
 
         String path = FileUtil.base64ToImage(banner.getImageBase64(), bannerDir, banner.getFilename());
         logger.info("成功上傳banner: " + path);
@@ -69,11 +85,32 @@ public class BannerService {
                 .availableFrom(banner.getAvailableFrom())
                 .sort(banner.getSort())
                 .type(banner.getType())
+                .description(banner.getDescription())
                 .imageName(banner.getFilename())
                 .build();
 
         return bannerMapper.insertSelective(b) > 0;
     }
+
+    public boolean modifyBanner(ModifyBannerRequest banner) {
+        BannerExample e = new BannerExample();
+        e.createCriteria().andTypeEqualTo(banner.getType()).andSortEqualTo(banner.getSort());
+        List<Banner> existed = bannerMapper.selectByExample(e);
+        if (existed != null && !existed.isEmpty() && existed.get(0).getId() != banner.getId()) {
+            throw new ApiException("請勿重複設定相同的序列");
+        }
+
+        Banner target = bannerMapper.selectByPrimaryKey(banner.getId());
+        if (target == null) throw new ApiException("查無資料");
+
+        target.setSort(banner.getSort());
+        target.setAvailableFrom(banner.getAvailableFrom());
+        target.setAvailableUntil(banner.getAvailableFrom());
+
+        return bannerMapper.updateByPrimaryKeySelective(target) > 0;
+
+    }
+
 
 
 }
