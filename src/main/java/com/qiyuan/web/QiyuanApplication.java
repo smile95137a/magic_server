@@ -22,34 +22,6 @@ public class QiyuanApplication {
     public static void main(String[] args) {
         SpringApplication.run(QiyuanApplication.class, args);
 //        generateCode05();
-//        generatePoems();
-    }
-
-
-    private static void generateCode() {
-
-        DatabaseSchemaGenerator generator = new DatabaseSchemaGenerator()
-                .setDatabase("com.microsoft.sqlserver.jdbc.SQLServerDriver",
-                        "jdbc:sqlserver://localhost:11433;databaseName=qiyuan;encrypt=true;trustServerCertificate=true;",
-                        "sa", "1qaz@WSX")
-                .setModelOutput("com.qiyuan.web.entity")
-                .setMapperOutput("com.qiyuan.web.dao")
-                .setXmlOutput("mappers")
-                .enableComments(false)
-                .setTableSelection(TableSelectionMode.INCLUDE,
-                        "user", "role", "user_role", "poem",
-                        "lantern", "lantern_purchase", "poe_rank",
-                        "offering", "offering_purchase", "banner", "god", "god_info",
-                        "master", "master_service_request" )
-                .enableToString(false);  // 排除所有視圖;
-
-        GenerateResult result = generator.generate();
-
-        if (result.isSuccess()) {
-            result.getGeneratedFiles().forEach(System.out::println);
-        } else {
-            System.err.println("✘ 生成失敗：");
-        }
     }
 
 

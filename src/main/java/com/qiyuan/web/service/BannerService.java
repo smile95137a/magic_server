@@ -22,7 +22,7 @@ public class BannerService {
     @Autowired
     private BannerMapper bannerMapper;
 
-    @Value("${}")
+    @Value("${upload.banner-path}")
     private String bannerDir;
 
     public List<BannerVO> getAvailableBannerByType(String type) {

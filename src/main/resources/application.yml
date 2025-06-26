@@ -19,7 +19,7 @@ spring:
   mail:
     host: smtp.gmail.com     # SMTP 伺服器（範例使用 Gmail）
     port: 587                # SMTP Port
-    username: yurisuha951@gmail.com      # 發信帳號
+    username: test      # 發信帳號
     password: your_app_password         # 密碼/應用程式密碼
     protocol: smtp
     properties:
@@ -30,6 +30,8 @@ spring:
             enable: true
         debug: true
 
+mybatis:
+  mapper-locations: classpath:/mappers/*.xml
 
 springdoc:
   api-docs:
@@ -57,5 +59,5 @@ security:
       - /swagger-ui
       - /swagger-ui.html
 
-mybatis:
-  mapper-locations: classpath:/mappers/*.xml
+upload:
+  banner-path: C:\Users\Public\workspace\banners
