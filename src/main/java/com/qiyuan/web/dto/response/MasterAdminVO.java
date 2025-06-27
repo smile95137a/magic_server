@@ -8,11 +8,11 @@ import lombok.NoArgsConstructor;
 
 import java.util.List;
 
-@Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class MasterVO {
+@Data
+public class MasterAdminVO {
     @Schema(description = "老師代號", example = "A001")
     private String code;
 
@@ -36,6 +36,9 @@ public class MasterVO {
 
     @Schema(description = "老師服務項目")
     private List<QaItemVO> serviceItem;
+
+    @Schema(description = "老師是否在架上", example = "true")
+    private Boolean status;
 
     @Schema(
             description = "老師圖像（Base64編碼字串，格式如：data:image/jpeg;base64,...）",

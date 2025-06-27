@@ -30,7 +30,7 @@ public class MasterFrontController {
     @Operation(summary = "取得老師清單",  description = "回傳在職的老師資料")
     @PostMapping("/list")
     public List<MasterVO> getMasterList() {
-        return masterService.getMasterList();
+        return masterService.getAvailableMasterList();
     }
 
     @Operation(summary = "預約老師服務", description = "送出預約資料，回傳預約是否成功")
