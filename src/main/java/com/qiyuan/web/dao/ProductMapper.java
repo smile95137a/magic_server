@@ -18,6 +18,8 @@ public interface ProductMapper {
 
     List<Product> selectByExample(ProductExample example);
 
+    List<Product> selectLimitsByExample(@Param("example")ProductExample example, @Param("limits") int limits);
+
     Product selectByPrimaryKey(Integer id);
 
     int updateByExampleSelective(@Param("record") Product record, @Param("example") ProductExample example);

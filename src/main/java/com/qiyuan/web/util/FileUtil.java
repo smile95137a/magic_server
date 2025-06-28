@@ -1,22 +1,25 @@
 package com.qiyuan.web.util;
 
+import com.qiyuan.web.enums.ImageExtension;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Base64;
+import java.util.List;
 
 public class FileUtil {
 
-    public static String concatFilePath(String prev, String suf) {
-        String sep = File.separator;
-        if (prev.endsWith(sep) && suf.startsWith(sep)) {
-            return prev.concat(suf.substring(1));
-        } else if (prev.endsWith(sep) || suf.startsWith(sep)) {
-            return prev.concat(suf);
-        } else {
-            return prev.concat(sep).concat(suf);
-        }
+    private static final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(FileUtil.class);
+
+    public static String concatFilePath(String... paths) {
+        return Paths.get(paths[0], java.util.Arrays.copyOfRange(paths, 1, paths.length)).toString();
     }
+
 
     /**
      * 將圖片 URL（本地或遠端）轉換成 Base64 字串
@@ -80,13 +83,13 @@ public class FileUtil {
     }
 
     private static String getContentType(String imageUrl) {
-        String lower = imageUrl.toLowerCase();
-        if (lower.endsWith(".png")) return "image/png";
-        if (lower.endsWith(".jpg") || lower.endsWith(".jpeg")) return "image/jpeg";
-        if (lower.endsWith(".gif")) return "image/gif";
-        return "image/*";
+        ImageExtension ext = ImageExtension.fromFilename(imageUrl);
+        return ext != null ? ext.getContentType() : "image/*";
     }
 
+    /**
+     * base64 轉圖片檔，檔名允許無副檔名（會根據 base64 前綴自動補副檔名）
+     */
     public static String base64ToImage(String base64Str, String destDir, String originalFilename) {
         if (base64Str == null || destDir == null || originalFilename == null) return null;
         try {
@@ -106,19 +109,18 @@ public class FileUtil {
                 }
             }
 
-            // 原始檔名副檔名
+            // 判斷副檔名
             String ext = "";
             int dotIdx = originalFilename.lastIndexOf(".");
             if (dotIdx >= 0) {
                 ext = originalFilename.substring(dotIdx);
             } else {
                 // 沒有副檔名才用 contentType
-                switch (contentType) {
-                    case "image/jpeg":
-                    case "image/jpg": ext = ".jpg"; break;
-                    case "image/gif": ext = ".gif"; break;
-                    case "image/png":
-                    default: ext = ".png"; break;
+                ImageExtension imageExt = ImageExtension.fromContentType(contentType);
+                if (imageExt != null) {
+                    ext = "." + imageExt.getExtension();
+                } else {
+                    ext = ".png"; // 預設
                 }
             }
 
@@ -149,4 +151,78 @@ public class FileUtil {
         }
     }
 
+    /**
+     * 將多個 base64 字串儲存為圖片，依序命名為 01.jpg, 02.png ...（自動判斷副檔名，僅支援 ImageExtension）
+     * @param base64List 前台傳來的 base64 字串清單
+     * @param destDir 儲存資料夾
+     * @return List<String> 實際儲存成功的路徑
+     */
+    public static List<String> saveBase64Images(List<String> base64List, String destDir) {
+        if (base64List == null || base64List.isEmpty()) return List.of();
+
+        File dir = new File(destDir);
+        if (!dir.exists()) dir.mkdirs();
+
+        List<String> result = new ArrayList<>();
+        int digits = Math.max(2, String.valueOf(base64List.size()).length());
+
+        for (int i = 0; i < base64List.size(); i++) {
+            String base64 = base64List.get(i);
+
+            // 取得 contentType
+            String contentType = "image/png";
+            if (base64 != null && base64.startsWith("data:")) {
+                int commaIdx = base64.indexOf(',');
+                if (commaIdx > 0) {
+                    String header = base64.substring(0, commaIdx);
+                    int semiIdx = header.indexOf(';');
+                    if (header.startsWith("data:") && semiIdx > 0) {
+                        contentType = header.substring(5, semiIdx);
+                    }
+                }
+            }
+            ImageExtension imageExt = ImageExtension.fromContentType(contentType);
+            if (imageExt == null) {
+                logger.warn(String.format("不支援的圖片格式：%s，index=%d", contentType, i));
+                continue;
+            }
+
+            String ext = "." + imageExt.getExtension();
+            String filename = String.format("%0" + digits + "d%s", i + 1, ext);
+            try {
+                String absPath = base64ToImage(base64, destDir, filename);
+                if (absPath != null) {
+                    result.add(absPath);
+                } else {
+                    logger.warn(String.format("儲存失敗：%s", filename));
+                }
+            } catch (Exception e) {
+                logger.warn(String.format("例外發生：%s，原因：%s", filename, e.getMessage()));
+            }
+        }
+        return result;
+    }
+
+    /**
+     * 讀取指定資料夾下所有圖片檔案（不含子資料夾），轉成 base64（含data:image/xxx;base64,...前綴）
+     * @param dirPath 資料夾路徑
+     * @return List<String> 每個圖片的base64字串
+     */
+    public static List<String> readAllImagesAsBase64(String dirPath) {
+        File dir = new File(dirPath);
+        if (!dir.isDirectory()) return List.of();
+
+        File[] files = dir.listFiles((file, name) -> {
+            return ImageExtension.fromFilename(name) != null;
+        });
+        if (files == null) return List.of();
+
+        List<String> result = new ArrayList<>();
+        for (File file : files) {
+            String base64 = imageToBase64(file.getAbsolutePath());
+            if (base64 != null) result.add(base64);
+        }
+        return result;
+    }
 }
+

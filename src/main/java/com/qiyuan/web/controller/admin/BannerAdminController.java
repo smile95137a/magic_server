@@ -1,15 +1,11 @@
 package com.qiyuan.web.controller.admin;
 
-import com.qiyuan.web.dto.request.BannerRequest;
 import com.qiyuan.web.dto.request.ModifyBannerRequest;
 import com.qiyuan.web.dto.request.NewBannerRequest;
 import com.qiyuan.web.dto.response.BannerAdminVO;
-import com.qiyuan.web.entity.Banner;
-import com.qiyuan.web.security.RoleExpressions;
 import com.qiyuan.web.service.BannerService;
 import jakarta.validation.constraints.Pattern;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
