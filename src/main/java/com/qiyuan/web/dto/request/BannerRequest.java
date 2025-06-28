@@ -24,11 +24,11 @@ public class BannerRequest {
     @Schema(description = "banner類型", example = "A:主banner;B:會員好康")
     private String type;
 
-    @Schema(description = "上架日期(yyyy-MM-dd)", example = "2025-06-23")
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+    @Schema(description = "上架日期(yyyy/MM/dd)", example = "2025/06/23")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy/MM/dd")
     private Date availableFrom;
 
-    @Schema(description = "下架日期(yyyy-MM-dd)", example = "2025-07-01")
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+    @Schema(description = "下架日期(yyyy/MM/dd)", example = "2025/07/01")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy/MM/dd")
     private Date availableUntil;
 }

@@ -1,19 +1,21 @@
 package com.qiyuan.web.controller.front;
 
-import com.qiyuan.web.dto.request.RefreshTokenRequest;
-import com.qiyuan.web.dto.request.UserLoginRequest;
-import com.qiyuan.web.dto.request.UserProfileModifyRequest;
-import com.qiyuan.web.dto.request.UserRegisterRequest;
+import com.qiyuan.web.dto.request.*;
 import com.qiyuan.web.dto.response.LoginResponse;
+import com.qiyuan.web.dto.response.RecordVO;
 import com.qiyuan.web.dto.response.UserProfileResponse;
 import com.qiyuan.web.security.RoleExpressions;
 import com.qiyuan.web.service.AuthService;
+import com.qiyuan.web.service.MemberService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/user")
@@ -21,9 +23,11 @@ import org.springframework.web.bind.annotation.*;
 public class UserFrontController {
 
     private final AuthService authService;
+    private final MemberService memberService;
 
-    public UserFrontController(AuthService authService) {
+    public UserFrontController(AuthService authService, MemberService memberService) {
         this.authService = authService;
+        this.memberService = memberService;
     }
 
     @PostMapping("/register")
@@ -59,6 +63,16 @@ public class UserFrontController {
     public UserProfileResponse getProfile() {
         return authService.getProfile();
     }
+
+    @PostMapping("/record/purchase")
+    @SecurityRequirement(name = "bearerAuth")
+    @PreAuthorize(RoleExpressions.ONLY_USER)
+    @Operation(summary = "取得會員消費紀錄", description = "需帶 Bearer JWT token")
+    public List<RecordVO> getPurchaseRecord(@RequestBody @Validated RecordPeriodRequest req) {
+        return memberService.getPurchaseRecord(req);
+    }
+
+
 
 //    @PostMapping("/forget-password")
 //    public ApiResponse<?> changePassword(@RequestBody ChangePasswordRequest req) {

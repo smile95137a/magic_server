@@ -23,6 +23,11 @@
     <result column="expired_time" jdbcType="TIMESTAMP" property="expiredTime" />
     <result column="blessing_times" jdbcType="SMALLINT" property="blessingTimes" />
   </resultMap>
+  <resultMap id="RecordJoinMap" type="com.qiyuan.web.entity.LanternRecord">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="lanternName" jdbcType="NVARCHAR" property="lanternName" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+  </resultMap>
   <sql id="Example_Where_Clause">
     <where>
       <foreach collection="oredCriteria" item="criteria" separator="or">
@@ -137,6 +142,18 @@
     <include refid="Base_Column_List" />
     from lantern_purchase
     where id = #{id,jdbcType=INTEGER}
+  </select>
+
+  <select id="selectRecordsByUserId" resultMap="RecordJoinMap">
+    SELECT
+    <if test="limits != null">
+      TOP (#{limits})
+    </if>
+    p.id id, p.create_time create_time, l.name lanternName
+    FROM lantern_purchase p
+    LEFT JOIN lantern l ON l.id = p.lantern_id
+    WHERE p.user_id = #{userId} AND p.create_time BETWEEN #{startTime} AND #{endTime}
+    ORDER By p.create_time ASC
   </select>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
     delete from lantern_purchase

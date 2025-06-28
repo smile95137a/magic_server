@@ -9,7 +9,7 @@ import java.util.Date;
 
 public class DateUtil {
 
-    private static final SimpleDateFormat DEFAULT_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
+    private static final SimpleDateFormat DEFAULT_FORMAT = new SimpleDateFormat("yyyy/MM/dd");
 
     public static String adjustDate(String inputDate, int days) {
         Date date = parseStringToDate(inputDate);
@@ -43,6 +43,16 @@ public class DateUtil {
         } catch (ParseException e) {
             throw new IllegalArgumentException("日期格式錯誤，應為 yyyy-MM-dd 或 yyyy/MM/dd");
         }
+    }
+
+    public static Date getEndOfDate(Date date) {
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
+        cal.set(Calendar.HOUR_OF_DAY, 23);
+        cal.set(Calendar.MINUTE, 59);
+        cal.set(Calendar.SECOND, 59);
+        cal.set(Calendar.MILLISECOND, 999);
+        return cal.getTime();
     }
 
     @SuppressWarnings("unchecked")

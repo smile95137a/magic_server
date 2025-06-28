@@ -2,7 +2,11 @@ package com.qiyuan.web.dao;
 
 import com.qiyuan.web.dto.LanternBlessingDTO;
 import com.qiyuan.web.entity.LanternPurchase;
+import com.qiyuan.web.entity.LanternRecord;
+import com.qiyuan.web.entity.OfferingRecord;
 import com.qiyuan.web.entity.example.LanternPurchaseExample;
+
+import java.util.Date;
 import java.util.List;
 import org.apache.ibatis.annotations.Param;
 
@@ -23,6 +27,8 @@ public interface LanternPurchaseMapper {
     List<LanternBlessingDTO> selectDistinctLimitByExample(@Param("example") LanternPurchaseExample example, @Param("limit") int limit);
 
     LanternPurchase selectByPrimaryKey(Integer id);
+
+    List<LanternRecord> selectRecordsByUserId(@Param("userId")String userId, @Param("startTime") Date startTime, @Param("endTime")Date endTime, @Param("limits") Integer limits);
 
     int updateByExampleSelective(@Param("record") LanternPurchase record, @Param("example") LanternPurchaseExample example);
 
