@@ -10,6 +10,7 @@
     <result column="line_id" jdbcType="VARCHAR" property="lineId" />
     <result column="note" jdbcType="NVARCHAR" property="note" />
     <result column="service" jdbcType="NVARCHAR" property="service" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -70,7 +71,7 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    serial, master_code, name, phone, email, line_id, note, service
+    serial, master_code, name, phone, email, line_id, note, service, create_time
   </sql>
   <select id="selectByExample" parameterType="com.qiyuan.web.entity.example.MasterServiceRequestExample" resultMap="BaseResultMap">
     select
@@ -102,17 +103,22 @@
       <include refid="Example_Where_Clause" />
     </if>
   </delete>
-  <insert id="insert" parameterType="com.qiyuan.web.entity.MasterServiceRequest" useGeneratedKeys="true" keyProperty="serial">
-    insert into master_service_request (master_code, name,
+  <insert id="insert" parameterType="com.qiyuan.web.entity.MasterServiceRequest">
+    insert into master_service_request (serial, master_code, name, 
       phone, email, line_id, 
-      note, service)
-    values (#{masterCode,jdbcType=VARCHAR}, #{name,jdbcType=NVARCHAR},
+      note, service, create_time
+      )
+    values (#{serial,jdbcType=INTEGER}, #{masterCode,jdbcType=VARCHAR}, #{name,jdbcType=NVARCHAR}, 
       #{phone,jdbcType=VARCHAR}, #{email,jdbcType=VARCHAR}, #{lineId,jdbcType=VARCHAR}, 
-      #{note,jdbcType=NVARCHAR}, #{service,jdbcType=NVARCHAR})
+      #{note,jdbcType=NVARCHAR}, #{service,jdbcType=NVARCHAR}, #{createTime,jdbcType=TIMESTAMP}
+      )
   </insert>
-  <insert id="insertSelective" parameterType="com.qiyuan.web.entity.MasterServiceRequest" useGeneratedKeys="true" keyProperty="serial">
+  <insert id="insertSelective" parameterType="com.qiyuan.web.entity.MasterServiceRequest">
     insert into master_service_request
     <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="serial != null">
+        serial,
+      </if>
       <if test="masterCode != null">
         master_code,
       </if>
@@ -133,6 +139,9 @@
       </if>
       <if test="service != null">
         service,
+      </if>
+      <if test="createTime != null">
+        create_time,
       </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
@@ -159,6 +168,9 @@
       </if>
       <if test="service != null">
         #{service,jdbcType=NVARCHAR},
+      </if>
+      <if test="createTime != null">
+        #{createTime,jdbcType=TIMESTAMP},
       </if>
     </trim>
   </insert>
@@ -195,6 +207,9 @@
       <if test="record.service != null">
         service = #{record.service,jdbcType=NVARCHAR},
       </if>
+      <if test="record.createTime != null">
+        create_time = #{record.createTime,jdbcType=TIMESTAMP},
+      </if>
     </set>
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
@@ -209,7 +224,8 @@
       email = #{record.email,jdbcType=VARCHAR},
       line_id = #{record.lineId,jdbcType=VARCHAR},
       note = #{record.note,jdbcType=NVARCHAR},
-      service = #{record.service,jdbcType=NVARCHAR}
+      service = #{record.service,jdbcType=NVARCHAR},
+      create_time = #{record.createTime,jdbcType=TIMESTAMP}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
     </if>
@@ -238,6 +254,9 @@
       <if test="service != null">
         service = #{service,jdbcType=NVARCHAR},
       </if>
+      <if test="createTime != null">
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
     </set>
     where serial = #{serial,jdbcType=INTEGER}
   </update>
@@ -249,7 +268,8 @@
       email = #{email,jdbcType=VARCHAR},
       line_id = #{lineId,jdbcType=VARCHAR},
       note = #{note,jdbcType=NVARCHAR},
-      service = #{service,jdbcType=NVARCHAR}
+      service = #{service,jdbcType=NVARCHAR},
+      create_time = #{createTime,jdbcType=TIMESTAMP}
     where serial = #{serial,jdbcType=INTEGER}
   </update>
 </mapper>

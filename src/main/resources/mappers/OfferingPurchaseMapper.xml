@@ -97,7 +97,7 @@
     where id = #{id,jdbcType=INTEGER}
   </select>
 
-  <select id="selectRecordsByUserId" resultMap="RecordJoinMap">
+  <select id="selectRecordsByUserIdAndPeriod" resultMap="RecordJoinMap">
     SELECT
     <if test="limits != null">
       TOP (#{limits})
@@ -108,6 +108,20 @@
     LEFT JOIN god g ON g.id = p.god_id
     WHERE p.user_id = #{userId}
     AND p.create_time BETWEEN #{startTime} AND #{endTime}
+    ORDER BY p.create_time ASC
+  </select>
+
+  <select id="selectRecordsByPeriod" resultMap="RecordJoinMap">
+    SELECT
+    <if test="limits != null">
+      TOP (#{limits})
+    </if>
+    p.id as id, p.create_time as create_time, o.name as offeringName, g.name as godName
+    FROM offering_purchase p
+    LEFT JOIN offering o ON o.id = p.offering_id
+    LEFT JOIN god g ON g.id = p.god_id
+    WHERE
+    p.create_time BETWEEN #{startTime} AND #{endTime}
     ORDER BY p.create_time ASC
   </select>
 

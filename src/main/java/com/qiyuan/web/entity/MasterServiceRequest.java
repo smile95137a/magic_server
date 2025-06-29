@@ -2,6 +2,8 @@ package com.qiyuan.web.entity;
 
 import lombok.Builder;
 
+import java.util.Date;
+
 @Builder
 public class MasterServiceRequest {
     private Integer serial;
@@ -19,6 +21,8 @@ public class MasterServiceRequest {
     private String note;
 
     private String service;
+
+    private Date createTime;
 
     public Integer getSerial() {
         return serial;
@@ -82,5 +86,13 @@ public class MasterServiceRequest {
 
     public void setService(String service) {
         this.service = service;
+    }
+
+    public Date getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(Date createTime) {
+        this.createTime = createTime;
     }
 }

@@ -1,8 +1,10 @@
 package com.qiyuan.web.util;
 
+import com.qiyuan.security.exception.ApiException;
 import com.qiyuan.web.enums.ImageExtension;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
 import java.net.HttpURLConnection;
@@ -11,6 +13,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
+import java.util.UUID;
 
 public class FileUtil {
 
@@ -46,6 +49,24 @@ public class FileUtil {
             e.printStackTrace();
             return null;
         }
+    }
+
+    public static String saveUploadImageReturnFilename(MultipartFile file, String destDir, int maxFileSizeMb) {
+        // 檢查副檔名/型態
+        ImageExtension ext = ImageExtension.fromFilename(file.getOriginalFilename());
+        if (ext == null) throw new IllegalArgumentException("不支援的圖片格式");
+        if (file.getSize() > maxFileSizeMb * 1024 * 1024L) throw new IllegalArgumentException("檔案太大");
+
+        String filename = System.currentTimeMillis() + "_" + UUID.randomUUID().toString().substring(0, 6) + "." + ext.getExtension();
+        File dir = new File(destDir);
+        if (!dir.exists()) dir.mkdirs();
+        File out = new File(dir, filename);
+        try {
+            file.transferTo(out);
+        } catch (IOException e) {
+            throw new RuntimeException("圖片儲存失敗", e);
+        }
+        return filename;
     }
 
     private static byte[] fetchImageFromHttp(String urlStr) throws IOException {
@@ -223,6 +244,41 @@ public class FileUtil {
             if (base64 != null) result.add(base64);
         }
         return result;
+    }
+
+
+    /**
+     * 上傳單一圖片檔案（檢查副檔名、檢查最大尺寸），自動產生新檔名，並回傳URL路徑
+     *
+     * @param file           MultipartFile
+     * @param destDir        實體儲存目錄（如 /data/images/product/temp/）
+     * @param urlPrefix      最終對外 img src（如 /images/product/temp/）
+     * @param maxFileSizeMb  檔案大小上限（MB）
+     * @return url           存檔成功的圖片網址
+     */
+    public static String saveUploadImage(MultipartFile file, String destDir, String urlPrefix, int maxFileSizeMb) {
+        // 檢查檔案大小
+        if (file.getSize() > maxFileSizeMb * 1024 * 1024L) {
+            throw new ApiException("圖片大小不可超過 " + maxFileSizeMb + "MB");
+        }
+        // 副檔名檢查
+        ImageExtension ext = ImageExtension.fromFilename(file.getOriginalFilename());
+        if (ext == null) {
+            throw new ApiException("不支援的圖片格式，請上傳 jpg/png/gif/webp/bmp 格式");
+        }
+        // 產生新檔名
+        String filename = System.currentTimeMillis() + "_" + UUID.randomUUID().toString().substring(0, 6)
+                + "." + ext.getExtension();
+        File dir = new File(destDir);
+        if (!dir.exists()) dir.mkdirs();
+        File out = new File(dir, filename);
+        try {
+            file.transferTo(out);
+        } catch (IOException e) {
+            throw new RuntimeException("圖片儲存失敗", e);
+        }
+        // 回傳可直接給 img src 的 URL
+        return urlPrefix + filename;
     }
 }
 

@@ -11,8 +11,9 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ProductVO {
+public class ProductViewVO {
     private Integer id;
+    private String categoryId;
     private String name;
     private BigDecimal originalPrice;
     private BigDecimal specialPrice;

@@ -1,5 +1,4 @@
 package com.qiyuan.web.enums;
-
 public enum ImageExtension {
     JPG("jpg", "image/jpeg"),
     JPEG("jpeg", "image/jpeg"),
@@ -16,32 +15,26 @@ public enum ImageExtension {
         this.contentType = contentType;
     }
 
-    public String getExtension() {
-        return extension;
-    }
-
-    public String getContentType() {
-        return contentType;
-    }
+    public String getExtension() { return extension; }
+    public String getContentType() { return contentType; }
 
     public static ImageExtension fromFilename(String filename) {
         if (filename == null) return null;
-        String lower = filename.toLowerCase();
-        for (ImageExtension ext : values()) {
-            if (lower.endsWith("." + ext.extension)) {
-                return ext;
-            }
+        int idx = filename.lastIndexOf('.');
+        if (idx < 0) return null;
+        String ext = filename.substring(idx + 1).toLowerCase();
+        for (ImageExtension e : values()) {
+            if (e.extension.equals(ext)) return e;
         }
         return null;
     }
 
     public static ImageExtension fromContentType(String contentType) {
         if (contentType == null) return null;
-        for (ImageExtension ext : values()) {
-            if (ext.contentType.equalsIgnoreCase(contentType)) {
-                return ext;
-            }
+        for (ImageExtension e : values()) {
+            if (contentType.equalsIgnoreCase(e.contentType)) return e;
         }
         return null;
     }
 }
+

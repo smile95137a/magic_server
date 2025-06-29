@@ -20,4 +20,19 @@ public enum ProductImageType {
     public String getLabel() {
         return label;
     }
+
+    public static boolean isValid(String value) {
+        if (value == null) return false;
+        for (ProductImageType type : values()) {
+            if (type.getFolder().equalsIgnoreCase(value)) return true;
+        }
+        return false;
+    }
+
+    public static ProductImageType fromString(String value) {
+        for (ProductImageType type : values()) {
+            if (type.getFolder().equalsIgnoreCase(value)) return type;
+        }
+        throw new IllegalArgumentException("Unknown ProductImageType: " + value);
+    }
 }

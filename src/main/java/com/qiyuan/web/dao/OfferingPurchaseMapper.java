@@ -23,7 +23,10 @@ public interface OfferingPurchaseMapper {
 
     OfferingPurchase selectByPrimaryKey(Integer id);
 
-    List<OfferingRecord> selectRecordsByUserId(@Param("userId")String userId, @Param("startTime") Date startTime, @Param("endTime")Date endTime, @Param("limits") Integer limits);
+    List<OfferingRecord> selectRecordsByUserIdAndPeriod(@Param("userId")String userId, @Param("startTime") Date startTime, @Param("endTime")Date endTime, @Param("limits") Integer limits);
+
+    List<OfferingRecord> selectRecordsByPeriod(@Param("startTime") Date startTime, @Param("endTime")Date endTime, @Param("limits") Integer limits);
+
 
     int updateByExampleSelective(@Param("record") OfferingPurchase record, @Param("example") OfferingPurchaseExample example);
 

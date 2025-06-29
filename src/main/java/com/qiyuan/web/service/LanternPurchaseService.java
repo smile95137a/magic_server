@@ -3,13 +3,19 @@ package com.qiyuan.web.service;
 import com.qiyuan.web.dao.LanternMapper;
 import com.qiyuan.web.dao.LanternPurchaseMapper;
 import com.qiyuan.web.dto.LanternBlessingDTO;
+import com.qiyuan.web.dto.request.RecordPeriodRequest;
+import com.qiyuan.web.dto.response.RecordVO;
 import com.qiyuan.web.entity.Lantern;
 import com.qiyuan.web.entity.LanternPurchase;
+import com.qiyuan.web.entity.LanternRecord;
+import com.qiyuan.web.entity.OfferingRecord;
 import com.qiyuan.web.entity.example.LanternExample;
 import com.qiyuan.web.entity.example.LanternPurchaseExample;
 import com.qiyuan.web.dto.request.LanternPurchaseRequest;
+import com.qiyuan.web.enums.RecordItem;
 import com.qiyuan.web.util.DateUtil;
 import com.qiyuan.web.dto.response.LanternBlessingVO;
+import org.apache.commons.lang3.time.DateFormatUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -41,6 +47,20 @@ public class LanternPurchaseService {
         LanternPurchaseExample e = new LanternPurchaseExample();
         e.createCriteria().andLanternIdEqualTo(lanternId);
         return lanternPurchaseMapper.countByExample(e);
+    }
+
+    public List<RecordVO> getLanternPurchaseList(RecordPeriodRequest req) {
+        Date startTime = req.getStartTime();
+        Date endTime = DateUtil.getEndOfDate(req.getEndTime());
+        List<LanternRecord> lanternRecords = lanternPurchaseMapper.selectRecordsByPeriod(startTime, endTime, 100);
+
+        return lanternRecords.stream()
+                .map(l -> RecordVO.builder()
+                        .date(DateFormatUtils.format(l.getCreateTime(), "yyyy/MM/dd HH:mm"))
+                        .item(RecordItem.Lantern.getLabel())
+                        .content(l.getLanternName())
+                        .build())
+                .collect(Collectors.toList());
     }
 
     public List<LanternBlessingVO> getLatestLanternBlessing(int num) {

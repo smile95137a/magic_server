@@ -1,5 +1,6 @@
 package com.qiyuan.web.service;
 
+import com.qiyuan.security.exception.ApiException;
 import com.qiyuan.web.dao.OfferingMapper;
 import com.qiyuan.web.dao.OfferingPurchaseMapper;
 import com.qiyuan.web.dto.response.OfferingVO;
@@ -8,10 +9,13 @@ import com.qiyuan.web.entity.OfferingPurchase;
 import com.qiyuan.web.entity.example.OfferingExample;
 import com.qiyuan.web.util.DateUtil;
 import com.qiyuan.web.util.FileUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
@@ -44,6 +48,51 @@ public class OfferingService {
         OfferingExample e = new OfferingExample();
         List<Offering> offeringList = offeringMapper.selectByExample(e);
         return offeringList.stream().map(this::convertToVo).collect(Collectors.toList());
+    }
+
+    public boolean addOffering(OfferingVO r) {
+        if (!StringUtils.isNoneEmpty(r.getName(), r.getImageBase64())) {
+            throw new ApiException("新增失敗, 參數不可為空");
+        }
+
+        String path = FileUtil.base64ToImage(r.getImageBase64(), offeringDir, r.getId());
+        String fileName = Paths.get(path).getFileName().toString();
+        Offering offering = Offering.builder()
+                .name(r.getName())
+                .points(r.getPoints() == null ? 0 : r.getPoints())
+                .price(r.getPrice() == null ? 0 : r.getPrice())
+                .imageExt(fileName.substring(fileName.lastIndexOf(".") + 1).toLowerCase(Locale.ROOT)).build();
+        return offeringMapper.insert(offering) > 0;
+    }
+
+    public boolean modifyOffering(OfferingVO r) {
+        if (StringUtils.isBlank(r.getId())) {
+            throw new ApiException("新增失敗, 查無資料");
+        }
+        Offering offering1 = offeringMapper.selectByPrimaryKey(r.getId());
+        if (StringUtils.isNotBlank(r.getName())) {
+            offering1.setName(r.getName());
+        }
+
+        if (StringUtils.isNotBlank(r.getImageBase64())) {
+            String path = FileUtil.base64ToImage(r.getImageBase64(), offeringDir, r.getId());
+            String fileName = Paths.get(path).getFileName().toString();
+            offering1.setImageExt(fileName.substring(fileName.lastIndexOf(".") + 1).toLowerCase(Locale.ROOT));
+        }
+
+        if (r.getPoints() != null) {
+            offering1.setPoints(r.getPoints());
+        }
+
+        if (r.getPrice() != null) {
+            offering1.setPrice(r.getPrice());
+        }
+
+        return offeringMapper.updateByPrimaryKeySelective(offering1) > 0;
+    }
+
+    public boolean deleteById(String id) {
+        return offeringMapper.deleteByPrimaryKey(id) > 0;
     }
 
     @Transactional

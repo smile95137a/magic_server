@@ -1,11 +1,8 @@
 package com.qiyuan.web.entity;
 
-import lombok.Builder;
-
 import java.math.BigDecimal;
 import java.util.Date;
 
-@Builder
 public class Product {
     private Integer id;
 
@@ -30,6 +27,8 @@ public class Product {
     private Date createTime;
 
     private Date updateTime;
+
+    private String detailHtml;
 
     public Integer getId() {
         return id;
@@ -125,5 +124,13 @@ public class Product {
 
     public void setUpdateTime(Date updateTime) {
         this.updateTime = updateTime;
+    }
+
+    public String getDetailHtml() {
+        return detailHtml;
+    }
+
+    public void setDetailHtml(String detailHtml) {
+        this.detailHtml = detailHtml;
     }
 }

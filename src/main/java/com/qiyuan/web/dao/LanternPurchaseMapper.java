@@ -28,7 +28,8 @@ public interface LanternPurchaseMapper {
 
     LanternPurchase selectByPrimaryKey(Integer id);
 
-    List<LanternRecord> selectRecordsByUserId(@Param("userId")String userId, @Param("startTime") Date startTime, @Param("endTime")Date endTime, @Param("limits") Integer limits);
+    List<LanternRecord> selectRecordsByUserIdAndPeriod(@Param("userId")String userId, @Param("startTime") Date startTime, @Param("endTime")Date endTime, @Param("limits") Integer limits);
+    List<LanternRecord> selectRecordsByPeriod(@Param("startTime") Date startTime, @Param("endTime")Date endTime, @Param("limits") Integer limits);
 
     int updateByExampleSelective(@Param("record") LanternPurchase record, @Param("example") LanternPurchaseExample example);
 

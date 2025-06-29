@@ -36,8 +36,8 @@ public class MemberService {
         String username = SecurityUtils.getCurrentUsername();
         User user = userMapper.selectByUsername(username);
 
-        List<OfferingRecord> offeringRecords = offeringPurchaseMapper.selectRecordsByUserId(user.getId(), startTime, endTime, 50);
-        List<LanternRecord> lanternRecords = lanternPurchaseMapper.selectRecordsByUserId(user.getId(), startTime, endTime, 50);
+        List<OfferingRecord> offeringRecords = offeringPurchaseMapper.selectRecordsByUserIdAndPeriod(user.getId(), startTime, endTime, 50);
+        List<LanternRecord> lanternRecords = lanternPurchaseMapper.selectRecordsByUserIdAndPeriod(user.getId(), startTime, endTime, 50);
 
         return Stream.concat(
                 offeringRecords

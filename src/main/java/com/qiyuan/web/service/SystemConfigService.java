@@ -43,4 +43,13 @@ public class SystemConfigService {
         }
         return 0l;
     }
+
+    public boolean insertSystemConfig(SystemConfig config) {
+        return systemConfigMapper.insert(config) > 0;
+    }
+
+    public boolean updateSystemConfig(SystemConfig config) {
+        return systemConfigMapper.updateByPrimaryKeySelective(config) > 0;
+    }
+
 }
