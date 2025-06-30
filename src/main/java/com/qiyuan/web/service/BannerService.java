@@ -96,7 +96,7 @@ public class BannerService {
         BannerExample e = new BannerExample();
         e.createCriteria().andTypeEqualTo(banner.getType()).andSortEqualTo(banner.getSort());
         List<Banner> existed = bannerMapper.selectByExample(e);
-        if (existed != null && !existed.isEmpty() && existed.get(0).getId() != banner.getId()) {
+        if (existed != null && !existed.isEmpty() && !existed.get(0).getId().equals(banner.getId())) {
             throw new ApiException("請勿重複設定相同的序列");
         }
 
@@ -105,7 +105,7 @@ public class BannerService {
 
         target.setSort(banner.getSort());
         target.setAvailableFrom(banner.getAvailableFrom());
-        target.setAvailableUntil(banner.getAvailableFrom());
+        target.setAvailableUntil(banner.getAvailableUntil());
 
         return bannerMapper.updateByPrimaryKeySelective(target) > 0;
 

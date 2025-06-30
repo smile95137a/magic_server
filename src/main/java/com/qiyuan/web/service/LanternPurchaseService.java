@@ -134,6 +134,7 @@ public class LanternPurchaseService {
                                 .expiredTime(DateUtil.adjustDate(now, 365, Date.class))
                                 .lanternId(lantern.getId())
                                 .userId(userId)
+                                .blessingTimes((short)0)
                                 .build()
                 ).forEach(l -> lanternPurchaseMapper.insertSelective(l));
         return true;

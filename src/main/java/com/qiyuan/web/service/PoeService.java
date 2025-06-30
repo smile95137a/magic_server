@@ -56,13 +56,13 @@ public class PoeService {
         Date now = DateUtil.getCurrentDate();
         if (poeRank == null) {
             PoeRank rank = PoeRank.builder().userId(user.getId())
-                    .times(1)
+                    .times(n)
                     .createTime(now)
                     .updateTime(now)
                     .build();
             return poeRankMapper.insertSelective(rank) > 0;
         } else {
-            poeRank.setTimes(poeRank.getTimes() + 1);
+            poeRank.setTimes(poeRank.getTimes() + n);
             poeRank.setUpdateTime(now);
             return poeRankMapper.updateByPrimaryKey(poeRank) > 0;
         }

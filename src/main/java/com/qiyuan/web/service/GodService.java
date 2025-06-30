@@ -122,6 +122,7 @@ public class GodService {
         User user = userMapper.selectByUsername(username);
         God god = getGodByCode(godCode);
         GodInfo godInfo = godInfoService.getGodInfo(user.getId(), god.getId());
+        if (godInfo == null) throw new ApiException("請先請神成功!");
 
         if (StringUtils.isBlank(godInfo.getOfferingList())) {
             godInfo.setOfferingList(newOfferingId);

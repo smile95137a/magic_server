@@ -15,6 +15,8 @@ import com.qiyuan.web.entity.User;
 import com.qiyuan.web.entity.UserRole;
 import com.qiyuan.web.util.DateUtil;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -27,6 +29,8 @@ import java.util.UUID;
 
 @Service
 public class AuthService {
+
+    private Logger logger = LoggerFactory.getLogger(AuthService.class);
 
     private final UserMapper userMapper;
     private final UserRoleMapper userRoleMapper;
@@ -91,10 +95,17 @@ public class AuthService {
     }
 
     public LoginResponse login(UserLoginRequest req) {
-        UserDetails userDetails = userService.loadUserByUsername(req.getUsername());
-        if (!passwordEncoder.matches(req.getPassword(), userDetails.getPassword())) {
+        UserDetails userDetails = null;
+        try {
+            userDetails = userService.loadUserByUsername(req.getUsername());
+            if (!passwordEncoder.matches(req.getPassword(), userDetails.getPassword())) {
+                throw new ApiException("帳號或密碼錯誤");
+            }
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
             throw new ApiException("帳號或密碼錯誤");
         }
+
 
         String accessToken = jwtTokenUtil.generateToken(userDetails.getUsername());
         String refreshToken = jwtTokenUtil.generateRefreshToken(userDetails.getUsername());

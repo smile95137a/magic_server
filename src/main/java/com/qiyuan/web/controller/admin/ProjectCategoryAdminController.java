@@ -3,9 +3,11 @@ package com.qiyuan.web.controller.admin;
 import com.qiyuan.web.dto.request.CategoryAdminRequest;
 import com.qiyuan.web.dto.request.ModifyCategoryAdminRequest;
 import com.qiyuan.web.entity.ProductCategory;
+import com.qiyuan.web.security.RoleExpressions;
 import com.qiyuan.web.service.ProductCategoryService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -17,6 +19,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/admin/product/category")
 @Tag(name = "後台商品分類管理", description = "後台商品分類維護（新增、修改、查詢）")
+@PreAuthorize(RoleExpressions.ONLY_ADMIN)
 public class ProjectCategoryAdminController {
 
     private final ProductCategoryService productCategoryService;

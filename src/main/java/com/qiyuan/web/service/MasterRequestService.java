@@ -85,7 +85,7 @@ public class MasterRequestService {
                 .note(req.getNote())
                 .phone(req.getCustomerPhone())
                 .build();
-        if (mapper.insert(request) == 0) {
+        if (mapper.insertSelective(request) == 0) {
             throw new ApiException("系統發生錯誤，請聯繫客服！");
         }
         String serial = String.format("%s-%s", req.getMasterCode(), getOrderIdFromTid(request.getSerial()));

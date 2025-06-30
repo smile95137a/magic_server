@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.jdbc.UncategorizedSQLException;
 import org.springframework.security.authorization.AuthorizationDeniedException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
@@ -28,6 +29,14 @@ public class GlobalResponseController {
         logger.error(ex.getMessage(), ex);
         return ApiResponse.error("9401", ex.getMessage());
     }
+
+    @ExceptionHandler({UsernameNotFoundException.class})
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public ApiResponse<String> handleAccountError(Exception ex) {
+        logger.error(ex.getMessage(), ex);
+        return ApiResponse.error("9001", "帳號或密碼輸入錯誤");
+    }
+
 
     // 資料庫問題
     @ExceptionHandler({SQLException.class, UncategorizedSQLException.class})

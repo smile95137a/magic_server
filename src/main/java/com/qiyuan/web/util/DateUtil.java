@@ -37,7 +37,7 @@ public class DateUtil {
     }
 
     public static Date parseStringToDate(String str) {
-        str = str.replace("/", "-");
+        str = str.replace("-", "/");
         try {
             return DEFAULT_FORMAT.parse(str);
         } catch (ParseException e) {

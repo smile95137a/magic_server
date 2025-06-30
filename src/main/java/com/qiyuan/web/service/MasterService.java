@@ -92,11 +92,13 @@ public class MasterService {
 
     @Transactional
     public boolean modifyMaster(MasterRequest r) {
-        MasterExample e = new MasterExample();
-        e.createCriteria().andSortEqualTo(r.getSort());
-        List<Master> existed = masterMapper.selectByExample(e);
-        if (existed != null && !existed.isEmpty() && existed.get(0).getCode() != r.getCode()) {
-            throw new ApiException("請勿設定重複的排序");
+        if (r.getSort() != null) {
+            MasterExample e = new MasterExample();
+            e.createCriteria().andSortEqualTo(r.getSort());
+            List<Master> existed = masterMapper.selectByExample(e);
+            if (existed != null && !existed.isEmpty() && existed.get(0).getCode() != r.getCode()) {
+                throw new ApiException("請勿設定重複的排序");
+            }
         }
 
         Master master = masterMapper.selectByPrimaryKey(r.getCode());
@@ -107,12 +109,16 @@ public class MasterService {
         master.setBio(r.getBio());
         master.setExperience(r.getExperience());
         master.setPersonalItems(r.getPersonalItems());
-        master.setServicesJson(JsonUtil.toJson(r.getServiceItem()));
+        if (r.getServiceItem() != null) {
+            master.setServicesJson(JsonUtil.toJson(r.getServiceItem()));
+        }
         master.setStatus(r.getStatus());
         try {
-            if (r.getImageBase64() != null && StringUtils.isNotBlank(master.getImageExt())) {
-                String fileToDelete = FileUtil.concatFilePath(masterDir, String.format("%s.%s", r.getCode(), master.getImageExt()));
-                Files.deleteIfExists(Paths.get(fileToDelete));
+            if (StringUtils.isNotBlank(r.getImageBase64())) {
+                if (StringUtils.isNotBlank(master.getImageExt())) {
+                    String fileToDelete = FileUtil.concatFilePath(masterDir, String.format("%s.%s", master.getCode(), master.getImageExt()));
+                    Files.deleteIfExists(Paths.get(fileToDelete));
+                }
 
                 String path = FileUtil.base64ToImage(r.getImageBase64(), masterDir, master.getCode());
                 String fileName = Paths.get(path).getFileName().toString();
