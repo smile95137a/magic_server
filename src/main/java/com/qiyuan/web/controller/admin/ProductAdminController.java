@@ -14,6 +14,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -38,7 +39,7 @@ public class ProductAdminController {
         return productService.createProductDraft();
     }
 
-    @PostMapping("/upload-image")
+    @PostMapping(value = "/upload-image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "上傳商品圖片", description = "上傳商品圖片並回傳圖片路徑")
     public UploadImageResponse uploadImage(@ModelAttribute UploadImageRequest req) {
         return productService.uploadImage(req);
@@ -51,7 +52,7 @@ public class ProductAdminController {
     }
 
     @PostMapping("/discard")
-    @Operation(summary = "丟棄商品草稿", description = "刪除/丟棄指定商品草稿")
+    @Operation(summary = "丟棄商品草稿", description = "刪除/丟棄指定商品的所有資訊")
     public boolean discard(@RequestBody DiscardProductRequest req) {
         try {
             return productService.discardProduct(req);

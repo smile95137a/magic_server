@@ -85,6 +85,7 @@ public class ProductService {
             update.setMainImage(filename);
             update.setUpdateTime(new Date());
             productMapper.updateByPrimaryKeySelective(update);
+            return new UploadImageResponse(url);
         } else {
             ProductImage img = new ProductImage();
             img.setProductId(productId);
@@ -94,9 +95,8 @@ public class ProductService {
             img.setCreateTime(new Date());
             img.setUpdateTime(new Date());
             productImageMapper.insertSelective(img);
+            return new UploadImageResponse(url, img.getId());
         }
-
-        return new UploadImageResponse(url);
     }
 
     private short getNextGallerySort(Integer productId) {
@@ -105,12 +105,13 @@ public class ProductService {
     }
 
     /**
-     * 清理未被 description 內容引用的圖片（以前叫 cleanUnusedRichImages）
+     * 清理未被 description 內容引用的圖片（本地+DB）
      */
     private void cleanUnusedDescriptionImages(Integer productId, String detailHtml) {
         String productPhysicalDir = mappingConfig.getImagePath("product");
         File descriptionDir = new File(FileUtil.concatFilePath(productPhysicalDir, productId.toString(), ProductImageType.DESCRIPTION.getFolder()));
         if (!descriptionDir.exists()) return;
+
         // 找出HTML引用的圖片檔名
         Pattern p = Pattern.compile("/images/product/" + productId + "/" + ProductImageType.DESCRIPTION.getFolder() + "/([\\w\\-.]+)");
         Set<String> usedImages = new HashSet<>();
@@ -118,11 +119,21 @@ public class ProductService {
             Matcher m = p.matcher(detailHtml);
             while (m.find()) usedImages.add(m.group(1));
         }
-        // 刪除未被引用的圖片
-        for (File f : descriptionDir.listFiles()) {
-            if (!usedImages.contains(f.getName())) f.delete();
+
+        File[] files = descriptionDir.listFiles();
+        if (files == null) return;
+
+        for (File f : files) {
+            String filename = f.getName();
+            if (!usedImages.contains(filename)) {
+                // 刪除本地圖片
+                f.delete();
+                // 刪除對應DB紀錄
+                productImageMapper.deleteByProductIdAndTypeAndFilename(productId, ProductImageType.DESCRIPTION.getFolder(), filename);
+            }
         }
     }
+
 
     public String getProductImagePhysicalPath(Integer productId, ProductImageType type, String filename) {
         String baseFolder = mappingConfig.getImagePath("product");
@@ -146,19 +157,17 @@ public class ProductService {
 
     @Transactional
     public boolean editProduct(EditProductRequest req) {
-        // 驗證商品草稿
+        // 驗證商品
         Product product = productMapper.selectByPrimaryKey(req.getProductId());
         if (product == null) throw new ApiException("商品不存在");
-        if (Boolean.TRUE.equals(product.getStatus()))
-            throw new ApiException("商品已完成，禁止重複提交");
 
-        // 驗證分類（如有）
+        // 驗證分類
         if (req.getCategoryId() != null) {
             ProductCategory c = productCategoryMapper.selectByPrimaryKey(req.getCategoryId());
             if (c == null) throw new ApiException("分類不存在");
         }
 
-        // 更新商品主資料
+        // 更新主資料
         Product update = new Product();
         update.setId(req.getProductId());
         update.setName(req.getName());
@@ -168,22 +177,30 @@ public class ProductService {
         update.setRemark(req.getRemark());
         update.setOriginalPrice(req.getOriginalPrice());
         update.setSpecialPrice(req.getSpecialPrice());
-        update.setMainImage(req.getMainImage());
+
+        // mainImage 處理
+        String mainImageFilename = req.getMainImage();
+        if (mainImageFilename != null && mainImageFilename.contains("/")) {
+            mainImageFilename = mainImageFilename.substring(mainImageFilename.lastIndexOf('/') + 1);
+        }
+        update.setMainImage(mainImageFilename);
+
         update.setDetailHtml(req.getDetailHtml());
-        update.setStatus(true); // 正式
+        update.setStatus(req.getStatus());
         update.setUpdateTime(new Date());
         productMapper.updateByPrimaryKeySelective(update);
 
-        // **只更新 gallery 排序**
+        // Gallery 圖片排序更新（只 update sort，不全刪全加！）
         if (req.getGalleryImages() != null) {
+            Set<Long> handledIds = new HashSet<>();
             for (GalleryImageVO img : req.getGalleryImages()) {
-                if (img.getId() != null && img.getSort() != null) {
+                if (img.getId() != null && img.getSort() != null && handledIds.add(img.getId())) {
                     productImageMapper.updateSortById(img.getId(), img.getSort().shortValue());
                 }
             }
         }
 
-        // 清理 description 圖片
+        // 清理未被 description 內容引用的圖片（同時刪DB、檔案）
         cleanUnusedDescriptionImages(req.getProductId(), req.getDetailHtml());
 
         return true;

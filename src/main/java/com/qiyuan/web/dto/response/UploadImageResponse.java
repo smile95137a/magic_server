@@ -12,4 +12,9 @@ import lombok.NoArgsConstructor;
 @Builder
 public class UploadImageResponse {
     private String url; // 圖片上傳成功的可用URL
+    private Long id; // 圖片ID
+
+    public UploadImageResponse(String url) {
+        this.url = url;
+    }
 }

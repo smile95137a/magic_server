@@ -18,6 +18,8 @@ public interface ProductImageMapper {
 
     int deleteByProductIdAndType(@Param("productId") Integer productId, @Param("type")String type);
 
+    int deleteByProductIdAndTypeAndFilename(@Param("productId") Integer productId, @Param("type")String type, @Param("filename")String filename);
+
     List<ProductImage> selectByProductIdAndType(@Param("productId") Integer productId, @Param("type") String type);
 
     int insert(ProductImage record);

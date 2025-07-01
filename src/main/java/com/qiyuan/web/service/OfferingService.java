@@ -9,6 +9,8 @@ import com.qiyuan.web.entity.OfferingPurchase;
 import com.qiyuan.web.entity.example.OfferingExample;
 import com.qiyuan.web.util.DateUtil;
 import com.qiyuan.web.util.FileUtil;
+import com.qiyuan.web.util.RandomGenerator;
+import com.qiyuan.web.util.SecurityUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -55,9 +57,12 @@ public class OfferingService {
             throw new ApiException("新增失敗, 參數不可為空");
         }
 
-        String path = FileUtil.base64ToImage(r.getImageBase64(), offeringDir, r.getId());
+        String uuid = RandomGenerator.getUUID();
+
+        String path = FileUtil.base64ToImage(r.getImageBase64(), offeringDir, uuid);
         String fileName = Paths.get(path).getFileName().toString();
         Offering offering = Offering.builder()
+                .id(uuid)
                 .name(r.getName())
                 .points(r.getPoints() == null ? 0 : r.getPoints())
                 .price(r.getPrice() == null ? 0 : r.getPrice())

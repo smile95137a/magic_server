@@ -46,7 +46,7 @@ public class ProductCategoryService {
         existed.setDescription(req.getDescription());
         existed.setName(req.getName());
         existed.setStatus(req.getStatus());
-        return productCategoryMapper.updateByPrimaryKey(existed) > 0;
+        return productCategoryMapper.updateByPrimaryKeySelective(existed) > 0;
     }
 
     public List<ProductCategoryVO> getCategoryAvailableList() {

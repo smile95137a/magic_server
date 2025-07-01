@@ -20,11 +20,11 @@ import java.util.List;
 @RequestMapping("/admin/product/category")
 @Tag(name = "後台商品分類管理", description = "後台商品分類維護（新增、修改、查詢）")
 @PreAuthorize(RoleExpressions.ONLY_ADMIN)
-public class ProjectCategoryAdminController {
+public class ProductCategoryAdminController {
 
     private final ProductCategoryService productCategoryService;
 
-    public ProjectCategoryAdminController(ProductCategoryService productCategoryService) {
+    public ProductCategoryAdminController(ProductCategoryService productCategoryService) {
         this.productCategoryService = productCategoryService;
     }
 

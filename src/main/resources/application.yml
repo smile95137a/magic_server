@@ -52,7 +52,7 @@ security:
     - /user/login
     - /user/refresh
     - /user/register
-    - /user/**
+    - /product/**
   response:
     exclude-paths:
       - /v3/api-docs
