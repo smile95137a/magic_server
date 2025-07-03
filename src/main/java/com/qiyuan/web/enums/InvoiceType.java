@@ -4,8 +4,7 @@ import com.qiyuan.security.exception.ApiException;
 
 public enum InvoiceType {
     PAPER("paper", "紙本發票"),
-    MOBILE("mobile", "手機條碼"),
-    CITIZEN("citizen", "自然人憑證"),
+    MOBILE("mobile", "手機條碼載具"),
     DONATION("donation", "捐贈發票"),
     COMPANY("company", "三聯式/公司戶");
 

@@ -4,15 +4,19 @@ import com.qiyuan.web.dto.request.QueryOrderAdminRequest;
 import com.qiyuan.web.dto.request.ShippingMethodRequest;
 import com.qiyuan.web.dto.request.UpdateOrderStatusBatchRequest;
 import com.qiyuan.web.dto.response.OrderDetailVO;
+import com.qiyuan.web.dto.response.OrderStatusVO;
 import com.qiyuan.web.dto.response.OrderVO;
 import com.qiyuan.web.dto.response.ShippingMethodVO;
+import com.qiyuan.web.enums.OrderStatus;
 import com.qiyuan.web.service.OrderAdminService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/admin/order")
@@ -55,5 +59,17 @@ public class OrderAdminController {
     @GetMapping("/shipping-method/list")
     public List<ShippingMethodVO> getShippingMethodList() {
         return orderAdminService.getShippingMethodList();
+    }
+
+    @Operation(
+            summary = "查詢可更改的訂單狀態列表",
+            description = "取得後台可用於訂單狀態異動的狀態列表（僅限: 訂單準備中、已出貨、已完成、已取消、已退款）"
+    )
+    @ApiResponse(responseCode = "200", description = "查詢成功，回傳可更改狀態")
+    @GetMapping("/status/updatable-list")
+    public List<OrderStatusVO> getUpdatableOrderStatusList() {
+        return OrderStatus.BACKEND_LIST.stream()
+                .map(status -> new OrderStatusVO(status.name(), status.getLabel()))
+                .collect(Collectors.toList());
     }
 }

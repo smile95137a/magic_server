@@ -14,6 +14,7 @@ import com.qiyuan.web.entity.example.OrdersExample;
 import com.qiyuan.web.entity.example.ShippingMethodExample;
 import com.qiyuan.web.enums.InvoiceType;
 import com.qiyuan.web.enums.OrderStatus;
+import com.qiyuan.web.enums.PaymentEnum;
 import com.qiyuan.web.util.DateUtil;
 import com.qiyuan.web.util.RandomGenerator;
 import com.qiyuan.web.util.SecurityUtils;
@@ -24,6 +25,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 
 @Service
@@ -183,12 +185,13 @@ public class OrderService {
 
 
     private OrderVO toOrderVO(Orders o) {
+        ShippingMethod shippingMethod = shippingMethodMapper.selectByPrimaryKey(o.getShippingMethodId());
         OrderVO vo = new OrderVO();
         vo.setId(o.getId());
         vo.setTotalAmount(o.getTotalAmount());
-        vo.setStatus(o.getStatus());
-        vo.setPaymentStatus(o.getPaid() != null && o.getPaid() ? "paid" : "pending");
-        vo.setShippingMethod(o.getShippingMethodId()); // 這邊如要顯示名稱可另外查詢
+        vo.setStatus(OrderStatus.fromValue(o.getStatus().toLowerCase(Locale.ROOT)).getLabel());
+        vo.setPaymentStatus(PaymentEnum.fromBoolean(o.getPaid()).getLabel());
+        vo.setShippingMethod(shippingMethod.getName());
         vo.setTrackingNo(o.getTrackingNo());
         vo.setCreateTime(o.getCreateTime());
         vo.setUpdateTime(o.getUpdateTime());
@@ -196,12 +199,14 @@ public class OrderService {
     }
 
     private OrderDetailVO toOrderDetailVO(Orders o, List<OrderItem> items) {
+        ShippingMethod shippingMethod = shippingMethodMapper.selectByPrimaryKey(o.getShippingMethodId());
+
         OrderDetailVO vo = new OrderDetailVO();
         vo.setId(o.getId());
         vo.setTotalAmount(o.getTotalAmount());
-        vo.setStatus(o.getStatus());
-        vo.setPaymentStatus(o.getPaid() != null && o.getPaid() ? "paid" : "pending");
-        vo.setShippingMethod(o.getShippingMethodId());
+        vo.setStatus(OrderStatus.fromValue(o.getStatus().toLowerCase(Locale.ROOT)).getLabel());
+        vo.setPaymentStatus(PaymentEnum.fromBoolean(o.getPaid()).getLabel());
+        vo.setShippingMethod(shippingMethod.getName());
         vo.setInvoiceType(o.getInvoiceType());
         vo.setInvoiceTarget(o.getInvoiceTarget());
         vo.setRecipientName(o.getRecipientName());
@@ -224,4 +229,18 @@ public class OrderService {
         vo.setItems(itemVOList);
         return vo;
     }
+
+    public void markAsPaid(String orderId) {
+        Orders order = ordersMapper.selectByPrimaryKey(orderId);
+        if (order == null) {
+            throw new ApiException("找不到訂單");
+        }
+        Orders update = new Orders();
+        update.setId(orderId);
+        update.setPaid(true);
+        update.setUpdateTime(new Date());
+        ordersMapper.updateByPrimaryKeySelective(update);
+    }
+
+
 }

@@ -2,6 +2,7 @@ package com.qiyuan.web.controller.front;
 
 import com.qiyuan.web.dto.request.CancelOrderRequest;
 import com.qiyuan.web.dto.request.CreateOrderRequest;
+import com.qiyuan.web.dto.request.PaySuccessRequest;
 import com.qiyuan.web.dto.request.QueryOrderRequest;
 import com.qiyuan.web.dto.response.*;
 import com.qiyuan.web.enums.InvoiceType;
@@ -71,6 +72,13 @@ public class OrderFrontController {
         return Arrays.stream(InvoiceType.values())
                 .map(type -> new InvoiceTypeVO(type.name(), type.getLabel()))
                 .collect(Collectors.toList());
+    }
+
+    @Operation(summary = "付款完成", description = "通知後台該訂單已完成付款")
+    @PostMapping("/pay-success")
+    public boolean paySuccess(@RequestBody @Validated PaySuccessRequest request) {
+        orderService.markAsPaid(request.getOrderId());
+        return true;
     }
 }
 

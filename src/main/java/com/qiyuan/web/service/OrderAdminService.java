@@ -18,6 +18,8 @@ import com.qiyuan.web.entity.ShippingMethod;
 import com.qiyuan.web.entity.example.OrderItemExample;
 import com.qiyuan.web.entity.example.OrdersExample;
 import com.qiyuan.web.entity.example.ShippingMethodExample;
+import com.qiyuan.web.enums.OrderStatus;
+import com.qiyuan.web.enums.PaymentEnum;
 import com.qiyuan.web.util.DateUtil;
 import com.qiyuan.web.util.RandomGenerator;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +28,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 @Service
 @RequiredArgsConstructor
@@ -112,7 +115,7 @@ public class OrderAdminService {
         shippingMethodMapper.updateByPrimaryKeySelective(method);
     }
 
-    // 查詢物流方式列表
+
     public List<ShippingMethodVO> getShippingMethodList() {
         ShippingMethodExample example = new ShippingMethodExample();
         example.setOrderByClause("sort asc, create_time desc");
@@ -140,12 +143,13 @@ public class OrderAdminService {
     }
 
     private OrderVO toOrderVO(Orders o) {
+        ShippingMethod shippingMethod = shippingMethodMapper.selectByPrimaryKey(o.getShippingMethodId());
         OrderVO vo = new OrderVO();
         vo.setId(o.getId());
         vo.setTotalAmount(o.getTotalAmount());
-        vo.setStatus(o.getStatus());
-        vo.setPaymentStatus(o.getPaid() != null && o.getPaid() ? "paid" : "pending");
-        vo.setShippingMethod(o.getShippingMethodId());
+        vo.setStatus(OrderStatus.fromValue(o.getStatus().toLowerCase(Locale.ROOT)).getLabel());
+        vo.setPaymentStatus(PaymentEnum.fromBoolean(o.getPaid()).getLabel());
+        vo.setShippingMethod(shippingMethod.getName());
         vo.setTrackingNo(o.getTrackingNo());
         vo.setCreateTime(o.getCreateTime());
         vo.setUpdateTime(o.getUpdateTime());
@@ -153,12 +157,13 @@ public class OrderAdminService {
     }
 
     private OrderDetailVO toOrderDetailVO(Orders o, List<OrderItem> items) {
+        ShippingMethod shippingMethod = shippingMethodMapper.selectByPrimaryKey(o.getShippingMethodId());
         OrderDetailVO vo = new OrderDetailVO();
         vo.setId(o.getId());
         vo.setTotalAmount(o.getTotalAmount());
-        vo.setStatus(o.getStatus());
-        vo.setPaymentStatus(o.getPaid() != null && o.getPaid() ? "paid" : "pending");
-        vo.setShippingMethod(o.getShippingMethodId());
+        vo.setStatus(OrderStatus.fromValue(o.getStatus().toLowerCase(Locale.ROOT)).getLabel());
+        vo.setPaymentStatus(PaymentEnum.fromBoolean(o.getPaid()).getLabel());
+        vo.setShippingMethod(shippingMethod.getName());
         vo.setInvoiceType(o.getInvoiceType());
         vo.setInvoiceTarget(o.getInvoiceTarget());
         vo.setRecipientName(o.getRecipientName());
