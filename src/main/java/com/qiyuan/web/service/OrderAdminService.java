@@ -100,42 +100,21 @@ public class OrderAdminService {
         }
     }
 
-    // 新增/修改物流方式
     public void saveShippingMethod(ShippingMethodRequest request) {
-        Date currentDate = DateUtil.getCurrentDate();
-
-        if (request.getId() == null || request.getId().isBlank()) {
-            // 新增
-            ShippingMethod method = new ShippingMethod();
-            method.setId(RandomGenerator.getUUID());
-            method.setCode(request.getCode());
-            method.setName(request.getName());
-            method.setDescription(request.getDescription());
-            method.setFee(request.getFee());
-            method.setStatus(request.getStatus());
-            method.setSort(request.getSort());
-            method.setCreateTime(currentDate);
-            method.setUpdateTime(currentDate);
-            shippingMethodMapper.insertSelective(method);
-        } else {
-            // 修改
-            ShippingMethod method = shippingMethodMapper.selectByPrimaryKey(request.getId());
-            if (method == null) throw new ApiException("物流方式不存在");
-            method.setCode(request.getCode());
-            method.setName(request.getName());
-            method.setDescription(request.getDescription());
-            method.setFee(request.getFee());
-            method.setStatus(request.getStatus());
-            method.setSort(request.getSort());
-            method.setUpdateTime(new Date());
-            shippingMethodMapper.updateByPrimaryKeySelective(method);
-        }
+        ShippingMethod method = shippingMethodMapper.selectByPrimaryKey(request.getId());
+        if (method == null) throw new ApiException("物流方式不存在");
+        method.setName(request.getName());
+        method.setDescription(request.getDescription());
+        method.setFee(request.getFee());
+        method.setStatus(request.getStatus());
+        method.setSort(request.getSort());
+        method.setUpdateTime(new Date());
+        shippingMethodMapper.updateByPrimaryKeySelective(method);
     }
 
     // 查詢物流方式列表
     public List<ShippingMethodVO> getShippingMethodList() {
         ShippingMethodExample example = new ShippingMethodExample();
-        example.createCriteria().andStatusEqualTo(true);
         example.setOrderByClause("sort asc, create_time desc");
         List<ShippingMethod> list = shippingMethodMapper.selectByExample(example);
         List<ShippingMethodVO> voList = new ArrayList<>();

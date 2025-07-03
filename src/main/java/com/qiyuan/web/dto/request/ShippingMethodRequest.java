@@ -12,9 +12,8 @@ import lombok.NoArgsConstructor;
 @Data
 @Builder
 public class ShippingMethodRequest {
-    private String id;         // 新增時可不傳，修改時必傳
     @NotBlank
-    private String code;
+    private String id;
     @NotBlank
     private String name;
     private String description;

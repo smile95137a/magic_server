@@ -67,6 +67,7 @@ public class AuthService {
         String userId = UUID.randomUUID().toString().replace("-", "").toUpperCase(Locale.ROOT);
         User newUser = User.builder()
                 .id(userId)
+                .username(req.getEmail())
                 .email(req.getEmail())
                 .password(req.getPassword())
                 .phone(req.getPhone())

@@ -1,5 +1,7 @@
 package com.qiyuan.web.enums;
 
+import com.qiyuan.security.exception.ApiException;
+
 public enum InvoiceType {
     PAPER("paper", "紙本發票"),
     MOBILE("mobile", "手機條碼"),
@@ -22,6 +24,6 @@ public enum InvoiceType {
         for (InvoiceType t : values()) {
             if (t.value.equalsIgnoreCase(value)) return t;
         }
-        throw new IllegalArgumentException("未知發票型別: " + value);
+        throw new ApiException("未知發票型別: " + value);
     }
 }

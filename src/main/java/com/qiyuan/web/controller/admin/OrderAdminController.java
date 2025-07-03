@@ -44,7 +44,7 @@ public class OrderAdminController {
         return true;
     }
 
-    @Operation(summary = "儲存物流方式", description = "新增或更新物流方式資訊")
+    @Operation(summary = "變更物流內容", description = "更新物流方式資訊")
     @PostMapping("/shipping-method/save")
     public boolean saveShippingMethod(@RequestBody @Validated ShippingMethodRequest request) {
         orderAdminService.saveShippingMethod(request);
