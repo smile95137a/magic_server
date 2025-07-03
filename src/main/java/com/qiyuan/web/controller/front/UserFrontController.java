@@ -56,7 +56,7 @@ public class UserFrontController {
         return authService.modifyUser(req);
     }
 
-    @PostMapping("/me")
+    @PostMapping("/info")
     @SecurityRequirement(name = "bearerAuth")
     @PreAuthorize(RoleExpressions.ONLY_USER)
     @Operation(summary = "取得會員資料",description = "依據 JWT token 取得當前會員個人資料。")

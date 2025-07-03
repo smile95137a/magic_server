@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.qiyuan.web.dao.OrderItemMapper">
   <resultMap id="BaseResultMap" type="com.qiyuan.web.entity.OrderItem">
-    <id column="id" jdbcType="CHAR" property="id" />
+    <id column="id" jdbcType="INTEGER" property="id" />
     <result column="order_id" jdbcType="CHAR" property="orderId" />
     <result column="product_id" jdbcType="INTEGER" property="productId" />
     <result column="product_name" jdbcType="NVARCHAR" property="productName" />
@@ -86,15 +86,15 @@
       order by ${orderByClause}
     </if>
   </select>
-  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
     select 
     <include refid="Base_Column_List" />
     from order_item
-    where id = #{id,jdbcType=CHAR}
+    where id = #{id,jdbcType=INTEGER}
   </select>
-  <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
     delete from order_item
-    where id = #{id,jdbcType=CHAR}
+    where id = #{id,jdbcType=INTEGER}
   </delete>
   <delete id="deleteByExample" parameterType="com.qiyuan.web.entity.example.OrderItemExample">
     delete from order_item
@@ -106,7 +106,7 @@
     insert into order_item (id, order_id, product_id, 
       product_name, unit_price, quantity, 
       subtotal, create_time)
-    values (#{id,jdbcType=CHAR}, #{orderId,jdbcType=CHAR}, #{productId,jdbcType=INTEGER}, 
+    values (#{id,jdbcType=INTEGER}, #{orderId,jdbcType=CHAR}, #{productId,jdbcType=INTEGER}, 
       #{productName,jdbcType=NVARCHAR}, #{unitPrice,jdbcType=DECIMAL}, #{quantity,jdbcType=INTEGER}, 
       #{subtotal,jdbcType=DECIMAL}, #{createTime,jdbcType=TIMESTAMP})
   </insert>
@@ -140,7 +140,7 @@
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
-        #{id,jdbcType=CHAR},
+        #{id,jdbcType=INTEGER},
       </if>
       <if test="orderId != null">
         #{orderId,jdbcType=CHAR},
@@ -175,7 +175,7 @@
     update order_item
     <set>
       <if test="record.id != null">
-        id = #{record.id,jdbcType=CHAR},
+        id = #{record.id,jdbcType=INTEGER},
       </if>
       <if test="record.orderId != null">
         order_id = #{record.orderId,jdbcType=CHAR},
@@ -205,7 +205,7 @@
   </update>
   <update id="updateByExample" parameterType="map">
     update order_item
-    set id = #{record.id,jdbcType=CHAR},
+    set id = #{record.id,jdbcType=INTEGER},
       order_id = #{record.orderId,jdbcType=CHAR},
       product_id = #{record.productId,jdbcType=INTEGER},
       product_name = #{record.productName,jdbcType=NVARCHAR},
@@ -242,7 +242,7 @@
         create_time = #{createTime,jdbcType=TIMESTAMP},
       </if>
     </set>
-    where id = #{id,jdbcType=CHAR}
+    where id = #{id,jdbcType=INTEGER}
   </update>
   <update id="updateByPrimaryKey" parameterType="com.qiyuan.web.entity.OrderItem">
     update order_item
@@ -253,6 +253,6 @@
       quantity = #{quantity,jdbcType=INTEGER},
       subtotal = #{subtotal,jdbcType=DECIMAL},
       create_time = #{createTime,jdbcType=TIMESTAMP}
-    where id = #{id,jdbcType=CHAR}
+    where id = #{id,jdbcType=INTEGER}
   </update>
 </mapper>

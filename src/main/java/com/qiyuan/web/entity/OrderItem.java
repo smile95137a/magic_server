@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 import java.util.Date;
 
 public class OrderItem {
-    private String id;
+    private Integer id;
 
     private String orderId;
 
@@ -20,11 +20,11 @@ public class OrderItem {
 
     private Date createTime;
 
-    public String getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 

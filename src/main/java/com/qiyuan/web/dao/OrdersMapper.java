@@ -18,6 +18,10 @@ public interface OrdersMapper {
 
     List<Orders> selectByExample(OrdersExample example);
 
+    List<Orders> selectByExampleWithPage(@Param("example") OrdersExample example,
+                                         @Param("offset") int offset,
+                                         @Param("size") int size);
+
     Orders selectByPrimaryKey(String id);
 
     int updateByExampleSelective(@Param("record") Orders record, @Param("example") OrdersExample example);
