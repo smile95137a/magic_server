@@ -72,11 +72,10 @@ public class UserFrontController {
         return memberService.getPurchaseRecord(req);
     }
 
+    @PostMapping("/forget-password")
+    public boolean sendResetPasswordMail(@RequestBody ForgetPasswordRequest req) {
+        memberService.sendResetPasswordMail(req.getEmail());
+        return true;
+    }
 
-
-//    @PostMapping("/forget-password")
-//    public ApiResponse<?> changePassword(@RequestBody ChangePasswordRequest req) {
-//        userAppService.changePassword(req.getOldPassword(), req.getNewPassword());
-//        return ApiResponse.success("修改成功");
-//    }
 }

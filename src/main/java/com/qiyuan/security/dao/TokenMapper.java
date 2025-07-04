@@ -7,9 +7,11 @@ import org.apache.ibatis.annotations.Mapper;
 public interface TokenMapper {
     void insert(Token token);
     Token findByToken(String token);
-    int countByUsername(String username);
+    int countRefreshByUsername(String username);
     void deleteExpiredTokens();
     boolean revokeToken(String token);
-    boolean revokeByUserName(String username);
+    boolean revokeRefreshByUsername(String username);
     int countTokenExpiredOver7Day();
+    void deleteSsoTokensByUsername(String username);
+
 }

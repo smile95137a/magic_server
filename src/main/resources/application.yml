@@ -17,18 +17,21 @@ spring:
     mvc:
       throw-exception-if-no-handler-found: true
   mail:
-    host: smtp.gmail.com     # SMTP 伺服器（範例使用 Gmail）
-    port: 587                # SMTP Port
-    username: test      # 發信帳號
-    password: your_app_password         # 密碼/應用程式密碼
+    host: localhost
+    port: 1025
+    username: test@test.com
+    password: 123456
     protocol: smtp
     properties:
       mail:
         smtp:
-          auth: true
+          auth: false
           starttls:
-            enable: true
-        debug: true
+            enable: false
+
+sso:
+  front-url: localhost:4040/api/sso/
+  expired-minute: 30
 
 mybatis:
   mapper-locations: classpath:/mappers/*.xml
@@ -38,6 +41,8 @@ springdoc:
     path: /v3/api-docs
   swagger-ui:
     path: /swagger-ui.html
+    url: /v3/api-docs
+
 
 security:
   public-endpoints:
@@ -52,7 +57,9 @@ security:
     - /user/login
     - /user/refresh
     - /user/register
+    - /user/forget-password
     - /product/**
+    - /test/mail/**
   response:
     exclude-paths:
       - /v3/api-docs

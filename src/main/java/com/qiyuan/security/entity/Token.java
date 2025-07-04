@@ -1,52 +1,22 @@
 package com.qiyuan.security.entity;
 
-import java.time.LocalDateTime;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
+import java.util.Date;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Token {
+    private Long id;
     private String username;
     private String token;
-    private LocalDateTime expirationTime;
-    private boolean revoked;
-
-    // Constructors
-    public Token() {}
-
-    public Token(String username, String token, LocalDateTime expirationTime, boolean revoked) {
-        this.username = username;
-        this.token = token;
-        this.expirationTime = expirationTime;
-        this.revoked = revoked;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public String getToken() {
-        return token;
-    }
-
-    public void setToken(String token) {
-        this.token = token;
-    }
-
-    public LocalDateTime getExpirationTime() {
-        return expirationTime;
-    }
-
-    public void setExpirationTime(LocalDateTime expirationTime) {
-        this.expirationTime = expirationTime;
-    }
-
-    public boolean isRevoked() {
-        return revoked;
-    }
-
-    public void setRevoked(boolean revoked) {
-        this.revoked = revoked;
-    }
+    private String type;
+    private Date expirationTime;
+    private Boolean revoked;
+    private Date createTime;
 }

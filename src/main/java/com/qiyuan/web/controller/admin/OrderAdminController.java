@@ -3,10 +3,7 @@ package com.qiyuan.web.controller.admin;
 import com.qiyuan.web.dto.request.QueryOrderAdminRequest;
 import com.qiyuan.web.dto.request.ShippingMethodRequest;
 import com.qiyuan.web.dto.request.UpdateOrderStatusBatchRequest;
-import com.qiyuan.web.dto.response.OrderDetailVO;
-import com.qiyuan.web.dto.response.OrderStatusVO;
-import com.qiyuan.web.dto.response.OrderVO;
-import com.qiyuan.web.dto.response.ShippingMethodVO;
+import com.qiyuan.web.dto.response.*;
 import com.qiyuan.web.enums.OrderStatus;
 import com.qiyuan.web.service.OrderAdminService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -72,4 +69,11 @@ public class OrderAdminController {
                 .map(status -> new OrderStatusVO(status.name(), status.getLabel()))
                 .collect(Collectors.toList());
     }
+
+    @Operation(summary = "取得訂單出貨單資訊", description = "回傳指定訂單的出貨資訊、客戶資訊、訂單明細等")
+    @GetMapping("/delivery-note/{orderId}")
+    public DeliveryNoteVO getDeliveryNote(@PathVariable String orderId) {
+        return orderAdminService.getDeliveryNote(orderId);
+    }
+
 }
