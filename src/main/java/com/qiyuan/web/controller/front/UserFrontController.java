@@ -78,4 +78,16 @@ public class UserFrontController {
         return true;
     }
 
+    @GetMapping("/reset-password/verify")
+    public boolean verifyResetToken(@RequestParam String token) {
+        memberService.verifySsoToken(token);
+        return true;
+    }
+
+    @PostMapping("/reset-password")
+    public boolean resetPassword(@RequestBody ResetPasswordRequest req) {
+        return memberService.resetPassword(req);
+    }
+
+
 }

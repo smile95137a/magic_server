@@ -7,6 +7,7 @@ import com.qiyuan.web.dao.LanternPurchaseMapper;
 import com.qiyuan.web.dao.OfferingPurchaseMapper;
 import com.qiyuan.web.dao.UserMapper;
 import com.qiyuan.web.dto.request.RecordPeriodRequest;
+import com.qiyuan.web.dto.request.ResetPasswordRequest;
 import com.qiyuan.web.dto.response.RecordVO;
 import com.qiyuan.web.entity.*;
 import com.qiyuan.web.entity.example.UserExample;
@@ -15,11 +16,14 @@ import com.qiyuan.web.enums.TokenType;
 import com.qiyuan.web.util.DateUtil;
 import com.qiyuan.web.util.RandomGenerator;
 import com.qiyuan.web.util.SecurityUtils;
+import com.qiyuan.web.util.ValidationUtil;
 import jakarta.mail.MessagingException;
 import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -79,6 +83,7 @@ public class MemberService {
                 ).collect(Collectors.toList());
     }
 
+
     public void sendResetPasswordMail(String email) {
         try {
             UserExample example = new UserExample();
@@ -116,4 +121,43 @@ public class MemberService {
         }
 
     }
+
+    @Transactional
+    public void verifySsoToken(String token) {
+        Token resetToken = tokenMapper.findByToken(token);
+        if (resetToken == null) {
+            throw new ApiException("連結已失效或不存在");
+        }
+
+        if (resetToken.getExpirationTime().before(new Date()))
+            throw new ApiException("連結已過期");
+
+        if (Boolean.TRUE.equals(resetToken.getRevoked()))
+            throw new ApiException("連結已失效");
+    }
+
+    @Transactional
+    public boolean resetPassword(ResetPasswordRequest req) {
+        Token token = tokenMapper.findByToken(req.getToken());
+
+        if (token == null || token.getExpirationTime().before(new Date())) {
+            throw new ApiException("連結已失效或過期");
+        }
+
+        if (!ValidationUtil.isValidPassword(req.getNewPassword())) {
+            throw new ApiException("密碼請輸入至少一位數字及小寫英文字母");
+        }
+
+        User user = userMapper.selectByUsername(token.getUsername());
+        if (user == null) throw new ApiException("帳號不存在");
+
+        user.setPassword(req.getNewPassword());
+        userMapper.updateByPrimaryKeySelective(user);
+
+        tokenMapper.revokeToken(token.getToken());
+
+        return true;
+    }
+
+
 }
