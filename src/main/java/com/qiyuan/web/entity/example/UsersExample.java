@@ -3,14 +3,14 @@ package com.qiyuan.web.entity.example;
 import java.util.ArrayList;
 import java.util.List;
 
-public class UserExample {
+public class UsersExample {
     protected String orderByClause;
 
     protected boolean distinct;
 
     protected List<Criteria> oredCriteria;
 
-    public UserExample() {
+    public UsersExample() {
         oredCriteria = new ArrayList<>();
     }
 
@@ -173,7 +173,6 @@ public class UserExample {
             addCriterion("id not between", value1, value2, "id");
             return (Criteria) this;
         }
-
 
         public Criteria andPasswordIsNull() {
             addCriterion("password is null");
@@ -732,6 +731,216 @@ public class UserExample {
 
         public Criteria andReceiptTypeNotBetween(String value1, String value2) {
             addCriterion("receipt_type not between", value1, value2, "receiptType");
+            return (Criteria) this;
+        }
+
+        public Criteria andUsernameIsNull() {
+            addCriterion("username is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andUsernameIsNotNull() {
+            addCriterion("username is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andUsernameEqualTo(String value) {
+            addCriterion("username =", value, "username");
+            return (Criteria) this;
+        }
+
+        public Criteria andUsernameNotEqualTo(String value) {
+            addCriterion("username <>", value, "username");
+            return (Criteria) this;
+        }
+
+        public Criteria andUsernameGreaterThan(String value) {
+            addCriterion("username >", value, "username");
+            return (Criteria) this;
+        }
+
+        public Criteria andUsernameGreaterThanOrEqualTo(String value) {
+            addCriterion("username >=", value, "username");
+            return (Criteria) this;
+        }
+
+        public Criteria andUsernameLessThan(String value) {
+            addCriterion("username <", value, "username");
+            return (Criteria) this;
+        }
+
+        public Criteria andUsernameLessThanOrEqualTo(String value) {
+            addCriterion("username <=", value, "username");
+            return (Criteria) this;
+        }
+
+        public Criteria andUsernameLike(String value) {
+            addCriterion("username like", value, "username");
+            return (Criteria) this;
+        }
+
+        public Criteria andUsernameNotLike(String value) {
+            addCriterion("username not like", value, "username");
+            return (Criteria) this;
+        }
+
+        public Criteria andUsernameIn(List<String> values) {
+            addCriterion("username in", values, "username");
+            return (Criteria) this;
+        }
+
+        public Criteria andUsernameNotIn(List<String> values) {
+            addCriterion("username not in", values, "username");
+            return (Criteria) this;
+        }
+
+        public Criteria andUsernameBetween(String value1, String value2) {
+            addCriterion("username between", value1, value2, "username");
+            return (Criteria) this;
+        }
+
+        public Criteria andUsernameNotBetween(String value1, String value2) {
+            addCriterion("username not between", value1, value2, "username");
+            return (Criteria) this;
+        }
+
+        public Criteria andOauthTypeIsNull() {
+            addCriterion("oauth_type is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andOauthTypeIsNotNull() {
+            addCriterion("oauth_type is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andOauthTypeEqualTo(String value) {
+            addCriterion("oauth_type =", value, "oauthType");
+            return (Criteria) this;
+        }
+
+        public Criteria andOauthTypeNotEqualTo(String value) {
+            addCriterion("oauth_type <>", value, "oauthType");
+            return (Criteria) this;
+        }
+
+        public Criteria andOauthTypeGreaterThan(String value) {
+            addCriterion("oauth_type >", value, "oauthType");
+            return (Criteria) this;
+        }
+
+        public Criteria andOauthTypeGreaterThanOrEqualTo(String value) {
+            addCriterion("oauth_type >=", value, "oauthType");
+            return (Criteria) this;
+        }
+
+        public Criteria andOauthTypeLessThan(String value) {
+            addCriterion("oauth_type <", value, "oauthType");
+            return (Criteria) this;
+        }
+
+        public Criteria andOauthTypeLessThanOrEqualTo(String value) {
+            addCriterion("oauth_type <=", value, "oauthType");
+            return (Criteria) this;
+        }
+
+        public Criteria andOauthTypeLike(String value) {
+            addCriterion("oauth_type like", value, "oauthType");
+            return (Criteria) this;
+        }
+
+        public Criteria andOauthTypeNotLike(String value) {
+            addCriterion("oauth_type not like", value, "oauthType");
+            return (Criteria) this;
+        }
+
+        public Criteria andOauthTypeIn(List<String> values) {
+            addCriterion("oauth_type in", values, "oauthType");
+            return (Criteria) this;
+        }
+
+        public Criteria andOauthTypeNotIn(List<String> values) {
+            addCriterion("oauth_type not in", values, "oauthType");
+            return (Criteria) this;
+        }
+
+        public Criteria andOauthTypeBetween(String value1, String value2) {
+            addCriterion("oauth_type between", value1, value2, "oauthType");
+            return (Criteria) this;
+        }
+
+        public Criteria andOauthTypeNotBetween(String value1, String value2) {
+            addCriterion("oauth_type not between", value1, value2, "oauthType");
+            return (Criteria) this;
+        }
+
+        public Criteria andOauthIdIsNull() {
+            addCriterion("oauth_id is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andOauthIdIsNotNull() {
+            addCriterion("oauth_id is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andOauthIdEqualTo(String value) {
+            addCriterion("oauth_id =", value, "oauthId");
+            return (Criteria) this;
+        }
+
+        public Criteria andOauthIdNotEqualTo(String value) {
+            addCriterion("oauth_id <>", value, "oauthId");
+            return (Criteria) this;
+        }
+
+        public Criteria andOauthIdGreaterThan(String value) {
+            addCriterion("oauth_id >", value, "oauthId");
+            return (Criteria) this;
+        }
+
+        public Criteria andOauthIdGreaterThanOrEqualTo(String value) {
+            addCriterion("oauth_id >=", value, "oauthId");
+            return (Criteria) this;
+        }
+
+        public Criteria andOauthIdLessThan(String value) {
+            addCriterion("oauth_id <", value, "oauthId");
+            return (Criteria) this;
+        }
+
+        public Criteria andOauthIdLessThanOrEqualTo(String value) {
+            addCriterion("oauth_id <=", value, "oauthId");
+            return (Criteria) this;
+        }
+
+        public Criteria andOauthIdLike(String value) {
+            addCriterion("oauth_id like", value, "oauthId");
+            return (Criteria) this;
+        }
+
+        public Criteria andOauthIdNotLike(String value) {
+            addCriterion("oauth_id not like", value, "oauthId");
+            return (Criteria) this;
+        }
+
+        public Criteria andOauthIdIn(List<String> values) {
+            addCriterion("oauth_id in", values, "oauthId");
+            return (Criteria) this;
+        }
+
+        public Criteria andOauthIdNotIn(List<String> values) {
+            addCriterion("oauth_id not in", values, "oauthId");
+            return (Criteria) this;
+        }
+
+        public Criteria andOauthIdBetween(String value1, String value2) {
+            addCriterion("oauth_id between", value1, value2, "oauthId");
+            return (Criteria) this;
+        }
+
+        public Criteria andOauthIdNotBetween(String value1, String value2) {
+            addCriterion("oauth_id not between", value1, value2, "oauthId");
             return (Criteria) this;
         }
     }

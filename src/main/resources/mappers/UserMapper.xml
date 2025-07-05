@@ -3,15 +3,17 @@
 <mapper namespace="com.qiyuan.web.dao.UserMapper">
   <resultMap id="BaseResultMap" type="com.qiyuan.web.entity.User">
     <id column="id" jdbcType="CHAR" property="id" />
-    <result column="username" jdbcType="VARCHAR" property="username" />
-    <result column="email" jdbcType="VARCHAR" property="email" />
     <result column="password" jdbcType="VARCHAR" property="password" />
+    <result column="email" jdbcType="VARCHAR" property="email" />
     <result column="phone" jdbcType="VARCHAR" property="phone" />
     <result column="nickname" jdbcType="NVARCHAR" property="nickname" />
     <result column="line_id" jdbcType="VARCHAR" property="lineId" />
     <result column="address_name" jdbcType="NVARCHAR" property="addressName" />
     <result column="address" jdbcType="NVARCHAR" property="address" />
     <result column="receipt_type" jdbcType="VARCHAR" property="receiptType" />
+    <result column="username" jdbcType="VARCHAR" property="username" />
+    <result column="oauth_type" jdbcType="VARCHAR" property="oauthType" />
+    <result column="oauth_id" jdbcType="VARCHAR" property="oauthId" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -72,9 +74,16 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    id, password, username, email, phone, nickname, line_id, address_name, address, receipt_type
+    id, password, email, phone, nickname, line_id, address_name, address, receipt_type, 
+    username, oauth_type, oauth_id
   </sql>
-  <select id="selectByExample" parameterType="com.qiyuan.web.entity.example.UserExample" resultMap="BaseResultMap">
+  <select id="selectByUsername" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from users
+    where username = #{username,jdbcType=VARCHAR}
+  </select>
+  <select id="selectByExample" parameterType="com.qiyuan.web.entity.example.UsersExample" resultMap="BaseResultMap">
     select
     <if test="distinct">
       distinct
@@ -94,33 +103,27 @@
     from users
     where id = #{id,jdbcType=CHAR}
   </select>
-
-  <select id="selectByUsername" parameterType="java.lang.String" resultMap="BaseResultMap">
-    select
-    <include refid="Base_Column_List" />
-    from users
-    where username = #{username,jdbcType=VARCHAR}
-  </select>
-
   <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
     delete from users
     where id = #{id,jdbcType=CHAR}
   </delete>
-  <delete id="deleteByExample" parameterType="com.qiyuan.web.entity.example.UserExample">
+  <delete id="deleteByExample" parameterType="com.qiyuan.web.entity.example.UsersExample">
     delete from users
     <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
     </if>
   </delete>
   <insert id="insert" parameterType="com.qiyuan.web.entity.User">
-    insert into users (id, password, username,
-      email, phone, nickname, 
-      line_id, address_name, address, 
-      receipt_type)
-    values (#{id,jdbcType=CHAR}, #{password,jdbcType=VARCHAR}, #{username,jdbcType=VARCHAR},
-      #{email,jdbcType=VARCHAR}, #{phone,jdbcType=VARCHAR}, #{nickname,jdbcType=NVARCHAR}, 
-      #{lineId,jdbcType=VARCHAR}, #{addressName,jdbcType=NVARCHAR}, #{address,jdbcType=NVARCHAR}, 
-      #{receiptType,jdbcType=VARCHAR})
+    insert into users (id, password, email, 
+      phone, nickname, line_id, 
+      address_name, address, receipt_type, 
+      username, oauth_type, oauth_id
+      )
+    values (#{id,jdbcType=CHAR}, #{password,jdbcType=VARCHAR}, #{email,jdbcType=VARCHAR}, 
+      #{phone,jdbcType=VARCHAR}, #{nickname,jdbcType=NVARCHAR}, #{lineId,jdbcType=VARCHAR}, 
+      #{addressName,jdbcType=NVARCHAR}, #{address,jdbcType=NVARCHAR}, #{receiptType,jdbcType=VARCHAR}, 
+      #{username,jdbcType=VARCHAR}, #{oauthType,jdbcType=VARCHAR}, #{oauthId,jdbcType=VARCHAR}
+      )
   </insert>
   <insert id="insertSelective" parameterType="com.qiyuan.web.entity.User">
     insert into users
@@ -130,9 +133,6 @@
       </if>
       <if test="password != null">
         password,
-      </if>
-      <if test="username != null">
-        username,
       </if>
       <if test="email != null">
         email,
@@ -155,6 +155,15 @@
       <if test="receiptType != null">
         receipt_type,
       </if>
+      <if test="username != null">
+        username,
+      </if>
+      <if test="oauthType != null">
+        oauth_type,
+      </if>
+      <if test="oauthId != null">
+        oauth_id,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -162,9 +171,6 @@
       </if>
       <if test="password != null">
         #{password,jdbcType=VARCHAR},
-      </if>
-      <if test="username != null">
-        #{username,jdbcType=VARCHAR},
       </if>
       <if test="email != null">
         #{email,jdbcType=VARCHAR},
@@ -187,9 +193,18 @@
       <if test="receiptType != null">
         #{receiptType,jdbcType=VARCHAR},
       </if>
+      <if test="username != null">
+        #{username,jdbcType=VARCHAR},
+      </if>
+      <if test="oauthType != null">
+        #{oauthType,jdbcType=VARCHAR},
+      </if>
+      <if test="oauthId != null">
+        #{oauthId,jdbcType=VARCHAR},
+      </if>
     </trim>
   </insert>
-  <select id="countByExample" parameterType="com.qiyuan.web.entity.example.UserExample" resultType="java.lang.Long">
+  <select id="countByExample" parameterType="com.qiyuan.web.entity.example.UsersExample" resultType="java.lang.Long">
     select count(*) from users
     <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
@@ -198,43 +213,62 @@
   <update id="updateByExampleSelective" parameterType="map">
     update users
     <set>
-      <if test="record.password != null">
-        password = #{record.password,jdbcType=VARCHAR},
+      <if test="row.id != null">
+        id = #{row.id,jdbcType=CHAR},
       </if>
-      <if test="record.phone != null">
-        phone = #{record.phone,jdbcType=VARCHAR},
+      <if test="row.password != null">
+        password = #{row.password,jdbcType=VARCHAR},
       </if>
-      <if test="record.nickname != null">
-        nickname = #{record.nickname,jdbcType=NVARCHAR},
+      <if test="row.email != null">
+        email = #{row.email,jdbcType=VARCHAR},
       </if>
-      <if test="record.lineId != null">
-        line_id = #{record.lineId,jdbcType=VARCHAR},
+      <if test="row.phone != null">
+        phone = #{row.phone,jdbcType=VARCHAR},
       </if>
-      <if test="record.addressName != null">
-        address_name = #{record.addressName,jdbcType=NVARCHAR},
+      <if test="row.nickname != null">
+        nickname = #{row.nickname,jdbcType=NVARCHAR},
       </if>
-      <if test="record.address != null">
-        address = #{record.address,jdbcType=NVARCHAR},
+      <if test="row.lineId != null">
+        line_id = #{row.lineId,jdbcType=VARCHAR},
       </if>
-      <if test="record.receiptType != null">
-        receipt_type = #{record.receiptType,jdbcType=VARCHAR},
+      <if test="row.addressName != null">
+        address_name = #{row.addressName,jdbcType=NVARCHAR},
+      </if>
+      <if test="row.address != null">
+        address = #{row.address,jdbcType=NVARCHAR},
+      </if>
+      <if test="row.receiptType != null">
+        receipt_type = #{row.receiptType,jdbcType=VARCHAR},
+      </if>
+      <if test="row.username != null">
+        username = #{row.username,jdbcType=VARCHAR},
+      </if>
+      <if test="row.oauthType != null">
+        oauth_type = #{row.oauthType,jdbcType=VARCHAR},
+      </if>
+      <if test="row.oauthId != null">
+        oauth_id = #{row.oauthId,jdbcType=VARCHAR},
       </if>
     </set>
-    <if test="_parameter != null">
+    <if test="example != null">
       <include refid="Update_By_Example_Where_Clause" />
     </if>
   </update>
   <update id="updateByExample" parameterType="map">
     update users
-    set
-      password = #{record.password,jdbcType=VARCHAR},
-      phone = #{record.phone,jdbcType=VARCHAR},
-      nickname = #{record.nickname,jdbcType=NVARCHAR},
-      line_id = #{record.lineId,jdbcType=VARCHAR},
-      address_name = #{record.addressName,jdbcType=NVARCHAR},
-      address = #{record.address,jdbcType=NVARCHAR},
-      receipt_type = #{record.receiptType,jdbcType=VARCHAR}
-    <if test="_parameter != null">
+    set id = #{row.id,jdbcType=CHAR},
+      password = #{row.password,jdbcType=VARCHAR},
+      email = #{row.email,jdbcType=VARCHAR},
+      phone = #{row.phone,jdbcType=VARCHAR},
+      nickname = #{row.nickname,jdbcType=NVARCHAR},
+      line_id = #{row.lineId,jdbcType=VARCHAR},
+      address_name = #{row.addressName,jdbcType=NVARCHAR},
+      address = #{row.address,jdbcType=NVARCHAR},
+      receipt_type = #{row.receiptType,jdbcType=VARCHAR},
+      username = #{row.username,jdbcType=VARCHAR},
+      oauth_type = #{row.oauthType,jdbcType=VARCHAR},
+      oauth_id = #{row.oauthId,jdbcType=VARCHAR}
+    <if test="example != null">
       <include refid="Update_By_Example_Where_Clause" />
     </if>
   </update>
@@ -243,6 +277,9 @@
     <set>
       <if test="password != null">
         password = #{password,jdbcType=VARCHAR},
+      </if>
+      <if test="email != null">
+        email = #{email,jdbcType=VARCHAR},
       </if>
       <if test="phone != null">
         phone = #{phone,jdbcType=VARCHAR},
@@ -262,19 +299,31 @@
       <if test="receiptType != null">
         receipt_type = #{receiptType,jdbcType=VARCHAR},
       </if>
+      <if test="username != null">
+        username = #{username,jdbcType=VARCHAR},
+      </if>
+      <if test="oauthType != null">
+        oauth_type = #{oauthType,jdbcType=VARCHAR},
+      </if>
+      <if test="oauthId != null">
+        oauth_id = #{oauthId,jdbcType=VARCHAR},
+      </if>
     </set>
     where id = #{id,jdbcType=CHAR}
   </update>
   <update id="updateByPrimaryKey" parameterType="com.qiyuan.web.entity.User">
     update users
-    set
-      password = #{password,jdbcType=VARCHAR},
+    set password = #{password,jdbcType=VARCHAR},
+      email = #{email,jdbcType=VARCHAR},
       phone = #{phone,jdbcType=VARCHAR},
       nickname = #{nickname,jdbcType=NVARCHAR},
       line_id = #{lineId,jdbcType=VARCHAR},
       address_name = #{addressName,jdbcType=NVARCHAR},
       address = #{address,jdbcType=NVARCHAR},
-      receipt_type = #{receiptType,jdbcType=VARCHAR}
+      receipt_type = #{receiptType,jdbcType=VARCHAR},
+      username = #{username,jdbcType=VARCHAR},
+      oauth_type = #{oauthType,jdbcType=VARCHAR},
+      oauth_id = #{oauthId,jdbcType=VARCHAR}
     where id = #{id,jdbcType=CHAR}
   </update>
 </mapper>

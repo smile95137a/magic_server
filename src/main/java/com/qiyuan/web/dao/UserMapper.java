@@ -1,32 +1,33 @@
 package com.qiyuan.web.dao;
 
 import com.qiyuan.web.entity.User;
-import com.qiyuan.web.entity.example.UserExample;
-import java.util.List;
+import com.qiyuan.web.entity.example.UsersExample;
 import org.apache.ibatis.annotations.Param;
 
-public interface UserMapper {
-    long countByExample(UserExample example);
+import java.util.List;
 
-    int deleteByExample(UserExample example);
+public interface UserMapper {
+    long countByExample(UsersExample example);
+
+    int deleteByExample(UsersExample example);
 
     int deleteByPrimaryKey(String id);
 
-    int insert(User record);
+    int insert(User row);
 
-    int insertSelective(User record);
-
-    List<User> selectByExample(UserExample example);
-
-    User selectByPrimaryKey(String id);
+    int insertSelective(User row);
 
     User selectByUsername(String selectByUsername);
 
-    int updateByExampleSelective(@Param("record") User record, @Param("example") UserExample example);
+    List<User> selectByExample(UsersExample example);
 
-    int updateByExample(@Param("record") User record, @Param("example") UserExample example);
+    User selectByPrimaryKey(String id);
 
-    int updateByPrimaryKeySelective(User record);
+    int updateByExampleSelective(@Param("row") User row, @Param("example") UsersExample example);
 
-    int updateByPrimaryKey(User record);
+    int updateByExample(@Param("row") User row, @Param("example") UsersExample example);
+
+    int updateByPrimaryKeySelective(User row);
+
+    int updateByPrimaryKey(User row);
 }

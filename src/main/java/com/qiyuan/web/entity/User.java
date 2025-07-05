@@ -6,8 +6,6 @@ import lombok.Builder;
 public class User {
     private String id;
 
-    private String username;
-
     private String password;
 
     private String email;
@@ -23,6 +21,12 @@ public class User {
     private String address;
 
     private String receiptType;
+
+    private String username;
+
+    private String oauthType;
+
+    private String oauthId;
 
     public String getId() {
         return id;
@@ -102,5 +106,21 @@ public class User {
 
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    public String getOauthType() {
+        return oauthType;
+    }
+
+    public void setOauthType(String oauthType) {
+        this.oauthType = oauthType;
+    }
+
+    public String getOauthId() {
+        return oauthId;
+    }
+
+    public void setOauthId(String oauthId) {
+        this.oauthId = oauthId;
     }
 }
