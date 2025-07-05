@@ -2,11 +2,13 @@ package com.qiyuan.web.controller.front;
 
 import com.qiyuan.web.dto.request.*;
 import com.qiyuan.web.dto.response.LoginResponse;
+import com.qiyuan.web.dto.response.OAuthLoginResponse;
 import com.qiyuan.web.dto.response.RecordVO;
 import com.qiyuan.web.dto.response.UserProfileResponse;
 import com.qiyuan.web.security.RoleExpressions;
 import com.qiyuan.web.service.AuthService;
 import com.qiyuan.web.service.MemberService;
+import com.qiyuan.web.service.OAuth2LoginService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 
@@ -24,10 +26,12 @@ public class UserFrontController {
 
     private final AuthService authService;
     private final MemberService memberService;
+    private final OAuth2LoginService oAuth2LoginService;
 
-    public UserFrontController(AuthService authService, MemberService memberService) {
+    public UserFrontController(AuthService authService, MemberService memberService, OAuth2LoginService oAuth2LoginService) {
         this.authService = authService;
         this.memberService = memberService;
+        this.oAuth2LoginService = oAuth2LoginService;
     }
 
     @PostMapping("/register")
@@ -87,6 +91,16 @@ public class UserFrontController {
     @PostMapping("/reset-password")
     public boolean resetPassword(@RequestBody ResetPasswordRequest req) {
         return memberService.resetPassword(req);
+    }
+
+    @PostMapping("/oauth2/login")
+    public OAuthLoginResponse oauth2Login(@RequestBody Oauth2LoginRequest request) {
+        return oAuth2LoginService.oauth2Login(
+                request.getProvider(),
+                request.getOauthId(),
+                request.getEmail(),
+                request.getNickname()
+        );
     }
 
 

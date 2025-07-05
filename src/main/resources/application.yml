@@ -35,11 +35,14 @@ spring:
           google:
             client-id: [ your-google-client-id ]
             client-secret: [ your-google-client-secret ]
-            scope: [ email, profile ]
+            scope:
+              - email
+              - profile
           facebook:
             client-id: [ your-facebook-app-id ]
             client-secret: [ your-facebook-app-secret ]
-            scope: [ email ]
+            scope:
+              - email
 
 
 sso:

@@ -1,15 +1,15 @@
 package com.qiyuan.web.dao;
 
 import com.qiyuan.web.entity.User;
-import com.qiyuan.web.entity.example.UsersExample;
+import com.qiyuan.web.entity.example.UserExample;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
 public interface UserMapper {
-    long countByExample(UsersExample example);
+    long countByExample(UserExample example);
 
-    int deleteByExample(UsersExample example);
+    int deleteByExample(UserExample example);
 
     int deleteByPrimaryKey(String id);
 
@@ -19,13 +19,13 @@ public interface UserMapper {
 
     User selectByUsername(String selectByUsername);
 
-    List<User> selectByExample(UsersExample example);
+    List<User> selectByExample(UserExample example);
 
     User selectByPrimaryKey(String id);
 
-    int updateByExampleSelective(@Param("row") User row, @Param("example") UsersExample example);
+    int updateByExampleSelective(@Param("row") User row, @Param("example") UserExample example);
 
-    int updateByExample(@Param("row") User row, @Param("example") UsersExample example);
+    int updateByExample(@Param("row") User row, @Param("example") UserExample example);
 
     int updateByPrimaryKeySelective(User row);
 

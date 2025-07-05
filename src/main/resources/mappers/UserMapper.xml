@@ -83,7 +83,7 @@
     from users
     where username = #{username,jdbcType=VARCHAR}
   </select>
-  <select id="selectByExample" parameterType="com.qiyuan.web.entity.example.UsersExample" resultMap="BaseResultMap">
+  <select id="selectByExample" parameterType="com.qiyuan.web.entity.example.UserExample" resultMap="BaseResultMap">
     select
     <if test="distinct">
       distinct
@@ -107,7 +107,7 @@
     delete from users
     where id = #{id,jdbcType=CHAR}
   </delete>
-  <delete id="deleteByExample" parameterType="com.qiyuan.web.entity.example.UsersExample">
+  <delete id="deleteByExample" parameterType="com.qiyuan.web.entity.example.UserExample">
     delete from users
     <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
@@ -204,7 +204,7 @@
       </if>
     </trim>
   </insert>
-  <select id="countByExample" parameterType="com.qiyuan.web.entity.example.UsersExample" resultType="java.lang.Long">
+  <select id="countByExample" parameterType="com.qiyuan.web.entity.example.UserExample" resultType="java.lang.Long">
     select count(*) from users
     <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
