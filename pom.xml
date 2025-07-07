@@ -27,6 +27,8 @@
         <spring.boot.version>3.4.6</spring.boot.version>
         <slf4j.logging>2.0.16</slf4j.logging>
         <xmlbeans.version>5.3.0</xmlbeans.version>
+        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
     </properties>
     <dependencies>
         <!--   spring  boot   -->
@@ -58,6 +60,7 @@
         <dependency>
             <groupId>org.mybatis.spring.boot</groupId>
             <artifactId>mybatis-spring-boot-starter</artifactId>
+            <version>${mybatis.spring.boot}</version>
         </dependency>
         <!--  DB      -->
         <dependency>
@@ -79,15 +82,18 @@
         <dependency>
             <groupId>io.jsonwebtoken</groupId>
             <artifactId>jjwt-api</artifactId>
+            <version>${jwt.token}</version>
         </dependency>
         <dependency>
             <groupId>io.jsonwebtoken</groupId>
             <artifactId>jjwt-impl</artifactId>
+            <version>${jwt.token}</version>
             <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>io.jsonwebtoken</groupId>
             <artifactId>jjwt-jackson</artifactId>
+            <version>${jwt.token}</version>
             <scope>runtime</scope>
         </dependency>
 

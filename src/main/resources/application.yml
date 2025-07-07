@@ -87,6 +87,6 @@ upload:
     banner: C:\Users\Public\test\banner
     master: C:\Users\Public\test\master
     offering: C:\Users\Public\test\offering
-    produst: C:\Users\Public\test\product
+    product: C:\Users\Public\test\product
   url-prefix:
     product: /images/product/
