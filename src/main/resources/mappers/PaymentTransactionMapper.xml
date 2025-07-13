@@ -78,7 +78,7 @@
     id, user_id, source_type, source_id, external_order_no, pay_method, provider, amount, 
     status, merchant_trade_no, raw_data, create_time, update_time
   </sql>
-  <select id="selectByExample" parameterType="com.qiyuan.web.entity.PaymentTransactionExample" resultMap="BaseResultMap">
+  <select id="selectByExample" parameterType="com.qiyuan.web.entity.example.PaymentTransactionExample" resultMap="BaseResultMap">
     select
     <if test="distinct">
       distinct
@@ -102,7 +102,7 @@
     delete from payment_transaction
     where id = #{id,jdbcType=CHAR}
   </delete>
-  <delete id="deleteByExample" parameterType="com.qiyuan.web.entity.PaymentTransactionExample">
+  <delete id="deleteByExample" parameterType="com.qiyuan.web.entity.example.PaymentTransactionExample">
     delete from payment_transaction
     <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
@@ -205,7 +205,7 @@
       </if>
     </trim>
   </insert>
-  <select id="countByExample" parameterType="com.qiyuan.web.entity.PaymentTransactionExample" resultType="java.lang.Long">
+  <select id="countByExample" parameterType="com.qiyuan.web.entity.example.PaymentTransactionExample" resultType="java.lang.Long">
     select count(*) from payment_transaction
     <if test="_parameter != null">
       <include refid="Example_Where_Clause" />

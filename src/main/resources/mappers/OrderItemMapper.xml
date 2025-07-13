@@ -77,7 +77,7 @@
     id, order_id, product_id, product_name, unit_price, special_price, quantity, subtotal,
     ext_json, create_time, spec_id, spec_value
   </sql>
-  <select id="selectByExample" parameterType="com.qiyuan.web.entity.OrderItemExample" resultMap="BaseResultMap">
+  <select id="selectByExample" parameterType="com.qiyuan.web.entity.example.OrderItemExample" resultMap="BaseResultMap">
     select
     <if test="distinct">
       distinct
@@ -101,7 +101,7 @@
     delete from order_item
     where id = #{id,jdbcType=INTEGER}
   </delete>
-  <delete id="deleteByExample" parameterType="com.qiyuan.web.entity.OrderItemExample">
+  <delete id="deleteByExample" parameterType="com.qiyuan.web.entity.example.OrderItemExample">
     delete from order_item
     <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
@@ -198,7 +198,7 @@
       </if>
     </trim>
   </insert>
-  <select id="countByExample" parameterType="com.qiyuan.web.entity.OrderItemExample" resultType="java.lang.Long">
+  <select id="countByExample" parameterType="com.qiyuan.web.entity.example.OrderItemExample" resultType="java.lang.Long">
     select count(*) from order_item
     <if test="_parameter != null">
       <include refid="Example_Where_Clause" />

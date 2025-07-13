@@ -75,7 +75,7 @@
     id, external_order_no, lantern_id, user_id, name, birthday, message, blessing_times,
     create_time, expired_time
   </sql>
-  <select id="selectByExample" parameterType="com.qiyuan.web.entity.LanternPurchaseExample" resultMap="BaseResultMap">
+  <select id="selectByExample" parameterType="com.qiyuan.web.entity.example.LanternPurchaseExample" resultMap="BaseResultMap">
     select
     <if test="distinct">
       distinct
@@ -95,11 +95,8 @@
     from lantern_purchase
     where id = #{id,jdbcType=CHAR}
   </select>
-  <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
-    delete from lantern_purchase
-    where id = #{id,jdbcType=CHAR}
-  </delete>
-  <delete id="deleteByExample" parameterType="com.qiyuan.web.entity.LanternPurchaseExample">
+
+  <delete id="deleteByExample" parameterType="com.qiyuan.web.entity.example.LanternPurchaseExample">
     delete from lantern_purchase
     <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
@@ -182,7 +179,7 @@
       </if>
     </trim>
   </insert>
-  <select id="countByExample" parameterType="com.qiyuan.web.entity.LanternPurchaseExample" resultType="java.lang.Long">
+  <select id="countByExample" parameterType="com.qiyuan.web.entity.example.LanternPurchaseExample" resultType="java.lang.Long">
     select count(*) from lantern_purchase
     <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
@@ -318,12 +315,6 @@
     </if>
   </select>
 
-  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
-    select
-    <include refid="Base_Column_List" />
-    from lantern_purchase
-    where id = #{id,jdbcType=INTEGER}
-  </select>
 
   <select id="selectRecordsByUserIdAndPeriod" resultMap="RecordJoinMap">
     SELECT

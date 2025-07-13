@@ -76,7 +76,7 @@
     serial, master_code, name, phone, email, line_id, note, service, create_time, id,
     external_order_no
   </sql>
-  <select id="selectByExample" parameterType="com.qiyuan.web.entity.MasterServiceRequestExample" resultMap="BaseResultMap">
+  <select id="selectByExample" parameterType="com.qiyuan.web.entity.example.MasterServiceRequestExample" resultMap="BaseResultMap">
     select
     <if test="distinct">
       distinct
@@ -100,7 +100,7 @@
     delete from master_service_request
     where serial = #{serial,jdbcType=INTEGER}
   </delete>
-  <delete id="deleteByExample" parameterType="com.qiyuan.web.entity.MasterServiceRequestExample">
+  <delete id="deleteByExample" parameterType="com.qiyuan.web.entity.example.MasterServiceRequestExample">
     delete from master_service_request
     <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
@@ -189,7 +189,7 @@
       </if>
     </trim>
   </insert>
-  <select id="countByExample" parameterType="com.qiyuan.web.entity.MasterServiceRequestExample" resultType="java.lang.Long">
+  <select id="countByExample" parameterType="com.qiyuan.web.entity.example.MasterServiceRequestExample" resultType="java.lang.Long">
     select count(*) from master_service_request
     <if test="_parameter != null">
       <include refid="Example_Where_Clause" />

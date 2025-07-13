@@ -68,7 +68,7 @@
   <sql id="Base_Column_List">
     id, product_id, spec_value, sort
   </sql>
-  <select id="selectByExample" parameterType="com.qiyuan.web.entity.ProductSpecExample" resultMap="BaseResultMap">
+  <select id="selectByExample" parameterType="com.qiyuan.web.entity.example.ProductSpecExample" resultMap="BaseResultMap">
     select
     <if test="distinct">
       distinct
@@ -92,7 +92,7 @@
     delete from product_spec
     where id = #{id,jdbcType=INTEGER}
   </delete>
-  <delete id="deleteByExample" parameterType="com.qiyuan.web.entity.ProductSpecExample">
+  <delete id="deleteByExample" parameterType="com.qiyuan.web.entity.example.ProductSpecExample">
     delete from product_spec
     <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
@@ -135,7 +135,7 @@
       </if>
     </trim>
   </insert>
-  <select id="countByExample" parameterType="com.qiyuan.web.entity.ProductSpecExample" resultType="java.lang.Long">
+  <select id="countByExample" parameterType="com.qiyuan.web.entity.example.ProductSpecExample" resultType="java.lang.Long">
     select count(*) from product_spec
     <if test="_parameter != null">
       <include refid="Example_Where_Clause" />

@@ -70,7 +70,7 @@
   <sql id="Base_Column_List">
     id, external_order_no, offering_id, user_id, god_id, create_time
   </sql>
-  <select id="selectByExample" parameterType="com.qiyuan.web.entity.OfferingPurchaseExample" resultMap="BaseResultMap">
+  <select id="selectByExample" parameterType="com.qiyuan.web.entity.example.OfferingPurchaseExample" resultMap="BaseResultMap">
     select
     <if test="distinct">
       distinct
@@ -94,7 +94,7 @@
     delete from offering_purchase
     where id = #{id,jdbcType=CHAR}
   </delete>
-  <delete id="deleteByExample" parameterType="com.qiyuan.web.entity.OfferingPurchaseExample">
+  <delete id="deleteByExample" parameterType="com.qiyuan.web.entity.example.OfferingPurchaseExample">
     delete from offering_purchase
     <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
@@ -151,7 +151,7 @@
       </if>
     </trim>
   </insert>
-  <select id="countByExample" parameterType="com.qiyuan.web.entity.OfferingPurchaseExample" resultType="java.lang.Long">
+  <select id="countByExample" parameterType="com.qiyuan.web.entity.example.OfferingPurchaseExample" resultType="java.lang.Long">
     select count(*) from offering_purchase
     <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
