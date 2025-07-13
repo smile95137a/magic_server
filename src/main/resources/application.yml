@@ -98,4 +98,15 @@ upload:
   url-prefix:
     product: /images/product/
 
+gomypay:
+  customerNo: 8F8ABEDD2FC67C38EEF644BF52831CE8
+  pwd: jk5rjwzmk2f16h3t1n6qgx87tqhdy3ky
+  api: https://n.gomypay.asia/TestShuntClass.aspx
+  einvoice:
+    api: http://testeinvoice.gomypay.asia/
+    pwd: jk5rjwzmk2f16h3t1n6qgx87tqhdy3ky
+    customerNo: 60755266
+
+ap:
+  backend: http://localhost:8080
 

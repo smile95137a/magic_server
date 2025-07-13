@@ -2,21 +2,19 @@ package com.qiyuan.web.service;
 
 import com.qiyuan.security.config.ImagePathMappingConfig;
 import com.qiyuan.security.exception.ApiException;
-import com.qiyuan.web.dao.ProductCategoryMapper;
-import com.qiyuan.web.dao.ProductImageMapper;
-import com.qiyuan.web.dao.ProductMapper;
+import com.qiyuan.web.dao.*;
 import com.qiyuan.web.dto.GalleryImageVO;
 import com.qiyuan.web.dto.PageResult;
 import com.qiyuan.web.dto.ProductAdminVO;
+import com.qiyuan.web.dto.SpecInfo;
 import com.qiyuan.web.dto.request.*;
 import com.qiyuan.web.dto.response.CreateProductDraftResponse;
 import com.qiyuan.web.dto.response.ProductDetailVO;
 import com.qiyuan.web.dto.response.ProductVO;
 import com.qiyuan.web.dto.response.UploadImageResponse;
-import com.qiyuan.web.entity.Product;
-import com.qiyuan.web.entity.ProductCategory;
-import com.qiyuan.web.entity.ProductImage;
+import com.qiyuan.web.entity.*;
 import com.qiyuan.web.entity.example.ProductExample;
+import com.qiyuan.web.entity.example.ProductSpecExample;
 import com.qiyuan.web.enums.ProductImageType;
 import com.qiyuan.web.util.DateUtil;
 import com.qiyuan.web.util.FileUtil;
@@ -49,6 +47,10 @@ public class ProductService {
     private ProductCategoryMapper productCategoryMapper;
     @Autowired
     private ImagePathMappingConfig mappingConfig;
+    @Autowired
+    private ProductSpecMapper productSpecMapper;
+    @Autowired
+    private ProductSpecStockMapper productSpecStockMapper;
 
     @Transactional
     public CreateProductDraftResponse createProductDraft() {
@@ -293,6 +295,20 @@ public class ProductService {
         if (p == null || !Boolean.TRUE.equals(p.getStatus()))
             throw new ApiException("商品不存在或已下架");
 
+        // 規格及庫存
+        ProductSpecExample e = new ProductSpecExample();
+        e.createCriteria().andProductIdEqualTo(productId);
+        List<ProductSpec> specList = productSpecMapper.selectByExample(e);
+        List<SpecInfo> specInfoList = new ArrayList<>();
+        for (ProductSpec spec : specList) {
+            ProductSpecStock stock = productSpecStockMapper.selectByPrimaryKey(spec.getId());
+            specInfoList.add(SpecInfo.builder()
+                    .specId(spec.getId())
+                    .specValue(spec.getSpecValue())
+                    .stock(stock != null ? stock.getStock() : 0)
+                    .build());
+        }
+
         // gallery
         List<ProductImage> galleryList = productImageMapper.selectByProductIdAndType(productId, ProductImageType.GALLERY.getFolder());
         List<String> galleryImageUrls = galleryList.stream()
@@ -313,8 +329,10 @@ public class ProductService {
                 .galleryImageUrls(galleryImageUrls)
                 .detailHtml(p.getDetailHtml())
                 .status(p.getStatus())
+                .specList(specInfoList)    // <=== 規格及庫存
                 .build();
     }
+
 
     public PageResult<ProductAdminVO> getProductPage(ProductPageRequest req) {
         int page = req.getPage() <= 0 ? 1 : req.getPage();

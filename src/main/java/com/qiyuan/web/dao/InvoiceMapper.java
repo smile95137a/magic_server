@@ -1,9 +1,10 @@
 package com.qiyuan.web.dao;
 
 import com.qiyuan.web.entity.Invoice;
-import com.qiyuan.web.entity.InvoiceExample;
-import java.util.List;
+import com.qiyuan.web.entity.example.InvoiceExample;
 import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 public interface InvoiceMapper {
     long countByExample(InvoiceExample example);

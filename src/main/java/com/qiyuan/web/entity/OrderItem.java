@@ -1,8 +1,11 @@
 package com.qiyuan.web.entity;
 
+import lombok.Builder;
+
 import java.math.BigDecimal;
 import java.util.Date;
 
+@Builder
 public class OrderItem {
     private Integer id;
 
@@ -14,11 +17,19 @@ public class OrderItem {
 
     private BigDecimal unitPrice;
 
+    private BigDecimal specialPrice;
+
     private Integer quantity;
 
     private BigDecimal subtotal;
 
+    private String extJson;
+
     private Date createTime;
+
+    private Integer specId;
+
+    private String specValue;
 
     public Integer getId() {
         return id;
@@ -60,6 +71,14 @@ public class OrderItem {
         this.unitPrice = unitPrice;
     }
 
+    public BigDecimal getSpecialPrice() {
+        return specialPrice;
+    }
+
+    public void setSpecialPrice(BigDecimal specialPrice) {
+        this.specialPrice = specialPrice;
+    }
+
     public Integer getQuantity() {
         return quantity;
     }
@@ -76,11 +95,35 @@ public class OrderItem {
         this.subtotal = subtotal;
     }
 
+    public String getExtJson() {
+        return extJson;
+    }
+
+    public void setExtJson(String extJson) {
+        this.extJson = extJson;
+    }
+
     public Date getCreateTime() {
         return createTime;
     }
 
     public void setCreateTime(Date createTime) {
         this.createTime = createTime;
+    }
+
+    public Integer getSpecId() {
+        return specId;
+    }
+
+    public void setSpecId(Integer specId) {
+        this.specId = specId;
+    }
+
+    public String getSpecValue() {
+        return specValue;
+    }
+
+    public void setSpecValue(String specValue) {
+        this.specValue = specValue;
     }
 }

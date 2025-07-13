@@ -5,8 +5,11 @@ import lombok.Builder;
 import java.util.Date;
 
 @Builder
+
 public class LanternPurchase {
-    private Integer id;
+    private String id;
+
+    private String externalOrderNo;
 
     private String lanternId;
 
@@ -18,18 +21,26 @@ public class LanternPurchase {
 
     private String message;
 
+    private Short blessingTimes;
+
     private Date createTime;
 
     private Date expiredTime;
 
-    private Short blessingTimes;
-
-    public Integer getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(String id) {
         this.id = id;
+    }
+
+    public String getExternalOrderNo() {
+        return externalOrderNo;
+    }
+
+    public void setExternalOrderNo(String externalOrderNo) {
+        this.externalOrderNo = externalOrderNo;
     }
 
     public String getLanternId() {
@@ -72,6 +83,14 @@ public class LanternPurchase {
         this.message = message;
     }
 
+    public Short getBlessingTimes() {
+        return blessingTimes;
+    }
+
+    public void setBlessingTimes(Short blessingTimes) {
+        this.blessingTimes = blessingTimes;
+    }
+
     public Date getCreateTime() {
         return createTime;
     }
@@ -86,13 +105,5 @@ public class LanternPurchase {
 
     public void setExpiredTime(Date expiredTime) {
         this.expiredTime = expiredTime;
-    }
-
-    public Short getBlessingTimes() {
-        return blessingTimes;
-    }
-
-    public void setBlessingTimes(Short blessingTimes) {
-        this.blessingTimes = blessingTimes;
     }
 }

@@ -84,7 +84,7 @@
     carrier_type, carrier_id, npoban, print_mark, amount, tax, status, response_msg, 
     raw_response, create_time, update_time
   </sql>
-  <select id="selectByExample" parameterType="com.qiyuan.web.entity.InvoiceExample" resultMap="BaseResultMap">
+  <select id="selectByExample" parameterType="com.qiyuan.web.entity.example.InvoiceExample" resultMap="BaseResultMap">
     select
     <if test="distinct">
       distinct
@@ -108,7 +108,7 @@
     delete from invoice
     where id = #{id,jdbcType=CHAR}
   </delete>
-  <delete id="deleteByExample" parameterType="com.qiyuan.web.entity.InvoiceExample">
+  <delete id="deleteByExample" parameterType="com.qiyuan.web.entity.example.InvoiceExample">
     delete from invoice
     <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
@@ -245,7 +245,7 @@
       </if>
     </trim>
   </insert>
-  <select id="countByExample" parameterType="com.qiyuan.web.entity.InvoiceExample" resultType="java.lang.Long">
+  <select id="countByExample" parameterType="com.qiyuan.web.entity.example.InvoiceExample" resultType="java.lang.Long">
     select count(*) from invoice
     <if test="_parameter != null">
       <include refid="Example_Where_Clause" />

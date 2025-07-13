@@ -24,6 +24,10 @@ public class MasterServiceRequest {
 
     private Date createTime;
 
+    private String id;
+
+    private String externalOrderNo;
+
     public Integer getSerial() {
         return serial;
     }
@@ -94,5 +98,21 @@ public class MasterServiceRequest {
 
     public void setCreateTime(Date createTime) {
         this.createTime = createTime;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getExternalOrderNo() {
+        return externalOrderNo;
+    }
+
+    public void setExternalOrderNo(String externalOrderNo) {
+        this.externalOrderNo = externalOrderNo;
     }
 }

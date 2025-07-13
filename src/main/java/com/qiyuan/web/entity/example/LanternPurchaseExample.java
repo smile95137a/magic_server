@@ -3,7 +3,6 @@ package com.qiyuan.web.entity.example;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-
 public class LanternPurchaseExample {
     protected String orderByClause;
 
@@ -115,53 +114,133 @@ public class LanternPurchaseExample {
             return (Criteria) this;
         }
 
-        public Criteria andIdEqualTo(Integer value) {
+        public Criteria andIdEqualTo(String value) {
             addCriterion("id =", value, "id");
             return (Criteria) this;
         }
 
-        public Criteria andIdNotEqualTo(Integer value) {
+        public Criteria andIdNotEqualTo(String value) {
             addCriterion("id <>", value, "id");
             return (Criteria) this;
         }
 
-        public Criteria andIdGreaterThan(Integer value) {
+        public Criteria andIdGreaterThan(String value) {
             addCriterion("id >", value, "id");
             return (Criteria) this;
         }
 
-        public Criteria andIdGreaterThanOrEqualTo(Integer value) {
+        public Criteria andIdGreaterThanOrEqualTo(String value) {
             addCriterion("id >=", value, "id");
             return (Criteria) this;
         }
 
-        public Criteria andIdLessThan(Integer value) {
+        public Criteria andIdLessThan(String value) {
             addCriterion("id <", value, "id");
             return (Criteria) this;
         }
 
-        public Criteria andIdLessThanOrEqualTo(Integer value) {
+        public Criteria andIdLessThanOrEqualTo(String value) {
             addCriterion("id <=", value, "id");
             return (Criteria) this;
         }
 
-        public Criteria andIdIn(List<Integer> values) {
+        public Criteria andIdLike(String value) {
+            addCriterion("id like", value, "id");
+            return (Criteria) this;
+        }
+
+        public Criteria andIdNotLike(String value) {
+            addCriterion("id not like", value, "id");
+            return (Criteria) this;
+        }
+
+        public Criteria andIdIn(List<String> values) {
             addCriterion("id in", values, "id");
             return (Criteria) this;
         }
 
-        public Criteria andIdNotIn(List<Integer> values) {
+        public Criteria andIdNotIn(List<String> values) {
             addCriterion("id not in", values, "id");
             return (Criteria) this;
         }
 
-        public Criteria andIdBetween(Integer value1, Integer value2) {
+        public Criteria andIdBetween(String value1, String value2) {
             addCriterion("id between", value1, value2, "id");
             return (Criteria) this;
         }
 
-        public Criteria andIdNotBetween(Integer value1, Integer value2) {
+        public Criteria andIdNotBetween(String value1, String value2) {
             addCriterion("id not between", value1, value2, "id");
+            return (Criteria) this;
+        }
+
+        public Criteria andExternalOrderNoIsNull() {
+            addCriterion("external_order_no is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andExternalOrderNoIsNotNull() {
+            addCriterion("external_order_no is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andExternalOrderNoEqualTo(String value) {
+            addCriterion("external_order_no =", value, "externalOrderNo");
+            return (Criteria) this;
+        }
+
+        public Criteria andExternalOrderNoNotEqualTo(String value) {
+            addCriterion("external_order_no <>", value, "externalOrderNo");
+            return (Criteria) this;
+        }
+
+        public Criteria andExternalOrderNoGreaterThan(String value) {
+            addCriterion("external_order_no >", value, "externalOrderNo");
+            return (Criteria) this;
+        }
+
+        public Criteria andExternalOrderNoGreaterThanOrEqualTo(String value) {
+            addCriterion("external_order_no >=", value, "externalOrderNo");
+            return (Criteria) this;
+        }
+
+        public Criteria andExternalOrderNoLessThan(String value) {
+            addCriterion("external_order_no <", value, "externalOrderNo");
+            return (Criteria) this;
+        }
+
+        public Criteria andExternalOrderNoLessThanOrEqualTo(String value) {
+            addCriterion("external_order_no <=", value, "externalOrderNo");
+            return (Criteria) this;
+        }
+
+        public Criteria andExternalOrderNoLike(String value) {
+            addCriterion("external_order_no like", value, "externalOrderNo");
+            return (Criteria) this;
+        }
+
+        public Criteria andExternalOrderNoNotLike(String value) {
+            addCriterion("external_order_no not like", value, "externalOrderNo");
+            return (Criteria) this;
+        }
+
+        public Criteria andExternalOrderNoIn(List<String> values) {
+            addCriterion("external_order_no in", values, "externalOrderNo");
+            return (Criteria) this;
+        }
+
+        public Criteria andExternalOrderNoNotIn(List<String> values) {
+            addCriterion("external_order_no not in", values, "externalOrderNo");
+            return (Criteria) this;
+        }
+
+        public Criteria andExternalOrderNoBetween(String value1, String value2) {
+            addCriterion("external_order_no between", value1, value2, "externalOrderNo");
+            return (Criteria) this;
+        }
+
+        public Criteria andExternalOrderNoNotBetween(String value1, String value2) {
+            addCriterion("external_order_no not between", value1, value2, "externalOrderNo");
             return (Criteria) this;
         }
 
@@ -505,6 +584,66 @@ public class LanternPurchaseExample {
             return (Criteria) this;
         }
 
+        public Criteria andBlessingTimesIsNull() {
+            addCriterion("blessing_times is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andBlessingTimesIsNotNull() {
+            addCriterion("blessing_times is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andBlessingTimesEqualTo(Short value) {
+            addCriterion("blessing_times =", value, "blessingTimes");
+            return (Criteria) this;
+        }
+
+        public Criteria andBlessingTimesNotEqualTo(Short value) {
+            addCriterion("blessing_times <>", value, "blessingTimes");
+            return (Criteria) this;
+        }
+
+        public Criteria andBlessingTimesGreaterThan(Short value) {
+            addCriterion("blessing_times >", value, "blessingTimes");
+            return (Criteria) this;
+        }
+
+        public Criteria andBlessingTimesGreaterThanOrEqualTo(Short value) {
+            addCriterion("blessing_times >=", value, "blessingTimes");
+            return (Criteria) this;
+        }
+
+        public Criteria andBlessingTimesLessThan(Short value) {
+            addCriterion("blessing_times <", value, "blessingTimes");
+            return (Criteria) this;
+        }
+
+        public Criteria andBlessingTimesLessThanOrEqualTo(Short value) {
+            addCriterion("blessing_times <=", value, "blessingTimes");
+            return (Criteria) this;
+        }
+
+        public Criteria andBlessingTimesIn(List<Short> values) {
+            addCriterion("blessing_times in", values, "blessingTimes");
+            return (Criteria) this;
+        }
+
+        public Criteria andBlessingTimesNotIn(List<Short> values) {
+            addCriterion("blessing_times not in", values, "blessingTimes");
+            return (Criteria) this;
+        }
+
+        public Criteria andBlessingTimesBetween(Short value1, Short value2) {
+            addCriterion("blessing_times between", value1, value2, "blessingTimes");
+            return (Criteria) this;
+        }
+
+        public Criteria andBlessingTimesNotBetween(Short value1, Short value2) {
+            addCriterion("blessing_times not between", value1, value2, "blessingTimes");
+            return (Criteria) this;
+        }
+
         public Criteria andCreateTimeIsNull() {
             addCriterion("create_time is null");
             return (Criteria) this;
@@ -622,66 +761,6 @@ public class LanternPurchaseExample {
 
         public Criteria andExpiredTimeNotBetween(Date value1, Date value2) {
             addCriterion("expired_time not between", value1, value2, "expiredTime");
-            return (Criteria) this;
-        }
-
-        public Criteria andBlessingTimesIsNull() {
-            addCriterion("blessing_times is null");
-            return (Criteria) this;
-        }
-
-        public Criteria andBlessingTimesIsNotNull() {
-            addCriterion("blessing_times is not null");
-            return (Criteria) this;
-        }
-
-        public Criteria andBlessingTimesEqualTo(Short value) {
-            addCriterion("blessing_times =", value, "blessingTimes");
-            return (Criteria) this;
-        }
-
-        public Criteria andBlessingTimesNotEqualTo(Short value) {
-            addCriterion("blessing_times <>", value, "blessingTimes");
-            return (Criteria) this;
-        }
-
-        public Criteria andBlessingTimesGreaterThan(Short value) {
-            addCriterion("blessing_times >", value, "blessingTimes");
-            return (Criteria) this;
-        }
-
-        public Criteria andBlessingTimesGreaterThanOrEqualTo(Short value) {
-            addCriterion("blessing_times >=", value, "blessingTimes");
-            return (Criteria) this;
-        }
-
-        public Criteria andBlessingTimesLessThan(Short value) {
-            addCriterion("blessing_times <", value, "blessingTimes");
-            return (Criteria) this;
-        }
-
-        public Criteria andBlessingTimesLessThanOrEqualTo(Short value) {
-            addCriterion("blessing_times <=", value, "blessingTimes");
-            return (Criteria) this;
-        }
-
-        public Criteria andBlessingTimesIn(List<Short> values) {
-            addCriterion("blessing_times in", values, "blessingTimes");
-            return (Criteria) this;
-        }
-
-        public Criteria andBlessingTimesNotIn(List<Short> values) {
-            addCriterion("blessing_times not in", values, "blessingTimes");
-            return (Criteria) this;
-        }
-
-        public Criteria andBlessingTimesBetween(Short value1, Short value2) {
-            addCriterion("blessing_times between", value1, value2, "blessingTimes");
-            return (Criteria) this;
-        }
-
-        public Criteria andBlessingTimesNotBetween(Short value1, Short value2) {
-            addCriterion("blessing_times not between", value1, value2, "blessingTimes");
             return (Criteria) this;
         }
     }

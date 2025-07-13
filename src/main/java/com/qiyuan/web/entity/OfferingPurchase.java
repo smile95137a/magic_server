@@ -6,7 +6,9 @@ import java.util.Date;
 
 @Builder
 public class OfferingPurchase {
-    private Integer id;
+    private String id;
+
+    private String externalOrderNo;
 
     private String offeringId;
 
@@ -16,12 +18,20 @@ public class OfferingPurchase {
 
     private Date createTime;
 
-    public Integer getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(String id) {
         this.id = id;
+    }
+
+    public String getExternalOrderNo() {
+        return externalOrderNo;
+    }
+
+    public void setExternalOrderNo(String externalOrderNo) {
+        this.externalOrderNo = externalOrderNo;
     }
 
     public String getOfferingId() {

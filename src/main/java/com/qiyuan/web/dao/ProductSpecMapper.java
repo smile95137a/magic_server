@@ -1,9 +1,10 @@
 package com.qiyuan.web.dao;
 
 import com.qiyuan.web.entity.ProductSpec;
-import com.qiyuan.web.entity.ProductSpecExample;
-import java.util.List;
+import com.qiyuan.web.entity.example.ProductSpecExample;
 import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 public interface ProductSpecMapper {
     long countByExample(ProductSpecExample example);

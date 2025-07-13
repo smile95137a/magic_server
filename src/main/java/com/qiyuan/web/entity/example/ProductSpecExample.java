@@ -1,4 +1,4 @@
-package com.qiyuan.web.entity;
+package com.qiyuan.web.entity.example;
 
 import java.util.ArrayList;
 import java.util.List;

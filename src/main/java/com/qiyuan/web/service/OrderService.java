@@ -12,14 +12,14 @@ import com.qiyuan.web.entity.*;
 import com.qiyuan.web.entity.example.OrderItemExample;
 import com.qiyuan.web.entity.example.OrdersExample;
 import com.qiyuan.web.entity.example.ShippingMethodExample;
-import com.qiyuan.web.enums.InvoiceType;
-import com.qiyuan.web.enums.OrderStatus;
-import com.qiyuan.web.enums.PaymentEnum;
+import com.qiyuan.web.enums.*;
 import com.qiyuan.web.util.DateUtil;
 import com.qiyuan.web.util.RandomGenerator;
 import com.qiyuan.web.util.SecurityUtils;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.time.DateFormatUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -37,59 +37,105 @@ public class OrderService {
     private final ShippingMethodMapper shippingMethodMapper;
     private final UserMapper userMapper;
     private final ProductMapper productMapper;
+    private final ProductSpecMapper productSpecMapper;
+    private final ProductSpecStockMapper productSpecStockMapper;
+    private final StockService stockService;
+    private final PaymentService paymentService;
 
+    @Transactional
     public CreateOrderResponse createOrder(CreateOrderRequest request) {
+        // 1. 取得登入會員
         String currentUsername = SecurityUtils.getCurrentUsername();
         User user = userMapper.selectByUsername(currentUsername);
+        if (user == null) throw new ApiException("會員不存在");
 
         Date currentDate = DateUtil.getCurrentDate();
-        Orders order = new Orders();
-        order.setId(RandomGenerator.getUUID());
-        order.setUserId(user.getId());
-        order.setTotalAmount(BigDecimal.ZERO); // 等下計算
-        order.setPaid(false);
-        order.setStatus(OrderStatus.CREATED.getValue());
-        order.setShippingMethodId(request.getShippingMethodId());
-        InvoiceType type = InvoiceType.fromValue(request.getInvoiceType());
-        order.setInvoiceType(type.getValue());
-        order.setInvoiceTarget(request.getInvoiceTarget());
-        order.setRecipientName(user.getAddressName());
-        order.setRecipientPhone(user.getPhone());
-        order.setRecipientAddress(user.getAddress());
-        order.setRemark(request.getRemark());
-        order.setCreateTime(currentDate);
-        order.setUpdateTime(currentDate);
-        ordersMapper.insertSelective(order);
+        List<CreateOrderItem> items = request.getItems();
+        if (items == null || items.isEmpty())
+            throw new ApiException("請選擇購買商品");
+
+        String orderId = RandomGenerator.getUUID();
+        String externalOrderNo = "O-" + System.currentTimeMillis();
 
         BigDecimal total = BigDecimal.ZERO;
-        for (CreateOrderItem item : request.getItems()) {
-            Product product = productMapper.selectByPrimaryKey(item.getProductId());
+        // 2. 處理每個商品規格（驗證 + 扣庫存 + 建明細）
+        for (CreateOrderItem item : items) {
+            ProductSpec spec = productSpecMapper.selectByPrimaryKey(item.getSpecId());
+            if (spec == null) throw new ApiException("商品規格不存在");
+
+            Product product = productMapper.selectByPrimaryKey(spec.getProductId());
+            if (product == null || !Boolean.TRUE.equals(product.getStatus()))
+                throw new ApiException("商品不存在或已下架");
+
+            ProductSpecStock stock = productSpecStockMapper.selectByPrimaryKey(spec.getId());
+            int needQty = item.getQuantity() == null ? 1 : item.getQuantity();
+            if (stock == null || stock.getStock() < needQty)
+                throw new ApiException("[" + product.getName() + " " + spec.getSpecValue() + "]庫存不足");
+
+            // 扣庫存
+            stockService.decreaseStock(spec.getId(), needQty);
+
+            // 計算金額
             BigDecimal unitPrice = product.getSpecialPrice();
-            BigDecimal subtotal = unitPrice.multiply(BigDecimal.valueOf(item.getQuantity()));
+            BigDecimal subtotal = unitPrice.multiply(BigDecimal.valueOf(needQty));
             total = total.add(subtotal);
 
-            OrderItem detail = new OrderItem();
-            detail.setOrderId(order.getId());
-            detail.setProductId(item.getProductId());
-            detail.setProductName(product.getName());
-            detail.setUnitPrice(unitPrice);
-            detail.setQuantity(item.getQuantity());
-            detail.setSubtotal(subtotal);
-            detail.setCreateTime(currentDate);
+            // 建立明細
+            OrderItem detail = OrderItem.builder()
+                    .orderId(orderId)
+                    .productId(product.getId())
+                    .productName(product.getName())
+                    .specId(spec.getId())
+                    .specValue(spec.getSpecValue())
+                    .unitPrice(unitPrice)
+                    .quantity(needQty)
+                    .subtotal(subtotal)
+                    .createTime(currentDate)
+                    .build();
             orderItemMapper.insertSelective(detail);
         }
 
-        Orders update = new Orders();
-        update.setId(order.getId());
-        update.setTotalAmount(total);
-        update.setUpdateTime(new Date());
-        ordersMapper.updateByPrimaryKeySelective(update);
+        // 3. 建立訂單主表
+        Orders order = Orders.builder()
+                .id(orderId)
+                .externalOrderNo(externalOrderNo)
+                .userId(user.getId())
+                .totalAmount(total)
+                .paid(false)
+                .status(OrderStatus.CREATED.getValue())
+                .shippingMethodId(request.getShippingMethodId())
+                .invoiceType(request.getInvoiceType())
+                .invoiceTarget(request.getInvoiceTarget())
+                .recipientName(user.getAddressName())
+                .recipientPhone(user.getPhone())
+                .recipientAddress(user.getAddress())
+                .remark(request.getRemark())
+                .createTime(currentDate)
+                .updateTime(currentDate)
+                .build();
+        ordersMapper.insertSelective(order);
 
-        CreateOrderResponse resp = new CreateOrderResponse();
-        resp.setOrderId(order.getId());
-        resp.setTotalAmount(total);
-        return resp;
+        // 4. 金流處理（可根據前端選擇的金流類型和分期資訊自動處理）
+        PayMethodEnum payMethod = PayMethodEnum.fromCode(request.getPayMethod());
+        boolean isInstallment = Boolean.TRUE.equals(request.getIsInstallment());
+        String installment = (request.getInstallment() != null) ? request.getInstallment() : "0";
+        PaymentCreateResult paymentResult = paymentService.createPayment(
+                user, externalOrderNo, total, payMethod, SourceTypeEnum.REAL, orderId, isInstallment, installment
+        );
+
+        return CreateOrderResponse.builder()
+                .orderId(orderId)
+                .externalOrderNo(externalOrderNo)
+                .totalAmount(total)
+                .status(OrderStatus.CREATED.getValue())
+                .paymentStatus("pending")
+                .payMethod(request.getPayMethod())
+                .shippingMethod(order.getShippingMethodId())
+                .paymentUrl(paymentResult.getPaymentUrl())
+                .createTime(DateFormatUtils.format(currentDate, "yyyy-MM-dd HH:mm:ss"))
+                .build();
     }
+
 
     public List<OrderItem> getOrderItemsByOrderId(String orderId) {
         OrderItemExample example = new OrderItemExample();

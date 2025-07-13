@@ -10,22 +10,48 @@ import lombok.NoArgsConstructor;
 
 import java.util.List;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Data
 @Builder
 public class CreateOrderRequest {
+
+    @Schema(description = "購買商品清單", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull
     private List<CreateOrderItem> items;
 
+    @Schema(description = "物流方式ID", example = "blackcat", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotBlank
     private String shippingMethodId;
 
+    @Schema(description = "付款方式", example = "credit_card", requiredMode = Schema.RequiredMode.REQUIRED)
+    @NotBlank
+    private String payMethod;  // 支援多金流
+
+    @Schema(description = "是否分期付款", example = "false")
+    private Boolean isInstallment;  // 若不支援分期可預設 null 或 false
+
+    @Schema(description = "分期期數", example = "3")
+    private String installment;     // ex: "0"=無分期, "3"=三期，前端帶字串或數字皆可
+
+    @Schema(description = "發票類型", example = "personal", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotBlank
     private String invoiceType;
 
+    @Schema(description = "發票開立對象(個人或公司/統編)", example = "12345678")
     private String invoiceTarget;
 
+    @Schema(description = "載具類型", example = "1" /* 1:手機條碼, 2:自然人憑證, 3:會員載具, 9:無載具 */, requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+    private String carrierType;
+
+    @Schema(description = "載具內容", example = "/ABCD1234" /* 手機條碼、自然人憑證等 */)
+    private String carrierId;
+
+    @Schema(description = "捐贈碼", example = "16888")
+    private String npoban;
+
+    @Schema(description = "訂單備註", example = "請儘速出貨")
     private String remark;
 }
-

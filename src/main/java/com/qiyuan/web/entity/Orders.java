@@ -1,10 +1,19 @@
 package com.qiyuan.web.entity;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.NoArgsConstructor;
+
 import java.math.BigDecimal;
 import java.util.Date;
 
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Orders {
     private String id;
+
+    private String externalOrderNo;
 
     private String userId;
 
@@ -40,6 +49,14 @@ public class Orders {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public String getExternalOrderNo() {
+        return externalOrderNo;
+    }
+
+    public void setExternalOrderNo(String externalOrderNo) {
+        this.externalOrderNo = externalOrderNo;
     }
 
     public String getUserId() {

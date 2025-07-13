@@ -11,6 +11,8 @@
     <result column="note" jdbcType="NVARCHAR" property="note" />
     <result column="service" jdbcType="NVARCHAR" property="service" />
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="id" jdbcType="CHAR" property="id" />
+    <result column="external_order_no" jdbcType="VARCHAR" property="externalOrderNo" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -71,9 +73,10 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    serial, master_code, name, phone, email, line_id, note, service, create_time
+    serial, master_code, name, phone, email, line_id, note, service, create_time, id,
+    external_order_no
   </sql>
-  <select id="selectByExample" parameterType="com.qiyuan.web.entity.example.MasterServiceRequestExample" resultMap="BaseResultMap">
+  <select id="selectByExample" parameterType="com.qiyuan.web.entity.MasterServiceRequestExample" resultMap="BaseResultMap">
     select
     <if test="distinct">
       distinct
@@ -88,7 +91,7 @@
     </if>
   </select>
   <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
-    select 
+    select
     <include refid="Base_Column_List" />
     from master_service_request
     where serial = #{serial,jdbcType=INTEGER}
@@ -97,23 +100,23 @@
     delete from master_service_request
     where serial = #{serial,jdbcType=INTEGER}
   </delete>
-  <delete id="deleteByExample" parameterType="com.qiyuan.web.entity.example.MasterServiceRequestExample">
+  <delete id="deleteByExample" parameterType="com.qiyuan.web.entity.MasterServiceRequestExample">
     delete from master_service_request
     <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
     </if>
   </delete>
   <insert id="insert" parameterType="com.qiyuan.web.entity.MasterServiceRequest">
-    insert into master_service_request (serial, master_code, name, 
-      phone, email, line_id, 
-      note, service, create_time
-      )
-    values (#{serial,jdbcType=INTEGER}, #{masterCode,jdbcType=VARCHAR}, #{name,jdbcType=NVARCHAR}, 
-      #{phone,jdbcType=VARCHAR}, #{email,jdbcType=VARCHAR}, #{lineId,jdbcType=VARCHAR}, 
-      #{note,jdbcType=NVARCHAR}, #{service,jdbcType=NVARCHAR}, #{createTime,jdbcType=TIMESTAMP}
-      )
+    insert into master_service_request (serial, master_code, name,
+                                        phone, email, line_id,
+                                        note, service, create_time,
+                                        id, external_order_no)
+    values (#{serial,jdbcType=INTEGER}, #{masterCode,jdbcType=VARCHAR}, #{name,jdbcType=NVARCHAR},
+            #{phone,jdbcType=VARCHAR}, #{email,jdbcType=VARCHAR}, #{lineId,jdbcType=VARCHAR},
+            #{note,jdbcType=NVARCHAR}, #{service,jdbcType=NVARCHAR}, #{createTime,jdbcType=TIMESTAMP},
+            #{id,jdbcType=CHAR}, #{externalOrderNo,jdbcType=VARCHAR})
   </insert>
-  <insert id="insertSelective" parameterType="com.qiyuan.web.entity.MasterServiceRequest" useGeneratedKeys="true" keyProperty="serial">
+  <insert id="insertSelective" parameterType="com.qiyuan.web.entity.MasterServiceRequest">
     insert into master_service_request
     <trim prefix="(" suffix=")" suffixOverrides=",">
       <if test="serial != null">
@@ -142,6 +145,12 @@
       </if>
       <if test="createTime != null">
         create_time,
+      </if>
+      <if test="id != null">
+        id,
+      </if>
+      <if test="externalOrderNo != null">
+        external_order_no,
       </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
@@ -172,9 +181,15 @@
       <if test="createTime != null">
         #{createTime,jdbcType=TIMESTAMP},
       </if>
+      <if test="id != null">
+        #{id,jdbcType=CHAR},
+      </if>
+      <if test="externalOrderNo != null">
+        #{externalOrderNo,jdbcType=VARCHAR},
+      </if>
     </trim>
   </insert>
-  <select id="countByExample" parameterType="com.qiyuan.web.entity.example.MasterServiceRequestExample" resultType="java.lang.Long">
+  <select id="countByExample" parameterType="com.qiyuan.web.entity.MasterServiceRequestExample" resultType="java.lang.Long">
     select count(*) from master_service_request
     <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
@@ -183,50 +198,58 @@
   <update id="updateByExampleSelective" parameterType="map">
     update master_service_request
     <set>
-      <if test="record.serial != null">
-        serial = #{record.serial,jdbcType=INTEGER},
+      <if test="row.serial != null">
+        serial = #{row.serial,jdbcType=INTEGER},
       </if>
-      <if test="record.masterCode != null">
-        master_code = #{record.masterCode,jdbcType=VARCHAR},
+      <if test="row.masterCode != null">
+        master_code = #{row.masterCode,jdbcType=VARCHAR},
       </if>
-      <if test="record.name != null">
-        name = #{record.name,jdbcType=NVARCHAR},
+      <if test="row.name != null">
+        name = #{row.name,jdbcType=NVARCHAR},
       </if>
-      <if test="record.phone != null">
-        phone = #{record.phone,jdbcType=VARCHAR},
+      <if test="row.phone != null">
+        phone = #{row.phone,jdbcType=VARCHAR},
       </if>
-      <if test="record.email != null">
-        email = #{record.email,jdbcType=VARCHAR},
+      <if test="row.email != null">
+        email = #{row.email,jdbcType=VARCHAR},
       </if>
-      <if test="record.lineId != null">
-        line_id = #{record.lineId,jdbcType=VARCHAR},
+      <if test="row.lineId != null">
+        line_id = #{row.lineId,jdbcType=VARCHAR},
       </if>
-      <if test="record.note != null">
-        note = #{record.note,jdbcType=NVARCHAR},
+      <if test="row.note != null">
+        note = #{row.note,jdbcType=NVARCHAR},
       </if>
-      <if test="record.service != null">
-        service = #{record.service,jdbcType=NVARCHAR},
+      <if test="row.service != null">
+        service = #{row.service,jdbcType=NVARCHAR},
       </if>
-      <if test="record.createTime != null">
-        create_time = #{record.createTime,jdbcType=TIMESTAMP},
+      <if test="row.createTime != null">
+        create_time = #{row.createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="row.id != null">
+        id = #{row.id,jdbcType=CHAR},
+      </if>
+      <if test="row.externalOrderNo != null">
+        external_order_no = #{row.externalOrderNo,jdbcType=VARCHAR},
       </if>
     </set>
-    <if test="_parameter != null">
+    <if test="example != null">
       <include refid="Update_By_Example_Where_Clause" />
     </if>
   </update>
   <update id="updateByExample" parameterType="map">
     update master_service_request
-    set serial = #{record.serial,jdbcType=INTEGER},
-      master_code = #{record.masterCode,jdbcType=VARCHAR},
-      name = #{record.name,jdbcType=NVARCHAR},
-      phone = #{record.phone,jdbcType=VARCHAR},
-      email = #{record.email,jdbcType=VARCHAR},
-      line_id = #{record.lineId,jdbcType=VARCHAR},
-      note = #{record.note,jdbcType=NVARCHAR},
-      service = #{record.service,jdbcType=NVARCHAR},
-      create_time = #{record.createTime,jdbcType=TIMESTAMP}
-    <if test="_parameter != null">
+    set serial = #{row.serial,jdbcType=INTEGER},
+    master_code = #{row.masterCode,jdbcType=VARCHAR},
+    name = #{row.name,jdbcType=NVARCHAR},
+    phone = #{row.phone,jdbcType=VARCHAR},
+    email = #{row.email,jdbcType=VARCHAR},
+    line_id = #{row.lineId,jdbcType=VARCHAR},
+    note = #{row.note,jdbcType=NVARCHAR},
+    service = #{row.service,jdbcType=NVARCHAR},
+    create_time = #{row.createTime,jdbcType=TIMESTAMP},
+    id = #{row.id,jdbcType=CHAR},
+    external_order_no = #{row.externalOrderNo,jdbcType=VARCHAR}
+    <if test="example != null">
       <include refid="Update_By_Example_Where_Clause" />
     </if>
   </update>
@@ -257,19 +280,27 @@
       <if test="createTime != null">
         create_time = #{createTime,jdbcType=TIMESTAMP},
       </if>
+      <if test="id != null">
+        id = #{id,jdbcType=CHAR},
+      </if>
+      <if test="externalOrderNo != null">
+        external_order_no = #{externalOrderNo,jdbcType=VARCHAR},
+      </if>
     </set>
     where serial = #{serial,jdbcType=INTEGER}
   </update>
   <update id="updateByPrimaryKey" parameterType="com.qiyuan.web.entity.MasterServiceRequest">
     update master_service_request
     set master_code = #{masterCode,jdbcType=VARCHAR},
-      name = #{name,jdbcType=NVARCHAR},
-      phone = #{phone,jdbcType=VARCHAR},
-      email = #{email,jdbcType=VARCHAR},
-      line_id = #{lineId,jdbcType=VARCHAR},
-      note = #{note,jdbcType=NVARCHAR},
-      service = #{service,jdbcType=NVARCHAR},
-      create_time = #{createTime,jdbcType=TIMESTAMP}
+        name = #{name,jdbcType=NVARCHAR},
+        phone = #{phone,jdbcType=VARCHAR},
+        email = #{email,jdbcType=VARCHAR},
+        line_id = #{lineId,jdbcType=VARCHAR},
+        note = #{note,jdbcType=NVARCHAR},
+        service = #{service,jdbcType=NVARCHAR},
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+        id = #{id,jdbcType=CHAR},
+        external_order_no = #{externalOrderNo,jdbcType=VARCHAR}
     where serial = #{serial,jdbcType=INTEGER}
   </update>
 </mapper>

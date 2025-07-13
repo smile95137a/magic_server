@@ -6,6 +6,7 @@ import com.qiyuan.web.dto.request.PaySuccessRequest;
 import com.qiyuan.web.dto.request.QueryOrderRequest;
 import com.qiyuan.web.dto.response.*;
 import com.qiyuan.web.enums.InvoiceType;
+import com.qiyuan.web.enums.PayMethodEnum;
 import com.qiyuan.web.service.OrderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
@@ -58,6 +59,14 @@ public class OrderFrontController {
         return true;
     }
 
+
+    @Operation(summary = "付款完成", description = "通知後台該訂單已完成付款")
+    @PostMapping("/pay-success")
+    public boolean paySuccess(@RequestBody @Validated PaySuccessRequest request) {
+        orderService.markAsPaid(request.getOrderId());
+        return true;
+    }
+
     @Operation(summary = "查詢物流方式列表", description = "取得前台可選物流方式清單")
     @ApiResponse(responseCode = "200", description = "查詢成功，回傳物流方式")
     @GetMapping("/shipping-method/list")
@@ -70,15 +79,17 @@ public class OrderFrontController {
     @GetMapping("/invoice-type/list")
     public List<InvoiceTypeVO> getInvoiceTypeList() {
         return Arrays.stream(InvoiceType.values())
-                .map(type -> new InvoiceTypeVO(type.name(), type.getLabel()))
+                .map(type -> new InvoiceTypeVO(type.getValue(), type.getLabel()))
                 .collect(Collectors.toList());
     }
 
-    @Operation(summary = "付款完成", description = "通知後台該訂單已完成付款")
-    @PostMapping("/pay-success")
-    public boolean paySuccess(@RequestBody @Validated PaySuccessRequest request) {
-        orderService.markAsPaid(request.getOrderId());
-        return true;
+    @PostMapping("/pay-method/list")
+    public List<PayMethodVO> getPayMethodList() {
+        return PayMethodEnum.getAllowsMethod().stream()
+                .map(pm -> new PayMethodVO(pm.getCode(), pm.getLabel()))
+                .collect(Collectors.toList());
     }
+
+
 }
 

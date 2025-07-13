@@ -1,5 +1,6 @@
 package com.qiyuan.web.dto.response;
 
+import com.qiyuan.web.dto.SpecInfo;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -25,4 +26,5 @@ public class ProductDetailVO {
     private List<String> galleryImageUrls;
     private String detailHtml;      // 富文字描述，含內嵌圖
     private Boolean status;
+    private List<SpecInfo> specList;
 }

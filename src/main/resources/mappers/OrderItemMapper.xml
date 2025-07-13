@@ -7,9 +7,13 @@
     <result column="product_id" jdbcType="INTEGER" property="productId" />
     <result column="product_name" jdbcType="NVARCHAR" property="productName" />
     <result column="unit_price" jdbcType="DECIMAL" property="unitPrice" />
+    <result column="special_price" jdbcType="DECIMAL" property="specialPrice" />
     <result column="quantity" jdbcType="INTEGER" property="quantity" />
     <result column="subtotal" jdbcType="DECIMAL" property="subtotal" />
+    <result column="ext_json" jdbcType="NVARCHAR" property="extJson" />
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="spec_id" jdbcType="INTEGER" property="specId" />
+    <result column="spec_value" jdbcType="NVARCHAR" property="specValue" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -70,9 +74,10 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    id, order_id, product_id, product_name, unit_price, quantity, subtotal, create_time
+    id, order_id, product_id, product_name, unit_price, special_price, quantity, subtotal,
+    ext_json, create_time, spec_id, spec_value
   </sql>
-  <select id="selectByExample" parameterType="com.qiyuan.web.entity.example.OrderItemExample" resultMap="BaseResultMap">
+  <select id="selectByExample" parameterType="com.qiyuan.web.entity.OrderItemExample" resultMap="BaseResultMap">
     select
     <if test="distinct">
       distinct
@@ -87,7 +92,7 @@
     </if>
   </select>
   <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
-    select 
+    select
     <include refid="Base_Column_List" />
     from order_item
     where id = #{id,jdbcType=INTEGER}
@@ -96,19 +101,23 @@
     delete from order_item
     where id = #{id,jdbcType=INTEGER}
   </delete>
-  <delete id="deleteByExample" parameterType="com.qiyuan.web.entity.example.OrderItemExample">
+  <delete id="deleteByExample" parameterType="com.qiyuan.web.entity.OrderItemExample">
     delete from order_item
     <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
     </if>
   </delete>
   <insert id="insert" parameterType="com.qiyuan.web.entity.OrderItem">
-    insert into order_item (id, order_id, product_id, 
-      product_name, unit_price, quantity, 
-      subtotal, create_time)
-    values (#{id,jdbcType=INTEGER}, #{orderId,jdbcType=CHAR}, #{productId,jdbcType=INTEGER}, 
-      #{productName,jdbcType=NVARCHAR}, #{unitPrice,jdbcType=DECIMAL}, #{quantity,jdbcType=INTEGER}, 
-      #{subtotal,jdbcType=DECIMAL}, #{createTime,jdbcType=TIMESTAMP})
+    insert into order_item (id, order_id, product_id,
+                            product_name, unit_price, special_price,
+                            quantity, subtotal, ext_json,
+                            create_time, spec_id, spec_value
+    )
+    values (#{id,jdbcType=INTEGER}, #{orderId,jdbcType=CHAR}, #{productId,jdbcType=INTEGER},
+            #{productName,jdbcType=NVARCHAR}, #{unitPrice,jdbcType=DECIMAL}, #{specialPrice,jdbcType=DECIMAL},
+            #{quantity,jdbcType=INTEGER}, #{subtotal,jdbcType=DECIMAL}, #{extJson,jdbcType=NVARCHAR},
+            #{createTime,jdbcType=TIMESTAMP}, #{specId,jdbcType=INTEGER}, #{specValue,jdbcType=NVARCHAR}
+           )
   </insert>
   <insert id="insertSelective" parameterType="com.qiyuan.web.entity.OrderItem">
     insert into order_item
@@ -128,14 +137,26 @@
       <if test="unitPrice != null">
         unit_price,
       </if>
+      <if test="specialPrice != null">
+        special_price,
+      </if>
       <if test="quantity != null">
         quantity,
       </if>
       <if test="subtotal != null">
         subtotal,
       </if>
+      <if test="extJson != null">
+        ext_json,
+      </if>
       <if test="createTime != null">
         create_time,
+      </if>
+      <if test="specId != null">
+        spec_id,
+      </if>
+      <if test="specValue != null">
+        spec_value,
       </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
@@ -154,18 +175,30 @@
       <if test="unitPrice != null">
         #{unitPrice,jdbcType=DECIMAL},
       </if>
+      <if test="specialPrice != null">
+        #{specialPrice,jdbcType=DECIMAL},
+      </if>
       <if test="quantity != null">
         #{quantity,jdbcType=INTEGER},
       </if>
       <if test="subtotal != null">
         #{subtotal,jdbcType=DECIMAL},
       </if>
+      <if test="extJson != null">
+        #{extJson,jdbcType=NVARCHAR},
+      </if>
       <if test="createTime != null">
         #{createTime,jdbcType=TIMESTAMP},
       </if>
+      <if test="specId != null">
+        #{specId,jdbcType=INTEGER},
+      </if>
+      <if test="specValue != null">
+        #{specValue,jdbcType=NVARCHAR},
+      </if>
     </trim>
   </insert>
-  <select id="countByExample" parameterType="com.qiyuan.web.entity.example.OrderItemExample" resultType="java.lang.Long">
+  <select id="countByExample" parameterType="com.qiyuan.web.entity.OrderItemExample" resultType="java.lang.Long">
     select count(*) from order_item
     <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
@@ -174,46 +207,62 @@
   <update id="updateByExampleSelective" parameterType="map">
     update order_item
     <set>
-      <if test="record.id != null">
-        id = #{record.id,jdbcType=INTEGER},
+      <if test="row.id != null">
+        id = #{row.id,jdbcType=INTEGER},
       </if>
-      <if test="record.orderId != null">
-        order_id = #{record.orderId,jdbcType=CHAR},
+      <if test="row.orderId != null">
+        order_id = #{row.orderId,jdbcType=CHAR},
       </if>
-      <if test="record.productId != null">
-        product_id = #{record.productId,jdbcType=INTEGER},
+      <if test="row.productId != null">
+        product_id = #{row.productId,jdbcType=INTEGER},
       </if>
-      <if test="record.productName != null">
-        product_name = #{record.productName,jdbcType=NVARCHAR},
+      <if test="row.productName != null">
+        product_name = #{row.productName,jdbcType=NVARCHAR},
       </if>
-      <if test="record.unitPrice != null">
-        unit_price = #{record.unitPrice,jdbcType=DECIMAL},
+      <if test="row.unitPrice != null">
+        unit_price = #{row.unitPrice,jdbcType=DECIMAL},
       </if>
-      <if test="record.quantity != null">
-        quantity = #{record.quantity,jdbcType=INTEGER},
+      <if test="row.specialPrice != null">
+        special_price = #{row.specialPrice,jdbcType=DECIMAL},
       </if>
-      <if test="record.subtotal != null">
-        subtotal = #{record.subtotal,jdbcType=DECIMAL},
+      <if test="row.quantity != null">
+        quantity = #{row.quantity,jdbcType=INTEGER},
       </if>
-      <if test="record.createTime != null">
-        create_time = #{record.createTime,jdbcType=TIMESTAMP},
+      <if test="row.subtotal != null">
+        subtotal = #{row.subtotal,jdbcType=DECIMAL},
+      </if>
+      <if test="row.extJson != null">
+        ext_json = #{row.extJson,jdbcType=NVARCHAR},
+      </if>
+      <if test="row.createTime != null">
+        create_time = #{row.createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="row.specId != null">
+        spec_id = #{row.specId,jdbcType=INTEGER},
+      </if>
+      <if test="row.specValue != null">
+        spec_value = #{row.specValue,jdbcType=NVARCHAR},
       </if>
     </set>
-    <if test="_parameter != null">
+    <if test="example != null">
       <include refid="Update_By_Example_Where_Clause" />
     </if>
   </update>
   <update id="updateByExample" parameterType="map">
     update order_item
-    set id = #{record.id,jdbcType=INTEGER},
-      order_id = #{record.orderId,jdbcType=CHAR},
-      product_id = #{record.productId,jdbcType=INTEGER},
-      product_name = #{record.productName,jdbcType=NVARCHAR},
-      unit_price = #{record.unitPrice,jdbcType=DECIMAL},
-      quantity = #{record.quantity,jdbcType=INTEGER},
-      subtotal = #{record.subtotal,jdbcType=DECIMAL},
-      create_time = #{record.createTime,jdbcType=TIMESTAMP}
-    <if test="_parameter != null">
+    set id = #{row.id,jdbcType=INTEGER},
+    order_id = #{row.orderId,jdbcType=CHAR},
+    product_id = #{row.productId,jdbcType=INTEGER},
+    product_name = #{row.productName,jdbcType=NVARCHAR},
+    unit_price = #{row.unitPrice,jdbcType=DECIMAL},
+    special_price = #{row.specialPrice,jdbcType=DECIMAL},
+    quantity = #{row.quantity,jdbcType=INTEGER},
+    subtotal = #{row.subtotal,jdbcType=DECIMAL},
+    ext_json = #{row.extJson,jdbcType=NVARCHAR},
+    create_time = #{row.createTime,jdbcType=TIMESTAMP},
+    spec_id = #{row.specId,jdbcType=INTEGER},
+    spec_value = #{row.specValue,jdbcType=NVARCHAR}
+    <if test="example != null">
       <include refid="Update_By_Example_Where_Clause" />
     </if>
   </update>
@@ -232,14 +281,26 @@
       <if test="unitPrice != null">
         unit_price = #{unitPrice,jdbcType=DECIMAL},
       </if>
+      <if test="specialPrice != null">
+        special_price = #{specialPrice,jdbcType=DECIMAL},
+      </if>
       <if test="quantity != null">
         quantity = #{quantity,jdbcType=INTEGER},
       </if>
       <if test="subtotal != null">
         subtotal = #{subtotal,jdbcType=DECIMAL},
       </if>
+      <if test="extJson != null">
+        ext_json = #{extJson,jdbcType=NVARCHAR},
+      </if>
       <if test="createTime != null">
         create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="specId != null">
+        spec_id = #{specId,jdbcType=INTEGER},
+      </if>
+      <if test="specValue != null">
+        spec_value = #{specValue,jdbcType=NVARCHAR},
       </if>
     </set>
     where id = #{id,jdbcType=INTEGER}
@@ -247,12 +308,16 @@
   <update id="updateByPrimaryKey" parameterType="com.qiyuan.web.entity.OrderItem">
     update order_item
     set order_id = #{orderId,jdbcType=CHAR},
-      product_id = #{productId,jdbcType=INTEGER},
-      product_name = #{productName,jdbcType=NVARCHAR},
-      unit_price = #{unitPrice,jdbcType=DECIMAL},
-      quantity = #{quantity,jdbcType=INTEGER},
-      subtotal = #{subtotal,jdbcType=DECIMAL},
-      create_time = #{createTime,jdbcType=TIMESTAMP}
+        product_id = #{productId,jdbcType=INTEGER},
+        product_name = #{productName,jdbcType=NVARCHAR},
+        unit_price = #{unitPrice,jdbcType=DECIMAL},
+        special_price = #{specialPrice,jdbcType=DECIMAL},
+        quantity = #{quantity,jdbcType=INTEGER},
+        subtotal = #{subtotal,jdbcType=DECIMAL},
+        ext_json = #{extJson,jdbcType=NVARCHAR},
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+        spec_id = #{specId,jdbcType=INTEGER},
+        spec_value = #{specValue,jdbcType=NVARCHAR}
     where id = #{id,jdbcType=INTEGER}
   </update>
 </mapper>

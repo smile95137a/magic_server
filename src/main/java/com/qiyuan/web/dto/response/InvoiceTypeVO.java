@@ -5,11 +5,12 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+@Data
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
-@Data
 public class InvoiceTypeVO {
-    private String code;
-    private String desc;
+    private String code;      // ex: personal, company, donation
+    private String label;     // 顯示名稱
 }
+

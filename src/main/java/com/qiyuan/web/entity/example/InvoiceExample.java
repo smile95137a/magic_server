@@ -1,4 +1,4 @@
-package com.qiyuan.web.entity;
+package com.qiyuan.web.entity.example;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;

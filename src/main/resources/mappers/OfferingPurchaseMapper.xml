@@ -2,17 +2,11 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.qiyuan.web.dao.OfferingPurchaseMapper">
   <resultMap id="BaseResultMap" type="com.qiyuan.web.entity.OfferingPurchase">
-    <id column="id" jdbcType="INTEGER" property="id" />
+    <id column="id" jdbcType="CHAR" property="id" />
+    <result column="external_order_no" jdbcType="VARCHAR" property="externalOrderNo" />
     <result column="offering_id" jdbcType="CHAR" property="offeringId" />
     <result column="user_id" jdbcType="CHAR" property="userId" />
     <result column="god_id" jdbcType="CHAR" property="godId" />
-    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
-  </resultMap>
-
-  <resultMap id="RecordJoinMap" type="com.qiyuan.web.entity.OfferingRecord">
-    <id column="id" jdbcType="INTEGER" property="id" />
-    <result column="offeringName" jdbcType="NVARCHAR" property="offeringName" />
-    <result column="godName" jdbcType="NVARCHAR" property="godName" />
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
   </resultMap>
   <sql id="Example_Where_Clause">
@@ -74,9 +68,9 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    id, offering_id, user_id, god_id, create_time
+    id, external_order_no, offering_id, user_id, god_id, create_time
   </sql>
-  <select id="selectByExample" parameterType="com.qiyuan.web.entity.example.OfferingPurchaseExample" resultMap="BaseResultMap">
+  <select id="selectByExample" parameterType="com.qiyuan.web.entity.OfferingPurchaseExample" resultMap="BaseResultMap">
     select
     <if test="distinct">
       distinct
@@ -90,12 +84,147 @@
       order by ${orderByClause}
     </if>
   </select>
-  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
-    select 
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select
     <include refid="Base_Column_List" />
     from offering_purchase
-    where id = #{id,jdbcType=INTEGER}
+    where id = #{id,jdbcType=CHAR}
   </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+    delete from offering_purchase
+    where id = #{id,jdbcType=CHAR}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.qiyuan.web.entity.OfferingPurchaseExample">
+    delete from offering_purchase
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.qiyuan.web.entity.OfferingPurchase">
+    insert into offering_purchase (id, external_order_no, offering_id,
+                                   user_id, god_id, create_time
+    )
+    values (#{id,jdbcType=CHAR}, #{externalOrderNo,jdbcType=VARCHAR}, #{offeringId,jdbcType=CHAR},
+            #{userId,jdbcType=CHAR}, #{godId,jdbcType=CHAR}, #{createTime,jdbcType=TIMESTAMP}
+           )
+  </insert>
+  <insert id="insertSelective" parameterType="com.qiyuan.web.entity.OfferingPurchase">
+    insert into offering_purchase
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="externalOrderNo != null">
+        external_order_no,
+      </if>
+      <if test="offeringId != null">
+        offering_id,
+      </if>
+      <if test="userId != null">
+        user_id,
+      </if>
+      <if test="godId != null">
+        god_id,
+      </if>
+      <if test="createTime != null">
+        create_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=CHAR},
+      </if>
+      <if test="externalOrderNo != null">
+        #{externalOrderNo,jdbcType=VARCHAR},
+      </if>
+      <if test="offeringId != null">
+        #{offeringId,jdbcType=CHAR},
+      </if>
+      <if test="userId != null">
+        #{userId,jdbcType=CHAR},
+      </if>
+      <if test="godId != null">
+        #{godId,jdbcType=CHAR},
+      </if>
+      <if test="createTime != null">
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.qiyuan.web.entity.OfferingPurchaseExample" resultType="java.lang.Long">
+    select count(*) from offering_purchase
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map">
+    update offering_purchase
+    <set>
+      <if test="row.id != null">
+        id = #{row.id,jdbcType=CHAR},
+      </if>
+      <if test="row.externalOrderNo != null">
+        external_order_no = #{row.externalOrderNo,jdbcType=VARCHAR},
+      </if>
+      <if test="row.offeringId != null">
+        offering_id = #{row.offeringId,jdbcType=CHAR},
+      </if>
+      <if test="row.userId != null">
+        user_id = #{row.userId,jdbcType=CHAR},
+      </if>
+      <if test="row.godId != null">
+        god_id = #{row.godId,jdbcType=CHAR},
+      </if>
+      <if test="row.createTime != null">
+        create_time = #{row.createTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    <if test="example != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map">
+    update offering_purchase
+    set id = #{row.id,jdbcType=CHAR},
+    external_order_no = #{row.externalOrderNo,jdbcType=VARCHAR},
+    offering_id = #{row.offeringId,jdbcType=CHAR},
+    user_id = #{row.userId,jdbcType=CHAR},
+    god_id = #{row.godId,jdbcType=CHAR},
+    create_time = #{row.createTime,jdbcType=TIMESTAMP}
+    <if test="example != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.qiyuan.web.entity.OfferingPurchase">
+    update offering_purchase
+    <set>
+      <if test="externalOrderNo != null">
+        external_order_no = #{externalOrderNo,jdbcType=VARCHAR},
+      </if>
+      <if test="offeringId != null">
+        offering_id = #{offeringId,jdbcType=CHAR},
+      </if>
+      <if test="userId != null">
+        user_id = #{userId,jdbcType=CHAR},
+      </if>
+      <if test="godId != null">
+        god_id = #{godId,jdbcType=CHAR},
+      </if>
+      <if test="createTime != null">
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=CHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.qiyuan.web.entity.OfferingPurchase">
+    update offering_purchase
+    set external_order_no = #{externalOrderNo,jdbcType=VARCHAR},
+        offering_id = #{offeringId,jdbcType=CHAR},
+        user_id = #{userId,jdbcType=CHAR},
+        god_id = #{godId,jdbcType=CHAR},
+        create_time = #{createTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=CHAR}
+  </update>
 
   <select id="selectRecordsByUserIdAndPeriod" resultMap="RecordJoinMap">
     SELECT
@@ -126,124 +255,4 @@
   </select>
 
 
-
-  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
-    delete from offering_purchase
-    where id = #{id,jdbcType=INTEGER}
-  </delete>
-  <delete id="deleteByExample" parameterType="com.qiyuan.web.entity.example.OfferingPurchaseExample">
-    delete from offering_purchase
-    <if test="_parameter != null">
-      <include refid="Example_Where_Clause" />
-    </if>
-  </delete>
-  <insert id="insert" parameterType="com.qiyuan.web.entity.OfferingPurchase">
-    insert into offering_purchase (id, offering_id, user_id, 
-      god_id, create_time)
-    values (#{id,jdbcType=INTEGER}, #{offeringId,jdbcType=CHAR}, #{userId,jdbcType=CHAR}, 
-      #{godId,jdbcType=CHAR}, #{createTime,jdbcType=TIMESTAMP})
-  </insert>
-  <insert id="insertSelective" parameterType="com.qiyuan.web.entity.OfferingPurchase">
-    insert into offering_purchase
-    <trim prefix="(" suffix=")" suffixOverrides=",">
-      <if test="id != null">
-        id,
-      </if>
-      <if test="offeringId != null">
-        offering_id,
-      </if>
-      <if test="userId != null">
-        user_id,
-      </if>
-      <if test="godId != null">
-        god_id,
-      </if>
-      <if test="createTime != null">
-        create_time,
-      </if>
-    </trim>
-    <trim prefix="values (" suffix=")" suffixOverrides=",">
-      <if test="id != null">
-        #{id,jdbcType=INTEGER},
-      </if>
-      <if test="offeringId != null">
-        #{offeringId,jdbcType=CHAR},
-      </if>
-      <if test="userId != null">
-        #{userId,jdbcType=CHAR},
-      </if>
-      <if test="godId != null">
-        #{godId,jdbcType=CHAR},
-      </if>
-      <if test="createTime != null">
-        #{createTime,jdbcType=TIMESTAMP},
-      </if>
-    </trim>
-  </insert>
-  <select id="countByExample" parameterType="com.qiyuan.web.entity.example.OfferingPurchaseExample" resultType="java.lang.Long">
-    select count(*) from offering_purchase
-    <if test="_parameter != null">
-      <include refid="Example_Where_Clause" />
-    </if>
-  </select>
-  <update id="updateByExampleSelective" parameterType="map">
-    update offering_purchase
-    <set>
-      <if test="record.id != null">
-        id = #{record.id,jdbcType=INTEGER},
-      </if>
-      <if test="record.offeringId != null">
-        offering_id = #{record.offeringId,jdbcType=CHAR},
-      </if>
-      <if test="record.userId != null">
-        user_id = #{record.userId,jdbcType=CHAR},
-      </if>
-      <if test="record.godId != null">
-        god_id = #{record.godId,jdbcType=CHAR},
-      </if>
-      <if test="record.createTime != null">
-        create_time = #{record.createTime,jdbcType=TIMESTAMP},
-      </if>
-    </set>
-    <if test="_parameter != null">
-      <include refid="Update_By_Example_Where_Clause" />
-    </if>
-  </update>
-  <update id="updateByExample" parameterType="map">
-    update offering_purchase
-    set id = #{record.id,jdbcType=INTEGER},
-      offering_id = #{record.offeringId,jdbcType=CHAR},
-      user_id = #{record.userId,jdbcType=CHAR},
-      god_id = #{record.godId,jdbcType=CHAR},
-      create_time = #{record.createTime,jdbcType=TIMESTAMP}
-    <if test="_parameter != null">
-      <include refid="Update_By_Example_Where_Clause" />
-    </if>
-  </update>
-  <update id="updateByPrimaryKeySelective" parameterType="com.qiyuan.web.entity.OfferingPurchase">
-    update offering_purchase
-    <set>
-      <if test="offeringId != null">
-        offering_id = #{offeringId,jdbcType=CHAR},
-      </if>
-      <if test="userId != null">
-        user_id = #{userId,jdbcType=CHAR},
-      </if>
-      <if test="godId != null">
-        god_id = #{godId,jdbcType=CHAR},
-      </if>
-      <if test="createTime != null">
-        create_time = #{createTime,jdbcType=TIMESTAMP},
-      </if>
-    </set>
-    where id = #{id,jdbcType=INTEGER}
-  </update>
-  <update id="updateByPrimaryKey" parameterType="com.qiyuan.web.entity.OfferingPurchase">
-    update offering_purchase
-    set offering_id = #{offeringId,jdbcType=CHAR},
-      user_id = #{userId,jdbcType=CHAR},
-      god_id = #{godId,jdbcType=CHAR},
-      create_time = #{createTime,jdbcType=TIMESTAMP}
-    where id = #{id,jdbcType=INTEGER}
-  </update>
 </mapper>

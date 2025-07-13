@@ -3,6 +3,7 @@
 <mapper namespace="com.qiyuan.web.dao.OrdersMapper">
   <resultMap id="BaseResultMap" type="com.qiyuan.web.entity.Orders">
     <id column="id" jdbcType="CHAR" property="id" />
+    <result column="external_order_no" jdbcType="VARCHAR" property="externalOrderNo" />
     <result column="user_id" jdbcType="CHAR" property="userId" />
     <result column="total_amount" jdbcType="DECIMAL" property="totalAmount" />
     <result column="paid" jdbcType="BIT" property="paid" />
@@ -77,11 +78,11 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    id, user_id, total_amount, paid, status, shipping_method_id, invoice_type, invoice_target, 
-    recipient_name, recipient_phone, recipient_address, remark, tracking_no, create_time, 
-    update_time
+    id, external_order_no, user_id, total_amount, paid, status, shipping_method_id, invoice_type,
+    invoice_target, recipient_name, recipient_phone, recipient_address, remark, tracking_no,
+    create_time, update_time
   </sql>
-  <select id="selectByExample" parameterType="com.qiyuan.web.entity.example.OrdersExample" resultMap="BaseResultMap">
+  <select id="selectByExample" parameterType="com.qiyuan.web.entity.OrdersExample" resultMap="BaseResultMap">
     select
     <if test="distinct">
       distinct
@@ -95,22 +96,8 @@
       order by ${orderByClause}
     </if>
   </select>
-
-  <select id="selectByExampleWithPage" parameterType="map" resultMap="BaseResultMap">
-    select
-    <include refid="Base_Column_List" />
-    from orders
-    <if test="_parameter != null">
-      <include refid="Update_By_Example_Where_Clause" />
-    </if>
-    <if test="example.orderByClause != null">
-      order by ${example.orderByClause}
-      OFFSET #{offset} ROWS FETCH NEXT #{size} ROWS ONLY
-    </if>
-  </select>
-
   <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
-    select 
+    select
     <include refid="Base_Column_List" />
     from orders
     where id = #{id,jdbcType=CHAR}
@@ -119,31 +106,34 @@
     delete from orders
     where id = #{id,jdbcType=CHAR}
   </delete>
-  <delete id="deleteByExample" parameterType="com.qiyuan.web.entity.example.OrdersExample">
+  <delete id="deleteByExample" parameterType="com.qiyuan.web.entity.OrdersExample">
     delete from orders
     <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
     </if>
   </delete>
   <insert id="insert" parameterType="com.qiyuan.web.entity.Orders">
-    insert into orders (id, user_id, total_amount, 
-      paid, status, shipping_method_id, 
-      invoice_type, invoice_target, recipient_name, 
-      recipient_phone, recipient_address, remark, 
-      tracking_no, create_time, update_time
-      )
-    values (#{id,jdbcType=CHAR}, #{userId,jdbcType=CHAR}, #{totalAmount,jdbcType=DECIMAL}, 
-      #{paid,jdbcType=BIT}, #{status,jdbcType=VARCHAR}, #{shippingMethodId,jdbcType=CHAR}, 
-      #{invoiceType,jdbcType=VARCHAR}, #{invoiceTarget,jdbcType=NVARCHAR}, #{recipientName,jdbcType=NVARCHAR}, 
-      #{recipientPhone,jdbcType=VARCHAR}, #{recipientAddress,jdbcType=NVARCHAR}, #{remark,jdbcType=NVARCHAR}, 
-      #{trackingNo,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}
-      )
+    insert into orders (id, external_order_no, user_id,
+                        total_amount, paid, status,
+                        shipping_method_id, invoice_type, invoice_target,
+                        recipient_name, recipient_phone, recipient_address,
+                        remark, tracking_no, create_time,
+                        update_time)
+    values (#{id,jdbcType=CHAR}, #{externalOrderNo,jdbcType=VARCHAR}, #{userId,jdbcType=CHAR},
+            #{totalAmount,jdbcType=DECIMAL}, #{paid,jdbcType=BIT}, #{status,jdbcType=VARCHAR},
+            #{shippingMethodId,jdbcType=CHAR}, #{invoiceType,jdbcType=VARCHAR}, #{invoiceTarget,jdbcType=NVARCHAR},
+            #{recipientName,jdbcType=NVARCHAR}, #{recipientPhone,jdbcType=VARCHAR}, #{recipientAddress,jdbcType=NVARCHAR},
+            #{remark,jdbcType=NVARCHAR}, #{trackingNo,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP},
+            #{updateTime,jdbcType=TIMESTAMP})
   </insert>
   <insert id="insertSelective" parameterType="com.qiyuan.web.entity.Orders">
     insert into orders
     <trim prefix="(" suffix=")" suffixOverrides=",">
       <if test="id != null">
         id,
+      </if>
+      <if test="externalOrderNo != null">
+        external_order_no,
       </if>
       <if test="userId != null">
         user_id,
@@ -192,6 +182,9 @@
       <if test="id != null">
         #{id,jdbcType=CHAR},
       </if>
+      <if test="externalOrderNo != null">
+        #{externalOrderNo,jdbcType=VARCHAR},
+      </if>
       <if test="userId != null">
         #{userId,jdbcType=CHAR},
       </if>
@@ -236,7 +229,7 @@
       </if>
     </trim>
   </insert>
-  <select id="countByExample" parameterType="com.qiyuan.web.entity.example.OrdersExample" resultType="java.lang.Long">
+  <select id="countByExample" parameterType="com.qiyuan.web.entity.OrdersExample" resultType="java.lang.Long">
     select count(*) from orders
     <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
@@ -245,80 +238,87 @@
   <update id="updateByExampleSelective" parameterType="map">
     update orders
     <set>
-      <if test="record.id != null">
-        id = #{record.id,jdbcType=CHAR},
+      <if test="row.id != null">
+        id = #{row.id,jdbcType=CHAR},
       </if>
-      <if test="record.userId != null">
-        user_id = #{record.userId,jdbcType=CHAR},
+      <if test="row.externalOrderNo != null">
+        external_order_no = #{row.externalOrderNo,jdbcType=VARCHAR},
       </if>
-      <if test="record.totalAmount != null">
-        total_amount = #{record.totalAmount,jdbcType=DECIMAL},
+      <if test="row.userId != null">
+        user_id = #{row.userId,jdbcType=CHAR},
       </if>
-      <if test="record.paid != null">
-        paid = #{record.paid,jdbcType=BIT},
+      <if test="row.totalAmount != null">
+        total_amount = #{row.totalAmount,jdbcType=DECIMAL},
       </if>
-      <if test="record.status != null">
-        status = #{record.status,jdbcType=VARCHAR},
+      <if test="row.paid != null">
+        paid = #{row.paid,jdbcType=BIT},
       </if>
-      <if test="record.shippingMethodId != null">
-        shipping_method_id = #{record.shippingMethodId,jdbcType=CHAR},
+      <if test="row.status != null">
+        status = #{row.status,jdbcType=VARCHAR},
       </if>
-      <if test="record.invoiceType != null">
-        invoice_type = #{record.invoiceType,jdbcType=VARCHAR},
+      <if test="row.shippingMethodId != null">
+        shipping_method_id = #{row.shippingMethodId,jdbcType=CHAR},
       </if>
-      <if test="record.invoiceTarget != null">
-        invoice_target = #{record.invoiceTarget,jdbcType=NVARCHAR},
+      <if test="row.invoiceType != null">
+        invoice_type = #{row.invoiceType,jdbcType=VARCHAR},
       </if>
-      <if test="record.recipientName != null">
-        recipient_name = #{record.recipientName,jdbcType=NVARCHAR},
+      <if test="row.invoiceTarget != null">
+        invoice_target = #{row.invoiceTarget,jdbcType=NVARCHAR},
       </if>
-      <if test="record.recipientPhone != null">
-        recipient_phone = #{record.recipientPhone,jdbcType=VARCHAR},
+      <if test="row.recipientName != null">
+        recipient_name = #{row.recipientName,jdbcType=NVARCHAR},
       </if>
-      <if test="record.recipientAddress != null">
-        recipient_address = #{record.recipientAddress,jdbcType=NVARCHAR},
+      <if test="row.recipientPhone != null">
+        recipient_phone = #{row.recipientPhone,jdbcType=VARCHAR},
       </if>
-      <if test="record.remark != null">
-        remark = #{record.remark,jdbcType=NVARCHAR},
+      <if test="row.recipientAddress != null">
+        recipient_address = #{row.recipientAddress,jdbcType=NVARCHAR},
       </if>
-      <if test="record.trackingNo != null">
-        tracking_no = #{record.trackingNo,jdbcType=VARCHAR},
+      <if test="row.remark != null">
+        remark = #{row.remark,jdbcType=NVARCHAR},
       </if>
-      <if test="record.createTime != null">
-        create_time = #{record.createTime,jdbcType=TIMESTAMP},
+      <if test="row.trackingNo != null">
+        tracking_no = #{row.trackingNo,jdbcType=VARCHAR},
       </if>
-      <if test="record.updateTime != null">
-        update_time = #{record.updateTime,jdbcType=TIMESTAMP},
+      <if test="row.createTime != null">
+        create_time = #{row.createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="row.updateTime != null">
+        update_time = #{row.updateTime,jdbcType=TIMESTAMP},
       </if>
     </set>
-    <if test="_parameter != null">
+    <if test="example != null">
       <include refid="Update_By_Example_Where_Clause" />
     </if>
   </update>
   <update id="updateByExample" parameterType="map">
     update orders
-    set id = #{record.id,jdbcType=CHAR},
-      user_id = #{record.userId,jdbcType=CHAR},
-      total_amount = #{record.totalAmount,jdbcType=DECIMAL},
-      paid = #{record.paid,jdbcType=BIT},
-      status = #{record.status,jdbcType=VARCHAR},
-      shipping_method_id = #{record.shippingMethodId,jdbcType=CHAR},
-      invoice_type = #{record.invoiceType,jdbcType=VARCHAR},
-      invoice_target = #{record.invoiceTarget,jdbcType=NVARCHAR},
-      recipient_name = #{record.recipientName,jdbcType=NVARCHAR},
-      recipient_phone = #{record.recipientPhone,jdbcType=VARCHAR},
-      recipient_address = #{record.recipientAddress,jdbcType=NVARCHAR},
-      remark = #{record.remark,jdbcType=NVARCHAR},
-      tracking_no = #{record.trackingNo,jdbcType=VARCHAR},
-      create_time = #{record.createTime,jdbcType=TIMESTAMP},
-      update_time = #{record.updateTime,jdbcType=TIMESTAMP}
-    <if test="_parameter != null">
+    set id = #{row.id,jdbcType=CHAR},
+    external_order_no = #{row.externalOrderNo,jdbcType=VARCHAR},
+    user_id = #{row.userId,jdbcType=CHAR},
+    total_amount = #{row.totalAmount,jdbcType=DECIMAL},
+    paid = #{row.paid,jdbcType=BIT},
+    status = #{row.status,jdbcType=VARCHAR},
+    shipping_method_id = #{row.shippingMethodId,jdbcType=CHAR},
+    invoice_type = #{row.invoiceType,jdbcType=VARCHAR},
+    invoice_target = #{row.invoiceTarget,jdbcType=NVARCHAR},
+    recipient_name = #{row.recipientName,jdbcType=NVARCHAR},
+    recipient_phone = #{row.recipientPhone,jdbcType=VARCHAR},
+    recipient_address = #{row.recipientAddress,jdbcType=NVARCHAR},
+    remark = #{row.remark,jdbcType=NVARCHAR},
+    tracking_no = #{row.trackingNo,jdbcType=VARCHAR},
+    create_time = #{row.createTime,jdbcType=TIMESTAMP},
+    update_time = #{row.updateTime,jdbcType=TIMESTAMP}
+    <if test="example != null">
       <include refid="Update_By_Example_Where_Clause" />
     </if>
   </update>
   <update id="updateByPrimaryKeySelective" parameterType="com.qiyuan.web.entity.Orders">
     update orders
     <set>
+      <if test="externalOrderNo != null">
+        external_order_no = #{externalOrderNo,jdbcType=VARCHAR},
+      </if>
       <if test="userId != null">
         user_id = #{userId,jdbcType=CHAR},
       </if>
@@ -366,20 +366,35 @@
   </update>
   <update id="updateByPrimaryKey" parameterType="com.qiyuan.web.entity.Orders">
     update orders
-    set user_id = #{userId,jdbcType=CHAR},
-      total_amount = #{totalAmount,jdbcType=DECIMAL},
-      paid = #{paid,jdbcType=BIT},
-      status = #{status,jdbcType=VARCHAR},
-      shipping_method_id = #{shippingMethodId,jdbcType=CHAR},
-      invoice_type = #{invoiceType,jdbcType=VARCHAR},
-      invoice_target = #{invoiceTarget,jdbcType=NVARCHAR},
-      recipient_name = #{recipientName,jdbcType=NVARCHAR},
-      recipient_phone = #{recipientPhone,jdbcType=VARCHAR},
-      recipient_address = #{recipientAddress,jdbcType=NVARCHAR},
-      remark = #{remark,jdbcType=NVARCHAR},
-      tracking_no = #{trackingNo,jdbcType=VARCHAR},
-      create_time = #{createTime,jdbcType=TIMESTAMP},
-      update_time = #{updateTime,jdbcType=TIMESTAMP}
+    set external_order_no = #{externalOrderNo,jdbcType=VARCHAR},
+        user_id = #{userId,jdbcType=CHAR},
+        total_amount = #{totalAmount,jdbcType=DECIMAL},
+        paid = #{paid,jdbcType=BIT},
+        status = #{status,jdbcType=VARCHAR},
+        shipping_method_id = #{shippingMethodId,jdbcType=CHAR},
+        invoice_type = #{invoiceType,jdbcType=VARCHAR},
+        invoice_target = #{invoiceTarget,jdbcType=NVARCHAR},
+        recipient_name = #{recipientName,jdbcType=NVARCHAR},
+        recipient_phone = #{recipientPhone,jdbcType=VARCHAR},
+        recipient_address = #{recipientAddress,jdbcType=NVARCHAR},
+        remark = #{remark,jdbcType=NVARCHAR},
+        tracking_no = #{trackingNo,jdbcType=VARCHAR},
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+        update_time = #{updateTime,jdbcType=TIMESTAMP}
     where id = #{id,jdbcType=CHAR}
   </update>
+
+  <select id="selectByExampleWithPage" parameterType="map" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from orders
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+    <if test="example.orderByClause != null">
+      order by ${example.orderByClause}
+      OFFSET #{offset} ROWS FETCH NEXT #{size} ROWS ONLY
+    </if>
+  </select>
+
 </mapper>
