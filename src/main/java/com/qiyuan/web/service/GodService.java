@@ -1,10 +1,13 @@
 package com.qiyuan.web.service;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.qiyuan.security.exception.ApiException;
 import com.qiyuan.web.dao.GodMapper;
 import com.qiyuan.web.dao.UserMapper;
 import com.qiyuan.web.dto.request.PresentOfferingRequest;
 import com.qiyuan.web.dto.response.GodInfoVO;
+import com.qiyuan.web.dto.response.MyGodInfoVO;
+import com.qiyuan.web.dto.response.OfferingStateVO;
 import com.qiyuan.web.dto.response.OfferingVO;
 import com.qiyuan.web.entity.God;
 import com.qiyuan.web.entity.GodInfo;
@@ -12,8 +15,12 @@ import com.qiyuan.web.entity.Offering;
 import com.qiyuan.web.entity.User;
 import com.qiyuan.web.entity.example.GodExample;
 import com.qiyuan.web.util.DateUtil;
+import com.qiyuan.web.util.JsonUtil;
 import com.qiyuan.web.util.SecurityUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.time.DateFormatUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,6 +30,8 @@ import java.util.stream.Stream;
 
 @Service
 public class GodService {
+
+    private final Logger log = LoggerFactory.getLogger(GodService.class);
     private final GodMapper godMapper;
     private final UserMapper userMapper;
     private final GodInfoService godInfoService;
@@ -80,23 +89,30 @@ public class GodService {
 
         boolean isGolden = godInfo.getGoldenExpiration() != null
                 && godInfo.getGoldenExpiration().after(DateUtil.getCurrentDate());
-        String offeringStr = godInfo.getOfferingList();
-        List<OfferingVO> offeringVOList = Collections.EMPTY_LIST;
-        if (StringUtils.isNotBlank(offeringStr) && offeringStr.indexOf(",") > 0) {
-            List<String> offeringIds = Arrays.asList(offeringStr.split(","));
-            List<Offering> offeringList = offeringService.getOfferingByIds(offeringIds);
-            offeringVOList = offeringList.stream().map(offeringService::convertToVo).collect(Collectors.toList());
-        }
 
-        return GodInfoVO.builder()
+        GodInfoVO vo = GodInfoVO.builder()
                 .imageCode(god.getImageCode())
                 .name(god.getName())
                 .isGolden(isGolden)
                 .cooldownTime(godInfo.getCooldownTime())
                 .onshelfTime(godInfo.getOnshelfTime())
                 .offshelfTime(godInfo.getOffshelfTime())
-                .offerings(offeringVOList)
                 .build();
+
+        String offeringJson = godInfo.getOfferingList();
+        if (StringUtils.isNotBlank(offeringJson)) {
+            try {
+                List<OfferingStateVO> offerings = JsonUtil.fromJsonList(offeringJson, OfferingStateVO.class);
+                List<Offering> offeringList = offeringService.getOfferingByIds(offerings.stream().map(OfferingStateVO::getId).collect(Collectors.toList()));
+                List<OfferingVO> offeringVOList = offeringList.stream().map(offeringService::convertToVo).collect(Collectors.toList());
+                vo.setOfferings(offeringVOList);
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
+                throw new ApiException("發生未知錯誤");
+            }
+
+        }
+        return vo;
     }
 
     public boolean extendGodPeriod(String godCode, int day) {
@@ -122,27 +138,39 @@ public class GodService {
         User user = userMapper.selectByUsername(username);
         God god = getGodByCode(godCode);
         GodInfo godInfo = godInfoService.getGodInfo(user.getId(), god.getId());
+        List<OfferingStateVO> offeringInfoList = null;
         if (godInfo == null) throw new ApiException("請先請神成功!");
 
         if (StringUtils.isBlank(godInfo.getOfferingList())) {
-            godInfo.setOfferingList(newOfferingId);
+            OfferingStateVO stateVO = OfferingStateVO.builder().id(newOfferingId).buyTime(DateFormatUtils.format(DateUtil.getCurrentDate(), "yyyy/MM/dd HH:mm")).build();
+            offeringInfoList = Arrays.asList(stateVO);
+            godInfo.setOfferingList(JsonUtil.toJson(offeringInfoList));
         } else {
-            List<String> offeringList = Arrays.asList(godInfo.getOfferingList().split(","));
-            if (StringUtils.isNoneBlank(prevOfferingId, godInfo.getOfferingList()) && godInfo.getOfferingList().contains(prevOfferingId)) {
-                int replacementTarget = offeringList.indexOf(prevOfferingId);
-                offeringList.set(replacementTarget, newOfferingId);
-                godInfo.setOfferingList(offeringList.stream().collect(Collectors.joining(",")));
+            offeringInfoList = JsonUtil.fromJsonList(godInfo.getOfferingList(), OfferingStateVO.class);
+            int target = -1;
+            for (int i =0; i < offeringInfoList.size(); i++) {
+                OfferingStateVO vo = offeringInfoList.get(i);
+                if (StringUtils.equals(vo.getId(), prevOfferingId)) {
+                    target = i;
+                    break;
+                }
+            }
+
+            // 舊換新
+            if (StringUtils.isNoneBlank(prevOfferingId, godInfo.getOfferingList()) && target != -1) {
+                OfferingStateVO replacementTarget = offeringInfoList.get(target);
+                replacementTarget.setId(newOfferingId);
+                replacementTarget.setBuyTime(DateFormatUtils.format(DateUtil.getCurrentDate(), "yyyy/MM/dd HH:mm"));
             } else {
-                if (offeringList.size() > 2) {
+                // 新增
+                if (offeringInfoList.size() > 2) {
                     throw new ApiException("購買供品發生系統錯誤，請聯繫客服！");
                 }
-                String newOfferingList = Stream.concat(
-                        offeringList.stream(),
-                        Stream.of(newOfferingId)
-                ).collect(Collectors.joining(","));
-                godInfo.setOfferingList(newOfferingList);
 
+                OfferingStateVO stateVO = OfferingStateVO.builder().id(newOfferingId).buyTime(DateFormatUtils.format(DateUtil.getCurrentDate(), "yyyy/MM/dd HH:mm")).build();
+                offeringInfoList.add(stateVO);
             }
+            godInfo.setOfferingList(JsonUtil.toJson(offeringInfoList));
         }
 
         Offering offering = offeringService.getOfferingById(newOfferingId);
@@ -160,19 +188,17 @@ public class GodService {
         newExp = newExp % 10;
         godInfo.setExp((byte) newExp);
 
+        // 更新請神資訊以及供品購買紀錄
         if (!(godInfoService.updateGodInfo(godInfo) &&
                 offeringService.addOfferingPurchase(user.getId(), offering.getId(), god.getId()))) {
             throw new ApiException("交易發生錯誤，請聯繫客服！");
         }
 
 
-        List<String> offeringIds  = Arrays.asList(godInfo.getOfferingList().split(","))
-                .stream()
-                .filter(id -> StringUtils.isNotBlank(id))
-                .collect(Collectors.toList());
-
+        List<String> offeringIds = offeringInfoList.stream().map(OfferingStateVO::getId).collect(Collectors.toList());
         List<Offering> offerings = offeringService.getOfferingByIds(offeringIds);
 
+        // 返回請神資訊
         return GodInfoVO.builder()
                 .imageCode(god.getImageCode())
                 .name(god.getName())

@@ -5,13 +5,11 @@ import com.qiyuan.web.dto.response.MasterAdminVO;
 import com.qiyuan.web.security.RoleExpressions;
 import com.qiyuan.web.service.MasterService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -44,4 +42,14 @@ public class MasterAdminController {
     public boolean modifyMaster(@RequestBody MasterRequest req) {
         return masterService.modifyMaster(req);
     }
+
+    @GetMapping("/{code}")
+    @Operation(summary = "查詢單一老師", description = "依 code 查詢老師詳細資訊")
+    public MasterAdminVO getMasterByCode(
+            @Parameter(description = "老師代號", example = "A001")
+            @PathVariable("code") String code) {
+        return masterService.getMasterByCode(code);
+    }
+
+
 }

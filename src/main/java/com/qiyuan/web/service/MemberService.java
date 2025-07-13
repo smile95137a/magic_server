@@ -3,29 +3,26 @@ package com.qiyuan.web.service;
 import com.qiyuan.security.dao.TokenMapper;
 import com.qiyuan.security.entity.Token;
 import com.qiyuan.security.exception.ApiException;
-import com.qiyuan.web.dao.LanternPurchaseMapper;
-import com.qiyuan.web.dao.OfferingPurchaseMapper;
-import com.qiyuan.web.dao.UserMapper;
+import com.qiyuan.web.dao.*;
 import com.qiyuan.web.dto.request.RecordPeriodRequest;
 import com.qiyuan.web.dto.request.ResetPasswordRequest;
+import com.qiyuan.web.dto.response.MyGodInfoVO;
+import com.qiyuan.web.dto.response.OfferingStateVO;
 import com.qiyuan.web.dto.response.RecordVO;
 import com.qiyuan.web.entity.*;
+import com.qiyuan.web.entity.example.GodExample;
+import com.qiyuan.web.entity.example.GodInfoExample;
 import com.qiyuan.web.entity.example.UserExample;
 import com.qiyuan.web.enums.RecordItem;
 import com.qiyuan.web.enums.TokenType;
-import com.qiyuan.web.util.DateUtil;
-import com.qiyuan.web.util.RandomGenerator;
-import com.qiyuan.web.util.SecurityUtils;
-import com.qiyuan.web.util.ValidationUtil;
-import jakarta.mail.MessagingException;
-import lombok.AllArgsConstructor;
+import com.qiyuan.web.util.*;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.RequestBody;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
@@ -37,6 +34,8 @@ public class MemberService {
 
     private final OfferingPurchaseMapper offeringPurchaseMapper;
     private final LanternPurchaseMapper lanternPurchaseMapper;
+    private final GodInfoMapper godInfoMapper;
+    private final GodMapper godMapper;
     private final UserMapper userMapper;
     private final TokenMapper tokenMapper;
     private final EmailService emailService;
@@ -47,9 +46,12 @@ public class MemberService {
     @Value("${sso.expired-minute}")
     private Integer expiredMinute;
 
-    public MemberService(OfferingPurchaseMapper offeringPurchaseMapper, LanternPurchaseMapper lanternPurchaseMapper, UserMapper userMapper, TokenMapper tokenMapper, EmailService emailService) {
+
+    public MemberService(OfferingPurchaseMapper offeringPurchaseMapper, LanternPurchaseMapper lanternPurchaseMapper, GodInfoMapper godInfoMapper, GodMapper godMapper, UserMapper userMapper, TokenMapper tokenMapper, EmailService emailService) {
         this.offeringPurchaseMapper = offeringPurchaseMapper;
         this.lanternPurchaseMapper = lanternPurchaseMapper;
+        this.godInfoMapper = godInfoMapper;
+        this.godMapper = godMapper;
         this.userMapper = userMapper;
         this.tokenMapper = tokenMapper;
         this.emailService = emailService;
@@ -157,6 +159,51 @@ public class MemberService {
         tokenMapper.revokeToken(token.getToken());
 
         return true;
+    }
+
+    public List<MyGodInfoVO> getMyGodInfo() {
+        String username = SecurityUtils.getCurrentUsername();
+        User user = userMapper.selectByUsername(username);
+
+        GodInfoExample example = new GodInfoExample();
+        example.createCriteria()
+                .andUserIdEqualTo(user.getId());
+
+        List<GodInfo> godInfoList = godInfoMapper.selectByExample(example);
+
+        if (godInfoList.isEmpty()) return Collections.EMPTY_LIST;
+
+        List<String> godIds = godInfoList.stream().map(GodInfo::getGodId).collect(Collectors.toList());
+        GodExample e = new GodExample();
+        e.createCriteria().andIdIn(godIds);
+        List<God> gods = godMapper.selectByExample(e);
+
+        return godInfoList.stream().map(g -> {
+            Date start = g.getOnshelfTime();
+            Date end = g.getGoldenExpiration();
+            int totalDays = 0, passDays = 0, remainingDays = 0;
+            if (start != null && end != null) {
+                LocalDate startDate = start.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+                LocalDate endDate = end.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+                LocalDate today = LocalDate.now();
+
+                totalDays = (int) (endDate.toEpochDay() - startDate.toEpochDay());
+                passDays = (int) (today.toEpochDay() - startDate.toEpochDay());
+                remainingDays = (int) (endDate.toEpochDay() - today.toEpochDay());
+
+                if (passDays < 0) passDays = 0;
+                if (remainingDays < 0) remainingDays = 0;
+            }
+
+            List<OfferingStateVO> offeringStates = g.getOfferingList() == null || g.getOfferingList().isEmpty() ? Collections.EMPTY_LIST : JsonUtil.fromJsonList(g.getOfferingList(), OfferingStateVO.class);
+            return MyGodInfoVO.builder()
+                    .godName(g.getGodId())
+                    .totalDays(totalDays)
+                    .passDays(passDays)
+                    .remainingDays(remainingDays)
+                    .offeringStates(offeringStates)
+                    .build();
+        }).collect(Collectors.toList());
     }
 
 

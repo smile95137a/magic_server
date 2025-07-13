@@ -2,7 +2,6 @@ package com.qiyuan.web.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Builder
@@ -32,6 +31,10 @@ public class User {
     private String oauthType;
 
     private String oauthId;
+
+    private String city;
+
+    private String district;
 
     public String getId() {
         return id;
@@ -127,5 +130,21 @@ public class User {
 
     public void setOauthId(String oauthId) {
         this.oauthId = oauthId;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
+    }
+
+    public String getDistrict() {
+        return district;
+    }
+
+    public void setDistrict(String district) {
+        this.district = district;
     }
 }

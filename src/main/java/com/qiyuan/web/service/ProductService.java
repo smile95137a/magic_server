@@ -6,6 +6,7 @@ import com.qiyuan.web.dao.ProductCategoryMapper;
 import com.qiyuan.web.dao.ProductImageMapper;
 import com.qiyuan.web.dao.ProductMapper;
 import com.qiyuan.web.dto.GalleryImageVO;
+import com.qiyuan.web.dto.PageResult;
 import com.qiyuan.web.dto.ProductAdminVO;
 import com.qiyuan.web.dto.request.*;
 import com.qiyuan.web.dto.response.CreateProductDraftResponse;
@@ -68,8 +69,6 @@ public class ProductService {
 
         Product product = productMapper.selectByPrimaryKey(productId);
         if (product == null) throw new ApiException("商品不存在");
-        if (Boolean.TRUE.equals(product.getStatus()))
-            throw new ApiException("商品已完成，禁止上傳圖片");
 
         String baseDir = mappingConfig.getImagePath("product");
         String subDir = imageType.getFolder();
@@ -315,6 +314,39 @@ public class ProductService {
                 .detailHtml(p.getDetailHtml())
                 .status(p.getStatus())
                 .build();
+    }
+
+    public PageResult<ProductAdminVO> getProductPage(ProductPageRequest req) {
+        int page = req.getPage() <= 0 ? 1 : req.getPage();
+        int size = req.getSize() <= 0 ? 10 : req.getSize();
+        int offset = (page - 1) * size;
+
+        String categoryId = req.getCategoryId();
+
+        ProductExample e = new ProductExample();
+        if (categoryId != null) {
+            e.createCriteria().andCategoryIdEqualTo(categoryId);
+        }
+
+        long total = productMapper.countByExample(e);
+        List<Product> productList = productMapper.selectPage(offset, size, categoryId);
+        List<ProductAdminVO> voList = productList.stream()
+                .map(p -> {
+                    ProductAdminVO vo = new ProductAdminVO();
+                    vo.setId(p.getId());
+                    vo.setCategoryId(p.getCategoryId());
+                    vo.setName(p.getName());
+                    vo.setSubtitle(p.getSubtitle());
+                    vo.setDescription(p.getDescription());
+                    vo.setRemark(p.getRemark());
+                    vo.setOriginalPrice(p.getOriginalPrice());
+                    vo.setSpecialPrice(p.getSpecialPrice());
+                    vo.setMainImageUrl(buildMainImageUrl(p));
+                    vo.setStatus(p.getStatus());
+                    return vo;
+                })
+                .collect(Collectors.toList());
+        return new PageResult<ProductAdminVO>((int) total, page, size, voList);
     }
 
 

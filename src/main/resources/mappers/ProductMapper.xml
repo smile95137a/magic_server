@@ -110,6 +110,18 @@
       order by ${orderByClause}
     </if>
   </select>
+  <select id="selectPage" resultType="com.qiyuan.web.entity.Product">
+    SELECT *
+    FROM product
+    <where>
+      <if test="categoryId != null">
+        AND category_id = #{categoryId}
+      </if>
+    </where>
+    ORDER BY create_time DESC
+    OFFSET #{offset} ROWS FETCH NEXT #{size} ROWS ONLY
+  </select>
+
 
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
     delete from product

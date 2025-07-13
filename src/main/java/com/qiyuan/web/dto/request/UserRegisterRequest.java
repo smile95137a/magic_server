@@ -24,5 +24,7 @@ public class UserRegisterRequest {
     @NotBlank
     private String lineId;
     private String addressName;
+    private String city;
+    private String area;
     private String address;
 }

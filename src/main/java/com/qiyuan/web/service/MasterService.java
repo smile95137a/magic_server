@@ -50,6 +50,13 @@ public class MasterService {
         return masterMapper.selectByExample(e).stream().map(this::convertMasterToAdminVo).collect(Collectors.toList());
     }
 
+    public MasterAdminVO getMasterByCode(String code) {
+        Master entity = masterMapper.selectByPrimaryKey(code);
+        if (entity == null) throw new ApiException("老師不存在");
+        return convertMasterToAdminVo(entity);
+    }
+
+
     @Transactional
     public boolean addMaster(MasterRequest r) {
         MasterExample e = new MasterExample();

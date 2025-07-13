@@ -14,6 +14,8 @@
     <result column="username" jdbcType="VARCHAR" property="username" />
     <result column="oauth_type" jdbcType="VARCHAR" property="oauthType" />
     <result column="oauth_id" jdbcType="VARCHAR" property="oauthId" />
+    <result column="city" jdbcType="NVARCHAR" property="city" />
+    <result column="district" jdbcType="NVARCHAR" property="district" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -75,15 +77,9 @@
   </sql>
   <sql id="Base_Column_List">
     id, password, email, phone, nickname, line_id, address_name, address, receipt_type, 
-    username, oauth_type, oauth_id
+    username, oauth_type, oauth_id, city, district
   </sql>
-  <select id="selectByUsername" parameterType="java.lang.String" resultMap="BaseResultMap">
-    select
-    <include refid="Base_Column_List" />
-    from users
-    where username = #{username,jdbcType=VARCHAR}
-  </select>
-  <select id="selectByExample" parameterType="com.qiyuan.web.entity.example.UserExample" resultMap="BaseResultMap">
+  <select id="selectByExample" parameterType="com.qiyuan.web.entity.UserExample" resultMap="BaseResultMap">
     select
     <if test="distinct">
       distinct
@@ -98,7 +94,7 @@
     </if>
   </select>
   <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
-    select 
+    select
     <include refid="Base_Column_List" />
     from users
     where id = #{id,jdbcType=CHAR}
@@ -107,23 +103,23 @@
     delete from users
     where id = #{id,jdbcType=CHAR}
   </delete>
-  <delete id="deleteByExample" parameterType="com.qiyuan.web.entity.example.UserExample">
+  <delete id="deleteByExample" parameterType="com.qiyuan.web.entity.UserExample">
     delete from users
     <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
     </if>
   </delete>
   <insert id="insert" parameterType="com.qiyuan.web.entity.User">
-    insert into users (id, password, email, 
-      phone, nickname, line_id, 
-      address_name, address, receipt_type, 
-      username, oauth_type, oauth_id
-      )
-    values (#{id,jdbcType=CHAR}, #{password,jdbcType=VARCHAR}, #{email,jdbcType=VARCHAR}, 
-      #{phone,jdbcType=VARCHAR}, #{nickname,jdbcType=NVARCHAR}, #{lineId,jdbcType=VARCHAR}, 
-      #{addressName,jdbcType=NVARCHAR}, #{address,jdbcType=NVARCHAR}, #{receiptType,jdbcType=VARCHAR}, 
-      #{username,jdbcType=VARCHAR}, #{oauthType,jdbcType=VARCHAR}, #{oauthId,jdbcType=VARCHAR}
-      )
+    insert into users (id, password, email,
+                       phone, nickname, line_id,
+                       address_name, address, receipt_type,
+                       username, oauth_type, oauth_id,
+                       city, district)
+    values (#{id,jdbcType=CHAR}, #{password,jdbcType=VARCHAR}, #{email,jdbcType=VARCHAR},
+            #{phone,jdbcType=VARCHAR}, #{nickname,jdbcType=NVARCHAR}, #{lineId,jdbcType=VARCHAR},
+            #{addressName,jdbcType=NVARCHAR}, #{address,jdbcType=NVARCHAR}, #{receiptType,jdbcType=VARCHAR},
+            #{username,jdbcType=VARCHAR}, #{oauthType,jdbcType=VARCHAR}, #{oauthId,jdbcType=VARCHAR},
+            #{city,jdbcType=NVARCHAR}, #{district,jdbcType=NVARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.qiyuan.web.entity.User">
     insert into users
@@ -164,6 +160,12 @@
       <if test="oauthId != null">
         oauth_id,
       </if>
+      <if test="city != null">
+        city,
+      </if>
+      <if test="district != null">
+        district,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -202,9 +204,15 @@
       <if test="oauthId != null">
         #{oauthId,jdbcType=VARCHAR},
       </if>
+      <if test="city != null">
+        #{city,jdbcType=NVARCHAR},
+      </if>
+      <if test="district != null">
+        #{district,jdbcType=NVARCHAR},
+      </if>
     </trim>
   </insert>
-  <select id="countByExample" parameterType="com.qiyuan.web.entity.example.UserExample" resultType="java.lang.Long">
+  <select id="countByExample" parameterType="com.qiyuan.web.entity.UserExample" resultType="java.lang.Long">
     select count(*) from users
     <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
@@ -249,6 +257,12 @@
       <if test="row.oauthId != null">
         oauth_id = #{row.oauthId,jdbcType=VARCHAR},
       </if>
+      <if test="row.city != null">
+        city = #{row.city,jdbcType=NVARCHAR},
+      </if>
+      <if test="row.district != null">
+        district = #{row.district,jdbcType=NVARCHAR},
+      </if>
     </set>
     <if test="example != null">
       <include refid="Update_By_Example_Where_Clause" />
@@ -257,17 +271,19 @@
   <update id="updateByExample" parameterType="map">
     update users
     set id = #{row.id,jdbcType=CHAR},
-      password = #{row.password,jdbcType=VARCHAR},
-      email = #{row.email,jdbcType=VARCHAR},
-      phone = #{row.phone,jdbcType=VARCHAR},
-      nickname = #{row.nickname,jdbcType=NVARCHAR},
-      line_id = #{row.lineId,jdbcType=VARCHAR},
-      address_name = #{row.addressName,jdbcType=NVARCHAR},
-      address = #{row.address,jdbcType=NVARCHAR},
-      receipt_type = #{row.receiptType,jdbcType=VARCHAR},
-      username = #{row.username,jdbcType=VARCHAR},
-      oauth_type = #{row.oauthType,jdbcType=VARCHAR},
-      oauth_id = #{row.oauthId,jdbcType=VARCHAR}
+    password = #{row.password,jdbcType=VARCHAR},
+    email = #{row.email,jdbcType=VARCHAR},
+    phone = #{row.phone,jdbcType=VARCHAR},
+    nickname = #{row.nickname,jdbcType=NVARCHAR},
+    line_id = #{row.lineId,jdbcType=VARCHAR},
+    address_name = #{row.addressName,jdbcType=NVARCHAR},
+    address = #{row.address,jdbcType=NVARCHAR},
+    receipt_type = #{row.receiptType,jdbcType=VARCHAR},
+    username = #{row.username,jdbcType=VARCHAR},
+    oauth_type = #{row.oauthType,jdbcType=VARCHAR},
+    oauth_id = #{row.oauthId,jdbcType=VARCHAR},
+    city = #{row.city,jdbcType=NVARCHAR},
+    district = #{row.district,jdbcType=NVARCHAR}
     <if test="example != null">
       <include refid="Update_By_Example_Where_Clause" />
     </if>
@@ -308,22 +324,30 @@
       <if test="oauthId != null">
         oauth_id = #{oauthId,jdbcType=VARCHAR},
       </if>
+      <if test="city != null">
+        city = #{city,jdbcType=NVARCHAR},
+      </if>
+      <if test="district != null">
+        district = #{district,jdbcType=NVARCHAR},
+      </if>
     </set>
     where id = #{id,jdbcType=CHAR}
   </update>
   <update id="updateByPrimaryKey" parameterType="com.qiyuan.web.entity.User">
     update users
     set password = #{password,jdbcType=VARCHAR},
-      email = #{email,jdbcType=VARCHAR},
-      phone = #{phone,jdbcType=VARCHAR},
-      nickname = #{nickname,jdbcType=NVARCHAR},
-      line_id = #{lineId,jdbcType=VARCHAR},
-      address_name = #{addressName,jdbcType=NVARCHAR},
-      address = #{address,jdbcType=NVARCHAR},
-      receipt_type = #{receiptType,jdbcType=VARCHAR},
-      username = #{username,jdbcType=VARCHAR},
-      oauth_type = #{oauthType,jdbcType=VARCHAR},
-      oauth_id = #{oauthId,jdbcType=VARCHAR}
+        email = #{email,jdbcType=VARCHAR},
+        phone = #{phone,jdbcType=VARCHAR},
+        nickname = #{nickname,jdbcType=NVARCHAR},
+        line_id = #{lineId,jdbcType=VARCHAR},
+        address_name = #{addressName,jdbcType=NVARCHAR},
+        address = #{address,jdbcType=NVARCHAR},
+        receipt_type = #{receiptType,jdbcType=VARCHAR},
+        username = #{username,jdbcType=VARCHAR},
+        oauth_type = #{oauthType,jdbcType=VARCHAR},
+        oauth_id = #{oauthId,jdbcType=VARCHAR},
+        city = #{city,jdbcType=NVARCHAR},
+        district = #{district,jdbcType=NVARCHAR}
     where id = #{id,jdbcType=CHAR}
   </update>
 </mapper>

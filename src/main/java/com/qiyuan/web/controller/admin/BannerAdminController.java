@@ -33,6 +33,15 @@ public class BannerAdminController {
         return bannerService.getAllBannerByType(type);
     }
 
+    @PostMapping("/{id}")
+    @Operation(summary = "查詢單一橫幅", description = "根據 id 查詢單一橫幅資料")
+    public BannerAdminVO getBannerById(
+            @Parameter(description = "橫幅ID", example = "55")
+            @PathVariable("id") Integer id) {
+        return bannerService.getBannerById(id);
+    }
+
+
     @PostMapping("/add")
     @Operation(summary = "新增橫幅", description = "新增一筆橫幅資料")
     public boolean addBanner(@Validated @RequestBody NewBannerRequest banner) {

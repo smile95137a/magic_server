@@ -2,7 +2,6 @@ package com.qiyuan.web.service;
 
 import com.qiyuan.security.exception.ApiException;
 import com.qiyuan.web.dao.BannerMapper;
-import com.qiyuan.web.dto.request.BannerRequest;
 import com.qiyuan.web.dto.request.ModifyBannerRequest;
 import com.qiyuan.web.dto.request.NewBannerRequest;
 import com.qiyuan.web.dto.response.BannerAdminVO;
@@ -49,23 +48,33 @@ public class BannerService {
                 .collect(Collectors.toList());
     }
 
+    public BannerAdminVO getBannerById(Integer id) {
+        Banner banner = bannerMapper.selectByPrimaryKey(id);
+        if (banner == null) throw new ApiException("橫幅不存在");
+        return convertToAdminVO(banner);
+    }
+
+    private BannerAdminVO convertToAdminVO(Banner b) {
+        return BannerAdminVO.builder()
+                .id(b.getId())
+                .type(b.getType())
+                .description(b.getDescription())
+                .imageName(b.getImageName())
+                .imageBase64(FileUtil.imageToBase64(FileUtil.concatFilePath(bannerDir, b.getImageName())))
+                .availableFrom(b.getAvailableFrom())
+                .availableUntil(b.getAvailableUntil())
+                .sort(b.getSort())
+                .build();
+    }
+
+
     public List<BannerAdminVO> getAllBannerByType(String type) {
         BannerExample e = new BannerExample();
         e.createCriteria().andTypeEqualTo(type);
         e.setOrderByClause("[sort] DESC");
         List<Banner> banners = bannerMapper.selectByExample(e);
         return banners.stream()
-                .map(b -> BannerAdminVO.builder()
-                        .id(b.getId())
-                        .type(b.getType())
-                        .description(b.getDescription())
-                        .imageName(b.getImageName())
-                        .imageBase64(FileUtil.imageToBase64(FileUtil.concatFilePath(bannerDir, b.getImageName())))
-                        .availableFrom(b.getAvailableFrom())
-                        .availableUntil(b.getAvailableUntil())
-                        .sort(b.getSort())
-                        .build()
-                ).collect(Collectors.toList());
+                .map(this::convertToAdminVO).collect(Collectors.toList());
     }
 
     public boolean addNewBanner(NewBannerRequest banner) {

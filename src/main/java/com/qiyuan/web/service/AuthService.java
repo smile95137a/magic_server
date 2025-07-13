@@ -65,6 +65,11 @@ public class AuthService {
         }
 
         String userId = UUID.randomUUID().toString().replace("-", "").toUpperCase(Locale.ROOT);
+
+        if (StringUtils.isNoneBlank(req.getEmail(), req.getLineId(), req.getPhone(), req.getPassword(), req.getNickName())) {
+            throw new ApiException("信箱、手機、密碼、暱稱、Line Id不可為空");
+        }
+
         User newUser = User.builder()
                 .id(userId)
                 .username(req.getEmail())
@@ -73,15 +78,10 @@ public class AuthService {
                 .phone(req.getPhone())
                 .nickname(req.getNickName())
                 .lineId(req.getLineId())
+                .city(req.getCity())
+                .district(req.getArea())
+                .address(req.getAddress())
                 .build();
-
-        if (StringUtils.isNotBlank(req.getAddressName())) {
-            newUser.setAddressName(req.getAddressName());
-        }
-
-        if (StringUtils.isNotBlank(req.getAddress())) {
-            newUser.setAddress(req.getAddress());
-        }
 
         UserRole userRole = UserRole
                 .builder()
@@ -150,6 +150,8 @@ public class AuthService {
         user.setAddressName(req.getAddressName());
         user.setLineId(req.getLineId());
         user.setPhone(req.getPhone());
+        user.setCity(req.getCity());
+        user.setDistrict(req.getArea());
         user.setAddress(req.getAddress());
         return userMapper.updateByPrimaryKeySelective(user) > 0;
     }
@@ -164,6 +166,8 @@ public class AuthService {
         resp.setAddressName(user.getAddressName());
         resp.setLineId(user.getLineId());
         resp.setPhone(user.getPhone());
+        resp.setCity(user.getCity());
+        resp.setArea(user.getDistrict());
         resp.setAddress(user.getAddress());
         return resp;
     }

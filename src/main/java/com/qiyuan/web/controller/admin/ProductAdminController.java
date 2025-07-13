@@ -1,10 +1,8 @@
 package com.qiyuan.web.controller.admin;
 
-import com.qiyuan.web.dto.request.DeleteImageRequest;
-import com.qiyuan.web.dto.request.DiscardProductRequest;
-import com.qiyuan.web.dto.request.EditProductRequest;
+import com.qiyuan.web.dto.PageResult;
+import com.qiyuan.web.dto.request.*;
 import com.qiyuan.web.dto.ProductAdminVO;
-import com.qiyuan.web.dto.request.UploadImageRequest;
 import com.qiyuan.web.dto.response.CreateProductDraftResponse;
 import com.qiyuan.web.dto.response.UploadImageResponse;
 import com.qiyuan.web.security.RoleExpressions;
@@ -74,4 +72,14 @@ public class ProductAdminController {
     public boolean deleteImage(@RequestBody DeleteImageRequest req) {
         return productService.deleteImage(req);
     }
+
+
+    @PostMapping("/list")
+    @Operation(summary = "查詢所有商品(分頁)", description = "分頁查詢商品列表")
+    public PageResult<ProductAdminVO> getProductList(@RequestBody ProductPageRequest req) {
+        return productService.getProductPage(req);
+    }
+
+
+
 }

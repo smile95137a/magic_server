@@ -1,10 +1,7 @@
 package com.qiyuan.web.controller.front;
 
 import com.qiyuan.web.dto.request.*;
-import com.qiyuan.web.dto.response.LoginResponse;
-import com.qiyuan.web.dto.response.OAuthLoginResponse;
-import com.qiyuan.web.dto.response.RecordVO;
-import com.qiyuan.web.dto.response.UserProfileResponse;
+import com.qiyuan.web.dto.response.*;
 import com.qiyuan.web.security.RoleExpressions;
 import com.qiyuan.web.service.AuthService;
 import com.qiyuan.web.service.MemberService;
@@ -75,6 +72,25 @@ public class UserFrontController {
     public List<RecordVO> getPurchaseRecord(@RequestBody @Validated RecordPeriodRequest req) {
         return memberService.getPurchaseRecord(req);
     }
+
+    @PostMapping("/record/offering")
+    @SecurityRequirement(name = "bearerAuth")
+    @PreAuthorize(RoleExpressions.ONLY_USER)
+    @Operation(summary = "取得會員供奉紀錄", description = "需帶 Bearer JWT token")
+    public List<RecordVO> getOfferingRecord(@RequestBody @Validated RecordPeriodRequest req) {
+//        return memberService.getOfferingRecord(req);
+        //TODO
+        return null;
+    }
+
+    @PostMapping("/record/my-god-info")
+    @SecurityRequirement(name = "bearerAuth")
+    @PreAuthorize(RoleExpressions.ONLY_USER)
+    @Operation(summary = "取得我的供奉狀態", description = "需帶 Bearer JWT token")
+    public List<MyGodInfoVO> getMyGodInfo() {
+        return memberService.getMyGodInfo();
+    }
+
 
     @PostMapping("/forget-password")
     public boolean sendResetPasswordMail(@RequestBody ForgetPasswordRequest req) {
