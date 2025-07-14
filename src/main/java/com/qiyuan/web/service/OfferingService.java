@@ -1,25 +1,36 @@
 package com.qiyuan.web.service;
 
 import com.qiyuan.security.exception.ApiException;
+import com.qiyuan.web.dao.GodMapper;
 import com.qiyuan.web.dao.OfferingMapper;
 import com.qiyuan.web.dao.OfferingPurchaseMapper;
+import com.qiyuan.web.dto.request.RecordPeriodRequest;
 import com.qiyuan.web.dto.response.OfferingVO;
+import com.qiyuan.web.dto.response.RecordVO;
+import com.qiyuan.web.entity.God;
 import com.qiyuan.web.entity.Offering;
 import com.qiyuan.web.entity.OfferingPurchase;
+import com.qiyuan.web.entity.example.GodExample;
 import com.qiyuan.web.entity.example.OfferingExample;
+import com.qiyuan.web.entity.example.OfferingPurchaseExample;
 import com.qiyuan.web.util.DateUtil;
 import com.qiyuan.web.util.FileUtil;
 import com.qiyuan.web.util.RandomGenerator;
 import com.qiyuan.web.util.SecurityUtils;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.time.DateFormatUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -30,10 +41,12 @@ public class OfferingService {
 
     private final OfferingMapper offeringMapper;
     private final OfferingPurchaseMapper offeringPurchaseMapper;
+    private final GodMapper godMapper;
 
-    public OfferingService(OfferingMapper offeringMapper, OfferingPurchaseMapper offeringPurchaseMapper) {
+    public OfferingService(OfferingMapper offeringMapper, OfferingPurchaseMapper offeringPurchaseMapper, GodMapper godMapper) {
         this.offeringMapper = offeringMapper;
         this.offeringPurchaseMapper = offeringPurchaseMapper;
+        this.godMapper = godMapper;
     }
 
     public Offering getOfferingById(String id) {
@@ -122,6 +135,34 @@ public class OfferingService {
                 .id(o.getId())
                 .imageBase64(FileUtil.imageToBase64(FileUtil.concatFilePath(offeringDir, String.format("%s.%s", o.getId(), o.getImageExt().toLowerCase(Locale.ROOT)))))
                 .build();
+    }
+
+    public List<RecordVO> getOfferingRecord(@RequestBody @Validated RecordPeriodRequest req) {
+        OfferingPurchaseExample e = new OfferingPurchaseExample();
+        e.createCriteria().andCreateTimeBetween(req.getStartTime(), req.getEndTime());
+        List<OfferingPurchase> purchases = offeringPurchaseMapper.selectByExample(e);
+        List<String> offeringIds = purchases.stream().map(OfferingPurchase::getOfferingId).collect(Collectors.toList());
+        List<String> godIds = purchases.stream().map(OfferingPurchase::getGodId).collect(Collectors.toList());
+
+        OfferingExample oe = new OfferingExample();
+        oe.createCriteria().andIdIn(offeringIds);
+        List<Offering> offeringList = offeringMapper.selectByExample(oe);
+        Map<String, String> offeringMap = offeringList.stream()
+                .collect(Collectors.toMap(Offering::getId, Offering::getName));
+
+
+        GodExample ge = new GodExample();
+        ge.createCriteria().andIdIn(godIds);
+        List<God> gods = godMapper.selectByExample(ge);
+        Map<String, String> godMap = gods.stream()
+                .collect(Collectors.toMap(God::getId, God::getName));
+
+        return purchases.stream().map(p -> RecordVO.builder()
+                .date(DateFormatUtils.format(p.getCreateTime(), "yyyy/MM/dd HH:mm"))
+                .item(offeringMap.get(p.getOfferingId()))
+                .content(String.format("%s供品", godMap.get(p.getGodId())))
+                .build()
+        ).collect(Collectors.toList());
     }
 
 }

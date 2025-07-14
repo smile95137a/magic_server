@@ -125,7 +125,6 @@ public class LanternPurchaseService {
         String userId = req.getUserId();
         String lanternCode = req.getLanternCode();
 
-        String externalOrderNo = RandomGenerator.getUUID();
         BigDecimal totalAmount = BigDecimal.ZERO;
 
         // 查單價
@@ -135,8 +134,9 @@ public class LanternPurchaseService {
 
         for (LanternPurchaseInfo info : req.getList()) {
             LanternPurchase entity = new LanternPurchase();
-            entity.setId(RandomGenerator.getUUID());
-            entity.setExternalOrderNo(externalOrderNo);
+            String id = RandomGenerator.getUUID();
+            entity.setId(id);
+            entity.setExternalOrderNo(id);
             entity.setLanternId(lantern.getId());
             entity.setUserId(userId);
             entity.setName(info.getName());

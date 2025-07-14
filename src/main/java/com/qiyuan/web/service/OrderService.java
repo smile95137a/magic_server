@@ -4,9 +4,7 @@ import com.qiyuan.security.exception.ApiException;
 import com.qiyuan.web.dao.*;
 import com.qiyuan.web.dto.CreateOrderItem;
 import com.qiyuan.web.dto.OrderItemVO;
-import com.qiyuan.web.dto.request.CancelOrderRequest;
-import com.qiyuan.web.dto.request.CreateOrderRequest;
-import com.qiyuan.web.dto.request.QueryOrderRequest;
+import com.qiyuan.web.dto.request.*;
 import com.qiyuan.web.dto.response.*;
 import com.qiyuan.web.entity.*;
 import com.qiyuan.web.entity.example.OrderItemExample;
@@ -17,6 +15,7 @@ import com.qiyuan.web.util.DateUtil;
 import com.qiyuan.web.util.RandomGenerator;
 import com.qiyuan.web.util.SecurityUtils;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,9 +36,6 @@ public class OrderService {
     private final ShippingMethodMapper shippingMethodMapper;
     private final UserMapper userMapper;
     private final ProductMapper productMapper;
-    private final ProductSpecMapper productSpecMapper;
-    private final ProductSpecStockMapper productSpecStockMapper;
-    private final StockService stockService;
     private final PaymentService paymentService;
 
     @Transactional
@@ -55,25 +51,20 @@ public class OrderService {
             throw new ApiException("請選擇購買商品");
 
         String orderId = RandomGenerator.getUUID();
-        String externalOrderNo = "O-" + System.currentTimeMillis();
 
         BigDecimal total = BigDecimal.ZERO;
-        // 2. 處理每個商品規格（驗證 + 扣庫存 + 建明細）
+        // 2. 處理每個商品（驗證 + 扣庫存 + 建明細）
         for (CreateOrderItem item : items) {
-            ProductSpec spec = productSpecMapper.selectByPrimaryKey(item.getSpecId());
-            if (spec == null) throw new ApiException("商品規格不存在");
-
-            Product product = productMapper.selectByPrimaryKey(spec.getProductId());
+            Product product = productMapper.selectByPrimaryKey(item.getProductId());
             if (product == null || !Boolean.TRUE.equals(product.getStatus()))
                 throw new ApiException("商品不存在或已下架");
 
-            ProductSpecStock stock = productSpecStockMapper.selectByPrimaryKey(spec.getId());
             int needQty = item.getQuantity() == null ? 1 : item.getQuantity();
-            if (stock == null || stock.getStock() < needQty)
-                throw new ApiException("[" + product.getName() + " " + spec.getSpecValue() + "]庫存不足");
+            if (product.getStock() == null || product.getStock() < needQty)
+                throw new ApiException("[" + product.getName() + "]庫存不足");
 
             // 扣庫存
-            stockService.decreaseStock(spec.getId(), needQty);
+            productMapper.decreaseStock(product.getId(), needQty); // 請確定你有實作這個方法（UPDATE product set stock=stock-#{needQty} where id=#{id} and stock>=#{needQty}）
 
             // 計算金額
             BigDecimal unitPrice = product.getSpecialPrice();
@@ -85,20 +76,37 @@ public class OrderService {
                     .orderId(orderId)
                     .productId(product.getId())
                     .productName(product.getName())
-                    .specId(spec.getId())
-                    .specValue(spec.getSpecValue())
-                    .unitPrice(unitPrice)
+                    .unitPrice(product.getOriginalPrice())
                     .quantity(needQty)
+                    .specialPrice(product.getSpecialPrice())
                     .subtotal(subtotal)
                     .createTime(currentDate)
                     .build();
             orderItemMapper.insertSelective(detail);
         }
 
-        // 3. 建立訂單主表
+        // 3. 決定收件人資訊
+        // TODO: 不確定，待確定
+        String recipientName = null, recipientPhone = null, recipientAddress = null;
+        ShippingMethod shippingMethod = shippingMethodMapper.selectByPrimaryKey(request.getShippingMethodId());
+        if (StringUtils.equals("SF_EXPRESS", shippingMethod.getCode())) {
+            HomeDeliveryRecipientInfo r = request.getHomeDeliveryRecipient();
+            if (r == null) throw new ApiException("宅配需填寫收件人資訊");
+            recipientName = r.getName();
+            recipientPhone = r.getPhone();
+            recipientAddress = r.getAddress();
+        } else {
+            StorePickupRecipientInfo r = request.getStorePickupRecipient();
+            if (r == null) throw new ApiException("超商取貨需填寫收件人資訊");
+            recipientName = r.getRecipientName();
+            recipientPhone = r.getPhone();
+            recipientAddress = r.getStoreAddress();
+        }
+
+        // 4. 建立訂單主表
         Orders order = Orders.builder()
                 .id(orderId)
-                .externalOrderNo(externalOrderNo)
+                .externalOrderNo(orderId)
                 .userId(user.getId())
                 .totalAmount(total)
                 .paid(false)
@@ -106,33 +114,34 @@ public class OrderService {
                 .shippingMethodId(request.getShippingMethodId())
                 .invoiceType(request.getInvoiceType())
                 .invoiceTarget(request.getInvoiceTarget())
-                .recipientName(user.getAddressName())
-                .recipientPhone(user.getPhone())
-                .recipientAddress(user.getAddress())
+                .recipientName(recipientName)
+                .recipientPhone(recipientPhone)
+                .recipientAddress(recipientAddress)
                 .remark(request.getRemark())
                 .createTime(currentDate)
                 .updateTime(currentDate)
                 .build();
         ordersMapper.insertSelective(order);
 
-        // 4. 金流處理（可根據前端選擇的金流類型和分期資訊自動處理）
-        PayMethodEnum payMethod = PayMethodEnum.fromCode(request.getPayMethod());
-        PaymentCreateResult paymentResult = paymentService.createPayment(
-                user, externalOrderNo, total, payMethod, SourceTypeEnum.REAL, orderId
-        );
+        // 5. 金流處理
+//        PayMethodEnum payMethod = PayMethodEnum.fromCode(request.getPayMethod());
+//        PaymentCreateResult paymentResult = paymentService.createPayment(
+//                user, externalOrderNo, total, payMethod, SourceTypeEnum.REAL, orderId
+//        );
 
         return CreateOrderResponse.builder()
                 .orderId(orderId)
-                .externalOrderNo(externalOrderNo)
+                .externalOrderNo(orderId)
                 .totalAmount(total)
                 .status(OrderStatus.CREATED.getValue())
                 .paymentStatus("pending")
                 .payMethod(request.getPayMethod())
                 .shippingMethod(order.getShippingMethodId())
-                .paymentUrl(paymentResult.getPaymentUrl())
+//                .paymentUrl(paymentResult.getPaymentUrl())
                 .createTime(DateFormatUtils.format(currentDate, "yyyy-MM-dd HH:mm:ss"))
                 .build();
     }
+
 
 
     public List<OrderItem> getOrderItemsByOrderId(String orderId) {

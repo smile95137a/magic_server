@@ -6,10 +6,12 @@ import com.qiyuan.web.security.RoleExpressions;
 import com.qiyuan.web.service.AuthService;
 import com.qiyuan.web.service.MemberService;
 import com.qiyuan.web.service.OAuth2LoginService;
+import com.qiyuan.web.service.OfferingService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -19,17 +21,15 @@ import java.util.List;
 @RestController
 @RequestMapping("/user")
 @Tag(name = "前台會員 ", description = "前台會員相關功能")
+@RequiredArgsConstructor
 public class UserFrontController {
 
     private final AuthService authService;
+    private final OfferingService offeringService;
     private final MemberService memberService;
     private final OAuth2LoginService oAuth2LoginService;
 
-    public UserFrontController(AuthService authService, MemberService memberService, OAuth2LoginService oAuth2LoginService) {
-        this.authService = authService;
-        this.memberService = memberService;
-        this.oAuth2LoginService = oAuth2LoginService;
-    }
+
 
     @PostMapping("/register")
     @Operation(summary = "會員註冊", description = "註冊新會員帳號。傳入 email、密碼、手機、暱稱、Line ID、收貨人姓名、收貨地址等資訊。")
@@ -78,9 +78,7 @@ public class UserFrontController {
     @PreAuthorize(RoleExpressions.ONLY_USER)
     @Operation(summary = "取得會員供奉紀錄", description = "需帶 Bearer JWT token")
     public List<RecordVO> getOfferingRecord(@RequestBody @Validated RecordPeriodRequest req) {
-//        return memberService.getOfferingRecord(req);
-        //TODO
-        return null;
+        return offeringService.getOfferingRecord(req);
     }
 
     @PostMapping("/record/my-god-info")

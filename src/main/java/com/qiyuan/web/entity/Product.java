@@ -30,6 +30,16 @@ public class Product {
 
     private String detailHtml;
 
+    private Integer stock;
+
+    public Integer getStock() {
+        return stock;
+    }
+
+    public void setStock(Integer stock) {
+        this.stock = stock;
+    }
+
     public Integer getId() {
         return id;
     }

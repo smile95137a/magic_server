@@ -12,6 +12,7 @@
     <result column="special_price" jdbcType="DECIMAL" property="specialPrice" />
     <result column="main_image" jdbcType="NVARCHAR" property="mainImage" />
     <result column="status" jdbcType="BIT" property="status" />
+    <result column="stock" jdbcType="INTEGER" property="stock" />   <!-- 新增 -->
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
     <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
     <result column="detail_html" jdbcType="NVARCHAR" property="detailHtml" />
@@ -76,7 +77,7 @@
   </sql>
   <sql id="Base_Column_List">
     id, category_id, name, subtitle, description, remark, original_price, special_price, 
-    main_image, status, create_time, update_time, detail_html
+    main_image, status, stock, create_time, update_time, detail_html
   </sql>
   <select id="selectByExample" parameterType="com.qiyuan.web.entity.example.ProductExample" resultMap="BaseResultMap">
     select
@@ -110,6 +111,12 @@
       order by ${orderByClause}
     </if>
   </select>
+  <update id="decreaseStock">
+    UPDATE product
+    SET stock = stock - #{qty}
+    WHERE id = #{productId} AND stock >= #{qty}
+  </update>
+
   <select id="selectPage" resultType="com.qiyuan.web.entity.Product">
     SELECT *
     FROM product
@@ -134,17 +141,18 @@
     </if>
   </delete>
   <insert id="insert" parameterType="com.qiyuan.web.entity.Product">
-    insert into product (id, category_id, name, 
-      subtitle, description, remark, 
-      original_price, special_price, main_image, 
-      status, create_time, update_time, 
-      detail_html)
-    values (#{id,jdbcType=INTEGER}, #{categoryId,jdbcType=CHAR}, #{name,jdbcType=NVARCHAR}, 
-      #{subtitle,jdbcType=NVARCHAR}, #{description,jdbcType=NVARCHAR}, #{remark,jdbcType=NVARCHAR}, 
-      #{originalPrice,jdbcType=DECIMAL}, #{specialPrice,jdbcType=DECIMAL}, #{mainImage,jdbcType=NVARCHAR}, 
-      #{status,jdbcType=BIT}, #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, 
-      #{detailHtml,jdbcType=NVARCHAR})
+    insert into product (id, category_id, name,
+                         subtitle, description, remark,
+                         original_price, special_price, main_image,
+                         status, stock, create_time, update_time,
+                         detail_html)
+    values (#{id,jdbcType=INTEGER}, #{categoryId,jdbcType=CHAR}, #{name,jdbcType=NVARCHAR},
+            #{subtitle,jdbcType=NVARCHAR}, #{description,jdbcType=NVARCHAR}, #{remark,jdbcType=NVARCHAR},
+            #{originalPrice,jdbcType=DECIMAL}, #{specialPrice,jdbcType=DECIMAL}, #{mainImage,jdbcType=NVARCHAR},
+            #{status,jdbcType=BIT}, #{stock,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP},
+            #{detailHtml,jdbcType=NVARCHAR})
   </insert>
+
   <insert id="insertSelective" parameterType="com.qiyuan.web.entity.Product" useGeneratedKeys="true" keyProperty="id">
     insert into product
     <trim prefix="(" suffix=")" suffixOverrides=",">
@@ -177,6 +185,9 @@
       </if>
       <if test="status != null">
         status,
+      </if>
+      <if test="stock != null">
+        stock,
       </if>
       <if test="createTime != null">
         create_time,
@@ -219,6 +230,9 @@
       <if test="status != null">
         #{status,jdbcType=BIT},
       </if>
+      <if test="stock != null">
+        #{stock,jdbcType=INTEGER},
+      </if>
       <if test="createTime != null">
         #{createTime,jdbcType=TIMESTAMP},
       </if>
@@ -245,6 +259,10 @@
       <if test="record.categoryId != null">
         category_id = #{record.categoryId,jdbcType=CHAR},
       </if>
+      <if test="stock != null">
+        stock = #{stock,jdbcType=INTEGER},
+      </if>
+
       <if test="record.name != null">
         name = #{record.name,jdbcType=NVARCHAR},
       </if>
@@ -291,7 +309,8 @@
       subtitle = #{record.subtitle,jdbcType=NVARCHAR},
       description = #{record.description,jdbcType=NVARCHAR},
       remark = #{record.remark,jdbcType=NVARCHAR},
-      original_price = #{record.originalPrice,jdbcType=DECIMAL},
+    stock = #{stock,jdbcType=INTEGER},
+    original_price = #{record.originalPrice,jdbcType=DECIMAL},
       special_price = #{record.specialPrice,jdbcType=DECIMAL},
       main_image = #{record.mainImage,jdbcType=NVARCHAR},
       status = #{record.status,jdbcType=BIT},
@@ -311,6 +330,10 @@
       <if test="name != null">
         name = #{name,jdbcType=NVARCHAR},
       </if>
+      <if test="stock != null">
+        stock = #{stock,jdbcType=INTEGER},
+      </if>
+
       <if test="subtitle != null">
         subtitle = #{subtitle,jdbcType=NVARCHAR},
       </if>
@@ -357,7 +380,8 @@
       status = #{status,jdbcType=BIT},
       create_time = #{createTime,jdbcType=TIMESTAMP},
       update_time = #{updateTime,jdbcType=TIMESTAMP},
-      detail_html = #{detailHtml,jdbcType=NVARCHAR}
+        stock = #{stock,jdbcType=INTEGER},
+        detail_html = #{detailHtml,jdbcType=NVARCHAR}
     where id = #{id,jdbcType=INTEGER}
   </update>
 </mapper>

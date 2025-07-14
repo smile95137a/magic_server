@@ -17,5 +17,4 @@ public class CreateOrderItem {
     @NotNull
     private Integer quantity;
 
-    private Integer specId;
 }
