@@ -2,6 +2,7 @@ package com.qiyuan.web.service;
 
 import com.qiyuan.security.exception.ApiException;
 import com.qiyuan.web.dao.*;
+import com.qiyuan.web.dto.PaymentNotifyDTO;
 import com.qiyuan.web.dto.request.GomypayRequest;
 import com.qiyuan.web.dto.request.PaymentNotifyRequest;
 import com.qiyuan.web.dto.response.GomypayResponse;
@@ -31,21 +32,23 @@ public class PaymentService {
     private final LanternPurchaseMapper lanternPurchaseMapper;
     private final OfferingPurchaseMapper offeringPurchaseMapper;
     private final MasterServiceRequestMapper masterServiceRequestMapper;
+    private final UserMapper userMapper;
 
-    public PaymentService(PaymentTransactionMapper paymentTransactionMapper, GomypayClient gomypayClient, OrdersMapper ordersMapper, LanternPurchaseMapper lanternPurchaseMapper, OfferingPurchaseMapper offeringPurchaseMapper, MasterServiceRequestMapper masterServiceRequestMapper) {
+    public PaymentService(PaymentTransactionMapper paymentTransactionMapper, GomypayClient gomypayClient, OrdersMapper ordersMapper, LanternPurchaseMapper lanternPurchaseMapper, OfferingPurchaseMapper offeringPurchaseMapper, MasterServiceRequestMapper masterServiceRequestMapper, UserMapper userMapper) {
         this.paymentTransactionMapper = paymentTransactionMapper;
         this.gomypayClient = gomypayClient;
         this.ordersMapper = ordersMapper;
         this.lanternPurchaseMapper = lanternPurchaseMapper;
         this.offeringPurchaseMapper = offeringPurchaseMapper;
         this.masterServiceRequestMapper = masterServiceRequestMapper;
+        this.userMapper = userMapper;
     }
 
     @Value("${gomypay.customerNo}")
     private String customerNo;
 
     public PaymentCreateResult createPayment(User user, String externalOrderNo, BigDecimal amount,
-                                             PayMethodEnum payMethod, SourceTypeEnum sourceType, String sourceId, boolean isInstallment, String installment) {
+                                             PayMethodEnum payMethod, SourceTypeEnum sourceType, String sourceId) {
         GomypayRequest req = GomypayRequest.builder()
                 .sendType(payMethod.getApiValue())         // 如 0, 7, ... 依金流API文件
                 .orderNo(externalOrderNo)
@@ -54,8 +57,8 @@ public class PaymentService {
                 .phone(user.getPhone())
                 .email(user.getEmail())
                 .memo("線上訂單")                          // 可自訂備註
-                .transMode(isInstallment ? "2" : "1")             // 一般交易 1，分期 2
-                .installment(installment == null ? "0" : installment)     // 無分期填0
+                .transMode("1")             // 一般交易 1，分期 2
+                .installment("0")     // 無分期填0
                 .build();
 
         // === 2. 呼叫金流API，取得回應
@@ -84,6 +87,8 @@ public class PaymentService {
                 .paymentUrl(resp.getPaymentUrl())
                 .build();
     }
+
+
 
     public void handleCallback(PaymentNotifyRequest notify) {
         // 1. 簽章驗證
@@ -137,24 +142,26 @@ public class PaymentService {
     }
 
     private void markSourceAsPaid(String sourceType, String sourceId) {
-        // TODO
-//        SourceTypeEnum type = SourceTypeEnum.fromCode(sourceType);
-//        switch (type) {
-//            case REAL:
-//                ordersMapper.markAsPaid(sourceId);
-//                break;
-//            case LANTERN:
-//                lanternPurchaseMapper.markAsPaid(Integer.valueOf(sourceId));
-//                break;
-//            case OFFERING:
-//                offeringPurchaseMapper.markAsPaid(Integer.valueOf(sourceId));
-//                break;
-//            case MASTER_SERVICE:
-//                masterServiceRequestMapper.markAsPaid(Integer.valueOf(sourceId));
-//                break;
-//            default:
-//                throw new ApiException("不支援的來源類型: " + sourceType);
-//        }
+        // 強烈建議 sourceId 用 String 存（UUID），不用轉 Integer
+        SourceTypeEnum type = SourceTypeEnum.fromCode(sourceType);
+
+        switch (type) {
+            case REAL: // 假設你的 SourceTypeEnum 實體商品訂單寫 REAL（M 也行）
+                // 只有實體商品才要 mark paid，這裡通常會把 orders.status 改成 "paid" 或 "待出貨"
+//                ordersMapper.updateStatusToPaid(sourceId);  // 你要補一個 updateStatusToPaid 方法
+                break;
+            case LANTERN:
+            case OFFERING:
+            case MASTER_SERVICE:
+                break;
+            default:
+                throw new ApiException("不支援的來源類型: " + sourceType);
+        }
     }
+
+
+
+
+
 
 }

@@ -18,6 +18,8 @@ public interface PaymentTransactionMapper {
 
     int insertSelective(PaymentTransaction row);
 
+    PaymentTransaction selectByExternalOrderNo(String externalOrderNo);
+
     List<PaymentTransaction> selectByExample(PaymentTransactionExample example);
 
     PaymentTransaction selectByPrimaryKey(String id);

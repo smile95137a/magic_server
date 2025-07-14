@@ -9,10 +9,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -49,4 +46,11 @@ public class ProductCategoryAdminController {
     public List<ProductCategory> getCategoryList() {
         return productCategoryService.getCategoryList();
     }
+
+    @Operation(summary = "查詢所有商品分類", description = "後台查詢所有商品分類清單")
+    @PostMapping("/{id}")
+    public ProductCategory getCategoryList(@PathVariable String id) {
+        return productCategoryService.getCategory(id);
+    }
+
 }

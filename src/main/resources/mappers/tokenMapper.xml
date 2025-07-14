@@ -23,10 +23,9 @@
 
     <!-- 根據 token 查詢 -->
     <select id="findByToken" resultMap="TokenResultMap" parameterType="string">
-        SELECT username, token, expiration_time, revoked
+        SELECT TOP (1) username, token, expiration_time, revoked
         FROM token
         WHERE token = #{token} AND ( revoked = 0 OR revoked IS NULL)
-            LIMIT 1
     </select>
 
     <select id="countRefreshByUsername" resultType="int" parameterType="string">

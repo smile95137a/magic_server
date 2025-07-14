@@ -3,7 +3,9 @@ package com.qiyuan.web.service;
 import com.qiyuan.web.dao.LanternMapper;
 import com.qiyuan.web.dao.LanternPurchaseMapper;
 import com.qiyuan.web.dto.LanternBlessingDTO;
+import com.qiyuan.web.dto.request.LanternPurchaseInfo;
 import com.qiyuan.web.dto.request.RecordPeriodRequest;
+import com.qiyuan.web.dto.response.PaymentCreateResult;
 import com.qiyuan.web.dto.response.RecordVO;
 import com.qiyuan.web.entity.Lantern;
 import com.qiyuan.web.entity.LanternPurchase;
@@ -15,11 +17,13 @@ import com.qiyuan.web.dto.request.LanternPurchaseRequest;
 import com.qiyuan.web.enums.RecordItem;
 import com.qiyuan.web.util.DateUtil;
 import com.qiyuan.web.dto.response.LanternBlessingVO;
+import com.qiyuan.web.util.RandomGenerator;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
@@ -36,6 +40,9 @@ public class LanternPurchaseService {
 
     @Autowired
     private LanternMapper lanternMapper;
+
+    @Autowired
+    private PaymentService paymentService;
 
     public List<LanternPurchase> getByLanternId(String lanternId) {
         LanternPurchaseExample e = new LanternPurchaseExample();
@@ -118,25 +125,31 @@ public class LanternPurchaseService {
         String userId = req.getUserId();
         String lanternCode = req.getLanternCode();
 
+        String externalOrderNo = RandomGenerator.getUUID();
+        BigDecimal totalAmount = BigDecimal.ZERO;
+
+        // 查單價
         LanternExample e = new LanternExample();
         e.createCriteria().andIconNameEqualTo(lanternCode);
-        List<Lantern> lanterns = lanternMapper.selectByExample(e);
-        Lantern lantern = lanterns.get(0);
-        Calendar now = Calendar.getInstance();
-        req.getList()
-                .stream()
-                .map(lpi ->
-                        LanternPurchase.builder()
-                                .name(lpi.getName())
-                                .message(lpi.getMessage())
-                                .birthday(DateUtil.parseStringToDate(lpi.getBirthday()))
-                                .createTime(now.getTime())
-                                .expiredTime(DateUtil.adjustDate(now, 365, Date.class))
-                                .lanternId(lantern.getId())
-                                .userId(userId)
-                                .blessingTimes((short)0)
-                                .build()
-                ).forEach(l -> lanternPurchaseMapper.insertSelective(l));
+        Lantern lantern = lanternMapper.selectByExample(e).get(0);
+
+        for (LanternPurchaseInfo info : req.getList()) {
+            LanternPurchase entity = new LanternPurchase();
+            entity.setId(RandomGenerator.getUUID());
+            entity.setExternalOrderNo(externalOrderNo);
+            entity.setLanternId(lantern.getId());
+            entity.setUserId(userId);
+            entity.setName(info.getName());
+            entity.setBirthday(DateUtil.parseStringToDate(info.getBirthday()));
+            entity.setMessage(info.getMessage());
+            entity.setBlessingTimes((short)0);
+            entity.setCreateTime(new Date());
+            entity.setExpiredTime(DateUtil.adjustDate(new Date(), 365, Date.class));
+            // TODO: 待補價格
+//            totalAmount = totalAmount.add(lantern.getPrice());
+            lanternPurchaseMapper.insertSelective(entity);
+        }
+
         return true;
     }
 }

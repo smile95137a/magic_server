@@ -3,6 +3,7 @@ package com.qiyuan.web.service;
 import com.qiyuan.security.exception.ApiException;
 import com.qiyuan.web.dao.LanternMapper;
 import com.qiyuan.web.entity.Lantern;
+import com.qiyuan.web.entity.LanternPurchase;
 import com.qiyuan.web.entity.example.LanternExample;
 import com.qiyuan.web.dto.response.LanternVO;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,4 +54,6 @@ public class LanternService {
         }
         return lanterns.get(0);
     }
+
+
 }

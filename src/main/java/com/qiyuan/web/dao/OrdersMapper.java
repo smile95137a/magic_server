@@ -22,6 +22,8 @@ public interface OrdersMapper {
                                          @Param("offset") int offset,
                                          @Param("size") int size);
 
+    void updateStatusToPaid(String orderId);
+
     Orders selectByPrimaryKey(String id);
 
     int updateByExampleSelective(@Param("record") Orders record, @Param("example") OrdersExample example);

@@ -92,6 +92,10 @@
       order by ${orderByClause}
     </if>
   </select>
+  <select id="selectByExternalOrderNo" resultType="com.qiyuan.web.entity.PaymentTransaction">
+    SELECT * FROM payment_transaction WHERE external_order_no = #{externalOrderNo} LIMIT 1
+  </select>
+
   <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
     select 
     <include refid="Base_Column_List" />

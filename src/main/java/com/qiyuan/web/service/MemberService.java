@@ -12,6 +12,7 @@ import com.qiyuan.web.dto.response.RecordVO;
 import com.qiyuan.web.entity.*;
 import com.qiyuan.web.entity.example.GodExample;
 import com.qiyuan.web.entity.example.GodInfoExample;
+import com.qiyuan.web.entity.example.OfferingExample;
 import com.qiyuan.web.entity.example.UserExample;
 import com.qiyuan.web.enums.RecordItem;
 import com.qiyuan.web.enums.TokenType;
@@ -39,6 +40,7 @@ public class MemberService {
     private final UserMapper userMapper;
     private final TokenMapper tokenMapper;
     private final EmailService emailService;
+    private final OfferingMapper offeringMapper;
 
     @Value("${sso.front-url}")
     private String frontUrl;
@@ -47,7 +49,7 @@ public class MemberService {
     private Integer expiredMinute;
 
 
-    public MemberService(OfferingPurchaseMapper offeringPurchaseMapper, LanternPurchaseMapper lanternPurchaseMapper, GodInfoMapper godInfoMapper, GodMapper godMapper, UserMapper userMapper, TokenMapper tokenMapper, EmailService emailService) {
+    public MemberService(OfferingPurchaseMapper offeringPurchaseMapper, LanternPurchaseMapper lanternPurchaseMapper, GodInfoMapper godInfoMapper, GodMapper godMapper, UserMapper userMapper, TokenMapper tokenMapper, EmailService emailService, OfferingMapper offeringMapper) {
         this.offeringPurchaseMapper = offeringPurchaseMapper;
         this.lanternPurchaseMapper = lanternPurchaseMapper;
         this.godInfoMapper = godInfoMapper;
@@ -55,6 +57,7 @@ public class MemberService {
         this.userMapper = userMapper;
         this.tokenMapper = tokenMapper;
         this.emailService = emailService;
+        this.offeringMapper = offeringMapper;
     }
 
     public List<RecordVO> getPurchaseRecord(RecordPeriodRequest req) {
@@ -177,10 +180,13 @@ public class MemberService {
         GodExample e = new GodExample();
         e.createCriteria().andIdIn(godIds);
         List<God> gods = godMapper.selectByExample(e);
+        Map<String, String> godMap = gods.stream()
+                .collect(Collectors.toMap(God::getId, God::getName));
+
 
         return godInfoList.stream().map(g -> {
             Date start = g.getOnshelfTime();
-            Date end = g.getGoldenExpiration();
+            Date end = g.getOffshelfTime();
             int totalDays = 0, passDays = 0, remainingDays = 0;
             if (start != null && end != null) {
                 LocalDate startDate = start.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
@@ -196,8 +202,19 @@ public class MemberService {
             }
 
             List<OfferingStateVO> offeringStates = g.getOfferingList() == null || g.getOfferingList().isEmpty() ? Collections.EMPTY_LIST : JsonUtil.fromJsonList(g.getOfferingList(), OfferingStateVO.class);
+            List<String> offeringIds = offeringStates.stream().map(OfferingStateVO::getId).collect(Collectors.toList());
+            OfferingExample oe = new OfferingExample();
+            oe.createCriteria().andIdIn(offeringIds);
+            List<Offering> offeringList = offeringMapper.selectByExample(oe);
+            Map<String, String> offeringMap = offeringList.stream()
+                    .collect(Collectors.toMap(Offering::getId, Offering::getName));
+
+            offeringStates.stream().forEach(o -> {
+                o.setId(offeringMap.get(o.getId()));
+            });
+
             return MyGodInfoVO.builder()
-                    .godName(g.getGodId())
+                    .godName(godMap.get(g.getGodId()))
                     .totalDays(totalDays)
                     .passDays(passDays)
                     .remainingDays(remainingDays)

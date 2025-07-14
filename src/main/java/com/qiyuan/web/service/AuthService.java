@@ -66,7 +66,7 @@ public class AuthService {
 
         String userId = UUID.randomUUID().toString().replace("-", "").toUpperCase(Locale.ROOT);
 
-        if (StringUtils.isNoneBlank(req.getEmail(), req.getLineId(), req.getPhone(), req.getPassword(), req.getNickName())) {
+        if (StringUtils.isAnyBlank(req.getEmail(), req.getLineId(), req.getPhone(), req.getPassword(), req.getNickName())) {
             throw new ApiException("信箱、手機、密碼、暱稱、Line Id不可為空");
         }
 
@@ -74,7 +74,7 @@ public class AuthService {
                 .id(userId)
                 .username(req.getEmail())
                 .email(req.getEmail())
-                .password(req.getPassword())
+                .password(passwordEncoder.encode(req.getPassword()))
                 .phone(req.getPhone())
                 .nickname(req.getNickName())
                 .lineId(req.getLineId())

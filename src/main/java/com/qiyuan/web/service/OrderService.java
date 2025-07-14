@@ -117,10 +117,8 @@ public class OrderService {
 
         // 4. 金流處理（可根據前端選擇的金流類型和分期資訊自動處理）
         PayMethodEnum payMethod = PayMethodEnum.fromCode(request.getPayMethod());
-        boolean isInstallment = Boolean.TRUE.equals(request.getIsInstallment());
-        String installment = (request.getInstallment() != null) ? request.getInstallment() : "0";
         PaymentCreateResult paymentResult = paymentService.createPayment(
-                user, externalOrderNo, total, payMethod, SourceTypeEnum.REAL, orderId, isInstallment, installment
+                user, externalOrderNo, total, payMethod, SourceTypeEnum.REAL, orderId
         );
 
         return CreateOrderResponse.builder()

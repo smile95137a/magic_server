@@ -79,6 +79,12 @@
     id, password, email, phone, nickname, line_id, address_name, address, receipt_type, 
     username, oauth_type, oauth_id, city, district
   </sql>
+  <select id="selectByUsername" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from users
+    where username = #{username,jdbcType=VARCHAR}
+  </select>
   <select id="selectByExample" parameterType="com.qiyuan.web.entity.example.UserExample" resultMap="BaseResultMap">
     select
     <if test="distinct">

@@ -65,4 +65,8 @@ public class ProductCategoryService {
         ProductCategoryExample e = new ProductCategoryExample();
         return productCategoryMapper.selectByExample(e);
     }
+
+    public ProductCategory getCategory(String id) {
+        return productCategoryMapper.selectByPrimaryKey(id);
+    }
 }

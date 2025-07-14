@@ -1,5 +1,6 @@
 package com.qiyuan.web.controller.front;
 
+import com.qiyuan.web.dto.response.PaymentCreateResult;
 import com.qiyuan.web.entity.Lantern;
 import com.qiyuan.web.dto.request.CountRequest;
 import com.qiyuan.web.dto.request.LanternPurchaseRequest;
@@ -82,7 +83,7 @@ public class LanternFrontController {
     @Operation(summary = "購買點燈", description = "購買點燈")
     @ApiResponse(responseCode = "200", description = "成功新增購買紀錄")
     @PostMapping("/purchase/info")
-    public Boolean purchaseLantern(
+    public boolean purchaseLantern(
             @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "購買資料")
             @Validated @RequestBody LanternPurchaseRequest req) {
         return lanternPurchaseService.addLanternPurchaseRecord(req);

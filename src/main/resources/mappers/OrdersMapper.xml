@@ -229,6 +229,10 @@
       </if>
     </trim>
   </insert>
+  <update id="updateStatusToPaid">
+    UPDATE orders SET status = 'paid' WHERE id = #{orderId}
+  </update>
+
   <select id="countByExample" parameterType="com.qiyuan.web.entity.example.OrdersExample" resultType="java.lang.Long">
     select count(*) from orders
     <if test="_parameter != null">

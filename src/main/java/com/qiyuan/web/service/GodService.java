@@ -87,6 +87,14 @@ public class GodService {
             return null;
         }
 
+        boolean isValid =
+                godInfo.getOffshelfTime() != null &&
+                        godInfo.getOnshelfTime() != null &&
+                        godInfo.getOffshelfTime().after(godInfo.getOnshelfTime()) &&
+                        new Date().before(godInfo.getOffshelfTime());
+
+        if (!isValid)  return null;
+
         boolean isGolden = godInfo.getGoldenExpiration() != null
                 && godInfo.getGoldenExpiration().after(DateUtil.getCurrentDate());
 

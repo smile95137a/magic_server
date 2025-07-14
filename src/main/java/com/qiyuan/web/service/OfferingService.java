@@ -102,7 +102,10 @@ public class OfferingService {
 
     @Transactional
     public boolean addOfferingPurchase(String userId, String offeringId, String godId) {
+        String id = RandomGenerator.getUUID();
         OfferingPurchase purchase = OfferingPurchase.builder()
+                .id(id)
+                .externalOrderNo(id)
                 .offeringId(offeringId)
                 .userId(userId)
                 .godId(godId)

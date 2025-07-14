@@ -30,12 +30,6 @@ public class CreateOrderRequest {
     @NotBlank
     private String payMethod;  // 支援多金流
 
-    @Schema(description = "是否分期付款", example = "false")
-    private Boolean isInstallment;  // 若不支援分期可預設 null 或 false
-
-    @Schema(description = "分期期數", example = "3")
-    private String installment;     // ex: "0"=無分期, "3"=三期，前端帶字串或數字皆可
-
     @Schema(description = "發票類型", example = "personal", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotBlank
     private String invoiceType;
@@ -54,4 +48,10 @@ public class CreateOrderRequest {
 
     @Schema(description = "訂單備註", example = "請儘速出貨")
     private String remark;
+
+    @Schema(description = "宅配收件資訊 (當物流方式為宅配時帶此欄)", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+    private HomeDeliveryRecipientInfo homeDeliveryRecipient;
+
+    @Schema(description = "超商取貨收件資訊 (當物流方式為超商時帶此欄)", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+    private StorePickupRecipientInfo storePickupRecipient;
 }
