@@ -1,0 +1,291 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.qiyuan.web.dao.GodInfoMapper">
+  <resultMap id="BaseResultMap" type="com.qiyuan.web.entity.GodInfo">
+    <id column="user_id" jdbcType="CHAR" property="userId" />
+    <id column="god_id" jdbcType="CHAR" property="godId" />
+    <result column="level" jdbcType="TINYINT" property="level" />
+    <result column="exp" jdbcType="TINYINT" property="exp" />
+    <result column="jiaobei_last_time" jdbcType="TIMESTAMP" property="jiaobeiLastTime" />
+    <result column="golden_expiration" jdbcType="TIMESTAMP" property="goldenExpiration" />
+    <result column="onshelf_time" jdbcType="TIMESTAMP" property="onshelfTime" />
+    <result column="offshelf_time" jdbcType="TIMESTAMP" property="offshelfTime" />
+    <result column="cooldown_time" jdbcType="TIMESTAMP" property="cooldownTime" />
+    <result column="offering_list" jdbcType="VARCHAR" property="offeringList" />
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause">
+    <where>
+      <foreach collection="example.oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    user_id, god_id, level, exp, jiaobei_last_time, golden_expiration, onshelf_time, 
+    offshelf_time, cooldown_time, offering_list
+  </sql>
+  <select id="selectByExample" parameterType="com.qiyuan.web.entity.example.GodInfoExample" resultMap="BaseResultMap">
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from god_info
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" parameterType="map" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from god_info
+    where user_id = #{userId,jdbcType=CHAR}
+      and god_id = #{godId,jdbcType=CHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="map">
+    delete from god_info
+    where user_id = #{userId,jdbcType=CHAR}
+      and god_id = #{godId,jdbcType=CHAR}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.qiyuan.web.entity.example.GodInfoExample">
+    delete from god_info
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.qiyuan.web.entity.GodInfo">
+    insert into god_info (user_id, god_id, level, 
+      exp, jiaobei_last_time, golden_expiration, 
+      onshelf_time, offshelf_time, cooldown_time, 
+      offering_list)
+    values (#{userId,jdbcType=CHAR}, #{godId,jdbcType=CHAR}, #{level,jdbcType=TINYINT}, 
+      #{exp,jdbcType=TINYINT}, #{jiaobeiLastTime,jdbcType=TIMESTAMP}, #{goldenExpiration,jdbcType=TIMESTAMP}, 
+      #{onshelfTime,jdbcType=TIMESTAMP}, #{offshelfTime,jdbcType=TIMESTAMP}, #{cooldownTime,jdbcType=TIMESTAMP}, 
+      #{offeringList,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.qiyuan.web.entity.GodInfo">
+    insert into god_info
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="userId != null">
+        user_id,
+      </if>
+      <if test="godId != null">
+        god_id,
+      </if>
+      <if test="level != null">
+        level,
+      </if>
+      <if test="exp != null">
+        exp,
+      </if>
+      <if test="jiaobeiLastTime != null">
+        jiaobei_last_time,
+      </if>
+      <if test="goldenExpiration != null">
+        golden_expiration,
+      </if>
+      <if test="onshelfTime != null">
+        onshelf_time,
+      </if>
+      <if test="offshelfTime != null">
+        offshelf_time,
+      </if>
+      <if test="cooldownTime != null">
+        cooldown_time,
+      </if>
+      <if test="offeringList != null">
+        offering_list,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="userId != null">
+        #{userId,jdbcType=CHAR},
+      </if>
+      <if test="godId != null">
+        #{godId,jdbcType=CHAR},
+      </if>
+      <if test="level != null">
+        #{level,jdbcType=TINYINT},
+      </if>
+      <if test="exp != null">
+        #{exp,jdbcType=TINYINT},
+      </if>
+      <if test="jiaobeiLastTime != null">
+        #{jiaobeiLastTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="goldenExpiration != null">
+        #{goldenExpiration,jdbcType=TIMESTAMP},
+      </if>
+      <if test="onshelfTime != null">
+        #{onshelfTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="offshelfTime != null">
+        #{offshelfTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="cooldownTime != null">
+        #{cooldownTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="offeringList != null">
+        #{offeringList,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.qiyuan.web.entity.example.GodInfoExample" resultType="java.lang.Long">
+    select count(*) from god_info
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map">
+    update god_info
+    <set>
+      <if test="record.userId != null">
+        user_id = #{record.userId,jdbcType=CHAR},
+      </if>
+      <if test="record.godId != null">
+        god_id = #{record.godId,jdbcType=CHAR},
+      </if>
+      <if test="record.level != null">
+        level = #{record.level,jdbcType=TINYINT},
+      </if>
+      <if test="record.exp != null">
+        exp = #{record.exp,jdbcType=TINYINT},
+      </if>
+      <if test="record.jiaobeiLastTime != null">
+        jiaobei_last_time = #{record.jiaobeiLastTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.goldenExpiration != null">
+        golden_expiration = #{record.goldenExpiration,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.onshelfTime != null">
+        onshelf_time = #{record.onshelfTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.offshelfTime != null">
+        offshelf_time = #{record.offshelfTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.cooldownTime != null">
+        cooldown_time = #{record.cooldownTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.offeringList != null">
+        offering_list = #{record.offeringList,jdbcType=VARCHAR},
+      </if>
+    </set>
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map">
+    update god_info
+    set user_id = #{record.userId,jdbcType=CHAR},
+      god_id = #{record.godId,jdbcType=CHAR},
+      level = #{record.level,jdbcType=TINYINT},
+      exp = #{record.exp,jdbcType=TINYINT},
+      jiaobei_last_time = #{record.jiaobeiLastTime,jdbcType=TIMESTAMP},
+      golden_expiration = #{record.goldenExpiration,jdbcType=TIMESTAMP},
+      onshelf_time = #{record.onshelfTime,jdbcType=TIMESTAMP},
+      offshelf_time = #{record.offshelfTime,jdbcType=TIMESTAMP},
+      cooldown_time = #{record.cooldownTime,jdbcType=TIMESTAMP},
+      offering_list = #{record.offeringList,jdbcType=VARCHAR}
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.qiyuan.web.entity.GodInfo">
+    update god_info
+    <set>
+      <if test="level != null">
+        level = #{level,jdbcType=TINYINT},
+      </if>
+      <if test="exp != null">
+        exp = #{exp,jdbcType=TINYINT},
+      </if>
+      <if test="jiaobeiLastTime != null">
+        jiaobei_last_time = #{jiaobeiLastTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="goldenExpiration != null">
+        golden_expiration = #{goldenExpiration,jdbcType=TIMESTAMP},
+      </if>
+      <if test="onshelfTime != null">
+        onshelf_time = #{onshelfTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="offshelfTime != null">
+        offshelf_time = #{offshelfTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="cooldownTime != null">
+        cooldown_time = #{cooldownTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="offeringList != null">
+        offering_list = #{offeringList,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where user_id = #{userId,jdbcType=CHAR}
+      and god_id = #{godId,jdbcType=CHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.qiyuan.web.entity.GodInfo">
+    update god_info
+    set level = #{level,jdbcType=TINYINT},
+      exp = #{exp,jdbcType=TINYINT},
+      jiaobei_last_time = #{jiaobeiLastTime,jdbcType=TIMESTAMP},
+      golden_expiration = #{goldenExpiration,jdbcType=TIMESTAMP},
+      onshelf_time = #{onshelfTime,jdbcType=TIMESTAMP},
+      offshelf_time = #{offshelfTime,jdbcType=TIMESTAMP},
+      cooldown_time = #{cooldownTime,jdbcType=TIMESTAMP},
+      offering_list = #{offeringList,jdbcType=VARCHAR}
+    where user_id = #{userId,jdbcType=CHAR}
+      and god_id = #{godId,jdbcType=CHAR}
+  </update>
+</mapper>

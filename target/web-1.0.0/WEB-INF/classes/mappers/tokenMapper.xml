@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.qiyuan.security.dao.TokenMapper">
+
+    <resultMap id="TokenResultMap" type="com.qiyuan.security.entity.Token">
+        <id property="id" column="id"/>
+        <result property="username" column="username"/>
+        <result property="token" column="token"/>
+        <result property="type" column="type"/>
+        <result property="expirationTime" column="expiration_time"/>
+        <result property="revoked" column="revoked"/>
+        <result property="createTime" column="create_time"/>
+    </resultMap>
+
+    <!-- 插入 token -->
+    <insert id="insert" parameterType="com.qiyuan.security.entity.Token">
+        INSERT INTO token (username, token, type, expiration_time, revoked, create_time)
+        VALUES (#{username}, #{token}, #{type}, #{expirationTime}, 0, GETDATE())
+    </insert>
+
+    <!-- 根據 token 查詢 -->
+    <select id="findByToken" resultMap="TokenResultMap" parameterType="string">
+        SELECT TOP (1) username, token, expiration_time, revoked
+        FROM token
+        WHERE token = #{token} AND ( revoked = 0 OR revoked IS NULL)
+    </select>
+
+    <select id="countRefreshByUsername" resultType="int" parameterType="string">
+        SELECT COUNT(*)
+        FROM token
+        WHERE username = #{username} AND ( revoked = 0 OR revoked IS NULL) AND type = 'refresh'
+    </select>
+
+    <!-- 刪除過期 token -->
+    <delete id="deleteExpiredTokens">
+        DELETE FROM token
+        WHERE expiration_time &lt; GETDATE()
+    </delete>
+
+    <delete id="deleteSsoTokensByUsername" parameterType="string">
+        DELETE FROM token
+        WHERE username = #{username} AND type = 'sso'
+    </delete>
+
+
+    <!-- 將 token 標記為 revoked -->
+    <update id="revokeToken" parameterType="string">
+        UPDATE token
+        SET revoked = 1
+        WHERE token = #{token}
+    </update>
+
+    <update id="revokeRefreshByUsername" parameterType="string">
+        UPDATE token
+        SET revoked = 1
+        WHERE username = #{username} AND type = 'refresh'
+    </update>
+
+    <select id="countTokenExpiredOver7Day" resultType="int">
+        SELECT count(*) FROM token
+        WHERE revoked = 1
+        OR expiration_time &lt; DATEADD(DAY, -7, GETDATE())
+    </select>
+
+</mapper>

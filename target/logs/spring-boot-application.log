@@ -1,0 +1,21 @@
+2025-07-15 15:31:53 - HV000001: Hibernate Validator 8.0.2.Final
+2025-07-15 15:31:53 - Starting QiyuanApplication v1.0.0 using Java 21.0.4 with PID 231336 (/home/ec2-user/godtrust/magic_server/target/web-1.0.0.war started by root in /home/ec2-user/godtrust/magic_server/target)
+2025-07-15 15:31:53 - No active profile set, falling back to 1 default profile: "default"
+2025-07-15 15:31:59 - Tomcat initialized with port 8443 (https)
+2025-07-15 15:31:59 - Initializing ProtocolHandler ["https-jsse-nio-8443"]
+2025-07-15 15:31:59 - Starting service [Tomcat]
+2025-07-15 15:31:59 - Starting Servlet engine: [Apache Tomcat/10.1.41]
+2025-07-15 15:31:59 - Initializing Spring embedded WebApplicationContext
+2025-07-15 15:31:59 - Root WebApplicationContext: initialization completed in 5573 ms
+2025-07-15 15:32:01 - Filter 'jwtAuthenticationFilter' configured for use
+2025-07-15 15:32:03 - Global AuthenticationManager configured with UserDetailsService bean with name customUserServiceImpl
+2025-07-15 15:32:05 - Starting ProtocolHandler ["https-jsse-nio-8443"]
+2025-07-15 15:32:05 - Connector [https-jsse-nio-8443], TLS virtual host [_default_], certificate type [UNDEFINED] configured from keystore [/root/.keystore] using alias [tomcat] with trust store [null]
+2025-07-15 15:32:05 - Tomcat started on port 8443 (https) with context path '/'
+2025-07-15 15:32:05 - Started QiyuanApplication in 13.864 seconds (process running for 15.345)
+2025-07-15 15:32:11 - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2025-07-15 15:32:11 - Initializing Servlet 'dispatcherServlet'
+2025-07-15 15:32:11 - Completed initialization in 2 ms
+2025-07-15 15:32:11 - HikariPool-1 - Starting...
+2025-07-15 15:32:11 - HikariPool-1 - Added connection ConnectionID:1 ClientConnectionId: f00c4380-4e72-48ca-8409-89173f0cba70
+2025-07-15 15:32:11 - HikariPool-1 - Start completed.
