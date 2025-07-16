@@ -37,6 +37,7 @@ public class OrderService {
     private final UserMapper userMapper;
     private final ProductMapper productMapper;
     private final PaymentService paymentService;
+    private final StockService stockService;
 
     @Transactional
     public CreateOrderResponse createOrder(CreateOrderRequest request) {
@@ -64,7 +65,7 @@ public class OrderService {
                 throw new ApiException("[" + product.getName() + "]庫存不足");
 
             // 扣庫存
-            productMapper.decreaseStock(product.getId(), needQty); // 請確定你有實作這個方法（UPDATE product set stock=stock-#{needQty} where id=#{id} and stock>=#{needQty}）
+            stockService.reserveStock(product.getId(), needQty, null);
 
             // 計算金額
             BigDecimal unitPrice = product.getSpecialPrice();
@@ -195,6 +196,7 @@ public class OrderService {
         return vo;
     }
 
+    @Transactional
     public void cancelOrder(CancelOrderRequest request) {
         String currentUsername = SecurityUtils.getCurrentUsername();
         User user = userMapper.selectByUsername(currentUsername);
@@ -203,15 +205,23 @@ public class OrderService {
         if (order == null || !order.getUserId().equals(user.getId())) {
             throw new RuntimeException("訂單不存在或無權限操作");
         }
-        if (!"created".equals(order.getStatus())) {
-            throw new RuntimeException("僅能取消未付款/未出貨訂單");
+        if (!OrderStatus.CREATED.getValue().equals(order.getStatus())) {
+            throw new RuntimeException("僅能取消未付款訂單");
         }
+
         Orders update = new Orders();
         update.setId(order.getId());
-        update.setStatus("cancelled");
+        update.setStatus(OrderStatus.CANCELLED.getValue());
         update.setRemark(request.getRemark());
         update.setUpdateTime(new Date());
         ordersMapper.updateByPrimaryKeySelective(update);
+
+        OrderItemExample ie = new OrderItemExample();
+        ie.createCriteria().andOrderIdEqualTo(order.getId());
+        List<OrderItem> itemList = orderItemMapper.selectByExample(ie);
+        for (OrderItem item : itemList) {
+            stockService.releaseReservedStock(item.getProductId(), item.getQuantity(), null);
+        }
     }
 
     // 5. 物流方式列表
@@ -242,7 +252,7 @@ public class OrderService {
         OrderVO vo = new OrderVO();
         vo.setId(o.getId());
         vo.setTotalAmount(o.getTotalAmount());
-        vo.setStatus(OrderStatus.fromValue(o.getStatus().toLowerCase(Locale.ROOT)).getLabel());
+        vo.setStatus(OrderStatus.findByValue(o.getStatus().toLowerCase(Locale.ROOT)).getLabel());
         vo.setPaymentStatus(PaymentEnum.fromBoolean(o.getPaid()).getLabel());
         vo.setShippingMethod(shippingMethod.getName());
         vo.setTrackingNo(o.getTrackingNo());
@@ -257,7 +267,7 @@ public class OrderService {
         OrderDetailVO vo = new OrderDetailVO();
         vo.setId(o.getId());
         vo.setTotalAmount(o.getTotalAmount());
-        vo.setStatus(OrderStatus.fromValue(o.getStatus().toLowerCase(Locale.ROOT)).getLabel());
+        vo.setStatus(OrderStatus.findByValue(o.getStatus().toLowerCase(Locale.ROOT)).getLabel());
         vo.setPaymentStatus(PaymentEnum.fromBoolean(o.getPaid()).getLabel());
         vo.setShippingMethod(shippingMethod.getName());
         vo.setInvoiceType(o.getInvoiceType());

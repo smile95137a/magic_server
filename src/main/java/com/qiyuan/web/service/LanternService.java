@@ -2,10 +2,12 @@ package com.qiyuan.web.service;
 
 import com.qiyuan.security.exception.ApiException;
 import com.qiyuan.web.dao.LanternMapper;
+import com.qiyuan.web.dto.response.LanternPriceVO;
 import com.qiyuan.web.entity.Lantern;
 import com.qiyuan.web.entity.LanternPurchase;
 import com.qiyuan.web.entity.example.LanternExample;
 import com.qiyuan.web.dto.response.LanternVO;
+import com.qiyuan.web.util.JsonUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -34,11 +36,17 @@ public class LanternService {
         long count = lanternPurchaseService.countByLanternId(lantern.getId());
         long mask = systemConfigService.getLanternCount();
 
+        List<LanternPriceVO> lanternPriceVOS = null;
+        if (lantern.getPriceListJson() != null) {
+            lanternPriceVOS = JsonUtil.fromJsonList(lantern.getPriceListJson(), LanternPriceVO.class);
+        }
+
         return LanternVO.builder()
                 .name(lantern.getName())
                 .id(lantern.getId())
                 .iconName(lantern.getIconName())
                 .qaJson(lantern.getQaJson())
+                .lanternPrice(lanternPriceVOS)
                 .labelRight(lantern.getLabelRight())
                 .count((int) (count + mask))
                 .subtitle(lantern.getSubtitle())

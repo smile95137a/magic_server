@@ -25,7 +25,7 @@ public class BannerAdminController {
     @Autowired
     private BannerService bannerService;
 
-    @PostMapping("/{type}")
+    @PostMapping("/list/{type}")
     @Operation(summary = "查詢指定類型橫幅", description = "根據類型(type)查詢所有橫幅")
     public List<BannerAdminVO> getBannerByType(
             @Parameter(description = "橫幅類型，必須為一個字元", example = "A")

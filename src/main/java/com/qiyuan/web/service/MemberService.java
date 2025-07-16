@@ -19,6 +19,7 @@ import com.qiyuan.web.enums.TokenType;
 import com.qiyuan.web.util.*;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -41,6 +42,7 @@ public class MemberService {
     private final TokenMapper tokenMapper;
     private final EmailService emailService;
     private final OfferingMapper offeringMapper;
+    private final PasswordEncoder passwordEncoder;
 
     @Value("${sso.front-url}")
     private String frontUrl;
@@ -49,7 +51,7 @@ public class MemberService {
     private Integer expiredMinute;
 
 
-    public MemberService(OfferingPurchaseMapper offeringPurchaseMapper, LanternPurchaseMapper lanternPurchaseMapper, GodInfoMapper godInfoMapper, GodMapper godMapper, UserMapper userMapper, TokenMapper tokenMapper, EmailService emailService, OfferingMapper offeringMapper) {
+    public MemberService(OfferingPurchaseMapper offeringPurchaseMapper, LanternPurchaseMapper lanternPurchaseMapper, GodInfoMapper godInfoMapper, GodMapper godMapper, UserMapper userMapper, TokenMapper tokenMapper, EmailService emailService, OfferingMapper offeringMapper, PasswordEncoder passwordEncoder) {
         this.offeringPurchaseMapper = offeringPurchaseMapper;
         this.lanternPurchaseMapper = lanternPurchaseMapper;
         this.godInfoMapper = godInfoMapper;
@@ -58,6 +60,7 @@ public class MemberService {
         this.tokenMapper = tokenMapper;
         this.emailService = emailService;
         this.offeringMapper = offeringMapper;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public List<RecordVO> getPurchaseRecord(RecordPeriodRequest req) {
@@ -156,7 +159,7 @@ public class MemberService {
         User user = userMapper.selectByUsername(token.getUsername());
         if (user == null) throw new ApiException("帳號不存在");
 
-        user.setPassword(req.getNewPassword());
+        user.setPassword(passwordEncoder.encode(req.getNewPassword()));
         userMapper.updateByPrimaryKeySelective(user);
 
         tokenMapper.revokeToken(token.getToken());

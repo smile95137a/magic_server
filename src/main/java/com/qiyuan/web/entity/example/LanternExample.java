@@ -66,6 +66,77 @@ public class LanternExample {
     protected abstract static class GeneratedCriteria {
         protected List<Criterion> criteria;
 
+        public Criteria andPriceListJsonIsNull() {
+            addCriterion("price_list_json is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andPriceListJsonIsNotNull() {
+            addCriterion("price_list_json is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andPriceListJsonEqualTo(String value) {
+            addCriterion("price_list_json =", value, "priceListJson");
+            return (Criteria) this;
+        }
+
+        public Criteria andPriceListJsonNotEqualTo(String value) {
+            addCriterion("price_list_json <>", value, "priceListJson");
+            return (Criteria) this;
+        }
+
+        public Criteria andPriceListJsonGreaterThan(String value) {
+            addCriterion("price_list_json >", value, "priceListJson");
+            return (Criteria) this;
+        }
+
+        public Criteria andPriceListJsonGreaterThanOrEqualTo(String value) {
+            addCriterion("price_list_json >=", value, "priceListJson");
+            return (Criteria) this;
+        }
+
+        public Criteria andPriceListJsonLessThan(String value) {
+            addCriterion("price_list_json <", value, "priceListJson");
+            return (Criteria) this;
+        }
+
+        public Criteria andPriceListJsonLessThanOrEqualTo(String value) {
+            addCriterion("price_list_json <=", value, "priceListJson");
+            return (Criteria) this;
+        }
+
+        public Criteria andPriceListJsonLike(String value) {
+            addCriterion("price_list_json like", value, "priceListJson");
+            return (Criteria) this;
+        }
+
+        public Criteria andPriceListJsonNotLike(String value) {
+            addCriterion("price_list_json not like", value, "priceListJson");
+            return (Criteria) this;
+        }
+
+        public Criteria andPriceListJsonIn(List<String> values) {
+            addCriterion("price_list_json in", values, "priceListJson");
+            return (Criteria) this;
+        }
+
+        public Criteria andPriceListJsonNotIn(List<String> values) {
+            addCriterion("price_list_json not in", values, "priceListJson");
+            return (Criteria) this;
+        }
+
+        public Criteria andPriceListJsonBetween(String value1, String value2) {
+            addCriterion("price_list_json between", value1, value2, "priceListJson");
+            return (Criteria) this;
+        }
+
+        public Criteria andPriceListJsonNotBetween(String value1, String value2) {
+            addCriterion("price_list_json not between", value1, value2, "priceListJson");
+            return (Criteria) this;
+        }
+
+
         protected GeneratedCriteria() {
             super();
             criteria = new ArrayList<>();

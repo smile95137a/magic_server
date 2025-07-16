@@ -29,8 +29,6 @@ public class UserFrontController {
     private final MemberService memberService;
     private final OAuth2LoginService oAuth2LoginService;
 
-
-
     @PostMapping("/register")
     @Operation(summary = "會員註冊", description = "註冊新會員帳號。傳入 email、密碼、手機、暱稱、Line ID、收貨人姓名、收貨地址等資訊。")
     public boolean register(@RequestBody UserRegisterRequest req) {

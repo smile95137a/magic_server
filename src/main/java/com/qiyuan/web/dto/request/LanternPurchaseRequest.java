@@ -20,4 +20,6 @@ public class LanternPurchaseRequest implements Serializable {
 
     @Valid
     private List<LanternPurchaseInfo> list;
+
+    private Integer month; // 幾個月
 }

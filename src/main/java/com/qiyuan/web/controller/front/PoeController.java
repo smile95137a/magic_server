@@ -28,7 +28,7 @@ public class PoeController {
 
     @Operation(summary = "取得擲筊排名", description = "根據輸入的數量(count)，取得前N名的擲筊記錄")
     @PostMapping("/rank")
-    public List<PoeRankVO> getPoeRank(@RequestBody @Validated CountRequest req) {
+    public List<PoeRankVO> getPoeRank(@RequestBody CountRequest req) {
         return poeService.getPoeRank(req.getCount());
     }
 

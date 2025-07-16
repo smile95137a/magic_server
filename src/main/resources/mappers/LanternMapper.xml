@@ -8,8 +8,10 @@
     <result column="icon_name" jdbcType="VARCHAR" property="iconName" />
     <result column="label_right" jdbcType="NVARCHAR" property="labelRight" />
     <result column="qa_json" jdbcType="NVARCHAR" property="qaJson" />
+    <result column="price_list_json" jdbcType="NVARCHAR" property="priceListJson" />
     <result column="sort" jdbcType="TINYINT" property="sort" />
   </resultMap>
+
   <sql id="Example_Where_Clause">
     <where>
       <foreach collection="oredCriteria" item="criteria" separator="or">
@@ -69,7 +71,7 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    id, name, subtitle, icon_name, label_right, qa_json, sort
+    id, name, subtitle, icon_name, label_right, qa_json, price_list_json, sort
   </sql>
   <select id="selectByExample" parameterType="com.qiyuan.web.entity.example.LanternExample" resultMap="BaseResultMap">
     select
@@ -102,12 +104,12 @@
     </if>
   </delete>
   <insert id="insert" parameterType="com.qiyuan.web.entity.Lantern">
-    insert into lantern (id, name, subtitle, 
-      icon_name, label_right, qa_json, 
-      sort)
-    values (#{id,jdbcType=CHAR}, #{name,jdbcType=NVARCHAR}, #{subtitle,jdbcType=NVARCHAR}, 
-      #{iconName,jdbcType=VARCHAR}, #{labelRight,jdbcType=NVARCHAR}, #{qaJson,jdbcType=NVARCHAR}, 
-      #{sort,jdbcType=TINYINT})
+    insert into lantern (id, name, subtitle,
+                         icon_name, label_right, qa_json, price_list_json,
+                         sort)
+    values (#{id,jdbcType=CHAR}, #{name,jdbcType=NVARCHAR}, #{subtitle,jdbcType=NVARCHAR},
+            #{iconName,jdbcType=VARCHAR}, #{labelRight,jdbcType=NVARCHAR}, #{qaJson,jdbcType=NVARCHAR}, #{priceListJson,jdbcType=NVARCHAR},
+            #{sort,jdbcType=TINYINT})
   </insert>
   <insert id="insertSelective" parameterType="com.qiyuan.web.entity.Lantern">
     insert into lantern
@@ -129,6 +131,9 @@
       </if>
       <if test="qaJson != null">
         qa_json,
+      </if>
+      <if test="priceListJson != null">
+        price_list_json,
       </if>
       <if test="sort != null">
         sort,
@@ -152,6 +157,9 @@
       </if>
       <if test="qaJson != null">
         #{qaJson,jdbcType=NVARCHAR},
+      </if>
+      <if test="priceListJson != null">
+        #{priceListJson,jdbcType=NVARCHAR},
       </if>
       <if test="sort != null">
         #{sort,jdbcType=TINYINT},
@@ -224,20 +232,25 @@
       <if test="qaJson != null">
         qa_json = #{qaJson,jdbcType=NVARCHAR},
       </if>
+      <if test="priceListJson != null">
+        price_list_json = #{priceListJson,jdbcType=NVARCHAR},
+      </if>
       <if test="sort != null">
         sort = #{sort,jdbcType=TINYINT},
       </if>
     </set>
     where id = #{id,jdbcType=CHAR}
   </update>
+
   <update id="updateByPrimaryKey" parameterType="com.qiyuan.web.entity.Lantern">
     update lantern
     set name = #{name,jdbcType=NVARCHAR},
-      subtitle = #{subtitle,jdbcType=NVARCHAR},
-      icon_name = #{iconName,jdbcType=VARCHAR},
-      label_right = #{labelRight,jdbcType=NVARCHAR},
-      qa_json = #{qaJson,jdbcType=NVARCHAR},
-      sort = #{sort,jdbcType=TINYINT}
+        subtitle = #{subtitle,jdbcType=NVARCHAR},
+        icon_name = #{iconName,jdbcType=VARCHAR},
+        label_right = #{labelRight,jdbcType=NVARCHAR},
+        qa_json = #{qaJson,jdbcType=NVARCHAR},
+        price_list_json = #{priceListJson,jdbcType=NVARCHAR},
+        sort = #{sort,jdbcType=TINYINT}
     where id = #{id,jdbcType=CHAR}
   </update>
 </mapper>
