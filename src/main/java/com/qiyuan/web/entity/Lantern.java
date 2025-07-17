@@ -15,6 +15,16 @@ public class Lantern {
 
     private Byte sort;
 
+    private String priceListJson;
+
+    public String getPriceListJson() {
+        return priceListJson;
+    }
+
+    public void setPriceListJson(String priceListJson) {
+        this.priceListJson = priceListJson;
+    }
+
     public String getId() {
         return id;
     }

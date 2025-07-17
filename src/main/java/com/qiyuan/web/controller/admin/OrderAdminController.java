@@ -26,9 +26,9 @@ public class OrderAdminController {
         this.orderAdminService = orderAdminService;
     }
 
-    @Operation(summary = "查詢訂單列表", description = "多條件查詢訂單，支援分頁")
+    @Operation(summary = "查詢訂單列表", description = "多條件查詢訂單")
     @PostMapping("/list")
-    public List<OrderVO> getOrderList(@RequestBody @Validated QueryOrderAdminRequest request) {
+    public List<OrderVO> getOrderList(@RequestBody QueryOrderAdminRequest request) {
         return orderAdminService.getOrderList(request);
     }
 
@@ -65,7 +65,7 @@ public class OrderAdminController {
     @ApiResponse(responseCode = "200", description = "查詢成功，回傳可更改狀態")
     @GetMapping("/status/updatable-list")
     public List<OrderStatusVO> getUpdatableOrderStatusList() {
-        return OrderStatus.BACKEND_LIST.stream()
+        return OrderStatus.BACKEND_SET.stream()
                 .map(status -> new OrderStatusVO(status.name(), status.getLabel()))
                 .collect(Collectors.toList());
     }

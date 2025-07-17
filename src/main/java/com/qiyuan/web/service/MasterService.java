@@ -66,13 +66,6 @@ public class MasterService {
             throw new ApiException("請勿設定重複的代號");
         }
 
-        e = new MasterExample();
-        e.createCriteria().andSortEqualTo(r.getSort());
-        existed = masterMapper.selectByExample(e);
-        if (existed != null && !existed.isEmpty()) {
-            throw new ApiException("請勿設定重複的排序");
-        }
-
         String ext = "";
         if (r.getImageBase64() != null) {
             String path = FileUtil.base64ToImage(r.getImageBase64(), masterDir, r.getCode());
@@ -99,15 +92,6 @@ public class MasterService {
 
     @Transactional
     public boolean modifyMaster(MasterRequest r) {
-        if (r.getSort() != null) {
-            MasterExample e = new MasterExample();
-            e.createCriteria().andSortEqualTo(r.getSort());
-            List<Master> existed = masterMapper.selectByExample(e);
-            if (existed != null && !existed.isEmpty() && existed.get(0).getCode() != r.getCode()) {
-                throw new ApiException("請勿設定重複的排序");
-            }
-        }
-
         Master master = masterMapper.selectByPrimaryKey(r.getCode());
 
         master.setName(r.getName());

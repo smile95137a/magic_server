@@ -125,12 +125,12 @@ public class LanternPurchaseService {
         String userId = req.getUserId();
         String lanternCode = req.getLanternCode();
 
-        BigDecimal totalAmount = BigDecimal.ZERO;
-
-        // 查單價
         LanternExample e = new LanternExample();
         e.createCriteria().andIconNameEqualTo(lanternCode);
         Lantern lantern = lanternMapper.selectByExample(e).get(0);
+
+        Integer month = req.getMonth();
+        Integer availableDays = month == 12 ? 365 : month * 30;
 
         for (LanternPurchaseInfo info : req.getList()) {
             LanternPurchase entity = new LanternPurchase();
@@ -144,9 +144,7 @@ public class LanternPurchaseService {
             entity.setMessage(info.getMessage());
             entity.setBlessingTimes((short)0);
             entity.setCreateTime(new Date());
-            entity.setExpiredTime(DateUtil.adjustDate(new Date(), 365, Date.class));
-            // TODO: 待補價格
-//            totalAmount = totalAmount.add(lantern.getPrice());
+            entity.setExpiredTime(DateUtil.adjustDate(new Date(), availableDays, Date.class));
             lanternPurchaseMapper.insertSelective(entity);
         }
 

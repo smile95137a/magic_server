@@ -111,11 +111,6 @@
       order by ${orderByClause}
     </if>
   </select>
-  <update id="decreaseStock">
-    UPDATE product
-    SET stock = stock - #{qty}
-    WHERE id = #{productId} AND stock >= #{qty}
-  </update>
 
   <select id="selectPage" resultType="com.qiyuan.web.entity.Product">
     SELECT *

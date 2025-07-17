@@ -14,6 +14,7 @@ import com.qiyuan.web.dto.response.ProductVO;
 import com.qiyuan.web.dto.response.UploadImageResponse;
 import com.qiyuan.web.entity.*;
 import com.qiyuan.web.entity.example.ProductExample;
+import com.qiyuan.web.entity.example.ProductStockExample;
 import com.qiyuan.web.enums.ProductImageType;
 import com.qiyuan.web.util.DateUtil;
 import com.qiyuan.web.util.FileUtil;
@@ -45,6 +46,8 @@ public class ProductService {
     @Autowired
     private ProductCategoryMapper productCategoryMapper;
     @Autowired
+    private StockService stockService;
+    @Autowired
     private ImagePathMappingConfig mappingConfig;
 
     @Transactional
@@ -55,6 +58,8 @@ public class ProductService {
         product.setCreateTime(currentDate);
         product.setUpdateTime(currentDate);
         productMapper.insertSelective(product);
+
+        stockService.add(product.getId());
         return new CreateProductDraftResponse(product.getId());
     }
 
@@ -231,10 +236,14 @@ public class ProductService {
     public boolean discardProduct(DiscardProductRequest req) throws IOException {
         Integer productId = req.getProductId();
         productImageMapper.deleteByProductId(productId);
-        productMapper.deleteByPrimaryKey(productId);
+
+        stockService.delete(productId);
+
         String dir = FileUtil.concatFilePath(mappingConfig.getImagePath("product"), productId.toString());
         File productDir = new File(dir);
         if (productDir.exists()) org.apache.commons.io.FileUtils.deleteDirectory(productDir);
+
+        productMapper.deleteByPrimaryKey(productId);
         return true;
     }
 
@@ -314,10 +323,10 @@ public class ProductService {
     }
 
 
-    public PageResult<ProductAdminVO> getProductPage(ProductPageRequest req) {
-        int page = req.getPage() <= 0 ? 1 : req.getPage();
-        int size = req.getSize() <= 0 ? 10 : req.getSize();
-        int offset = (page - 1) * size;
+    public List<ProductAdminVO> getProductPage(ProductPageRequest req) {
+//        int page = req.getPage() <= 0 ? 1 : req.getPage();
+//        int size = req.getSize() <= 0 ? 10 : req.getSize();
+//        int offset = (page - 1) * size;
 
         String categoryId = req.getCategoryId();
 
@@ -326,8 +335,8 @@ public class ProductService {
             e.createCriteria().andCategoryIdEqualTo(categoryId);
         }
 
-        long total = productMapper.countByExample(e);
-        List<Product> productList = productMapper.selectPage(offset, size, categoryId);
+//        long total = productMapper.countByExample(e);
+        List<Product> productList = productMapper.selectByExample(e);
         List<ProductAdminVO> voList = productList.stream()
                 .map(p -> {
                     ProductAdminVO vo = new ProductAdminVO();
@@ -344,7 +353,7 @@ public class ProductService {
                     return vo;
                 })
                 .collect(Collectors.toList());
-        return new PageResult<ProductAdminVO>((int) total, page, size, voList);
+        return voList;
     }
 
 

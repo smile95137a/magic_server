@@ -14,9 +14,6 @@ public interface ProductMapper {
 
     int insert(Product record);
 
-    int decreaseStock(@Param("productId") Integer productId, @Param("qty") int qty);
-
-
     int insertSelective(Product record);
 
     List<Product> selectByExample(ProductExample example);

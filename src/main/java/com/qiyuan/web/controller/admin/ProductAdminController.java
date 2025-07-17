@@ -17,6 +17,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/admin/product")
 @PreAuthorize(RoleExpressions.ONLY_ADMIN)
@@ -75,11 +77,8 @@ public class ProductAdminController {
 
 
     @PostMapping("/list")
-    @Operation(summary = "查詢所有商品(分頁)", description = "分頁查詢商品列表")
-    public PageResult<ProductAdminVO> getProductList(@RequestBody ProductPageRequest req) {
+    @Operation(summary = "查詢所有商品", description = "分頁查詢商品列表")
+    public List<ProductAdminVO> getProductList(@RequestBody ProductPageRequest req) {
         return productService.getProductPage(req);
     }
-
-
-
 }

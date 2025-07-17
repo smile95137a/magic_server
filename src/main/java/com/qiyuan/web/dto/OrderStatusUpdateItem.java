@@ -14,8 +14,6 @@ import lombok.NoArgsConstructor;
 public class OrderStatusUpdateItem {
     @NotBlank
     private String orderId;
-    @NotBlank
-    private String status;
     private String trackingNo;
     private String remark;
 }

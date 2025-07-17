@@ -80,6 +80,7 @@ security:
     - /user/refresh
     - /user/register
     - /user/forget-password
+    - /user/reset-password/**
     - /product/**
     - /test/mail/**
   response:

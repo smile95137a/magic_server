@@ -24,6 +24,7 @@ import com.qiyuan.web.util.DateUtil;
 import com.qiyuan.web.util.RandomGenerator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.*;
@@ -37,8 +38,8 @@ public class OrderAdminService {
     private final OrderItemMapper orderItemMapper;
     private final ShippingMethodMapper shippingMethodMapper;
     private final UserMapper userMapper;
+    private final StockService stockService;
 
-    // 查詢所有訂單（可多條件查詢、分頁）
     public List<OrderVO> getOrderList(QueryOrderAdminRequest request) {
         OrdersExample example = new OrdersExample();
         OrdersExample.Criteria criteria = example.createCriteria();
@@ -59,12 +60,8 @@ public class OrderAdminService {
             criteria.andCreateTimeLessThanOrEqualTo(request.getEndTime());
         }
 
-        int page = (request.getPage() != null && request.getPage() > 0) ? request.getPage() : 1;
-        int size = (request.getSize() != null && request.getSize() > 0) ? request.getSize() : 20;
-        int offset = (page - 1) * size;
-
         example.setOrderByClause("create_time desc");
-        List<Orders> orderList = ordersMapper.selectByExampleWithPage(example, offset, size);
+        List<Orders> orderList = ordersMapper.selectByExample(example);
 
         List<OrderVO> voList = new ArrayList<>();
         for (Orders o : orderList) {
@@ -84,14 +81,34 @@ public class OrderAdminService {
     }
 
     // 批次變更訂單狀態
+    @Transactional
     public void updateOrderStatusBatch(UpdateOrderStatusBatchRequest request) {
+        OrderStatus targetStatus = request.getStatus();
+
         for (OrderStatusUpdateItem update : request.getUpdates()) {
             Orders order = ordersMapper.selectByPrimaryKey(update.getOrderId());
             if (order == null) continue;
 
+            // 查詢訂單明細
+            OrderItemExample e = new OrderItemExample();
+            e.createCriteria().andOrderIdEqualTo(order.getId());
+            List<OrderItem> items = orderItemMapper.selectByExample(e);
+
+            // 處理庫存異動
+            if (targetStatus == OrderStatus.SHIPPED) {
+                // 出貨：將 reservedStock 扣除（shipReservedStock）
+                for (OrderItem item : items) {
+                    stockService.shipReservedStock(item.getProductId(), item.getQuantity(), null);
+                }
+            } else if (targetStatus == OrderStatus.RETURNED) {
+                for (OrderItem item : items) {
+                    stockService.releaseReservedStock(item.getProductId(), item.getQuantity(), null);
+                }
+            }
+
             Orders record = new Orders();
             record.setId(order.getId());
-            record.setStatus(update.getStatus());
+            record.setStatus(targetStatus.getValue());
             if (update.getTrackingNo() != null) {
                 record.setTrackingNo(update.getTrackingNo());
             }
@@ -103,6 +120,7 @@ public class OrderAdminService {
         }
     }
 
+    @Transactional
     public void saveShippingMethod(ShippingMethodRequest request) {
         ShippingMethod method = shippingMethodMapper.selectByPrimaryKey(request.getId());
         if (method == null) throw new ApiException("物流方式不存在");
@@ -146,7 +164,7 @@ public class OrderAdminService {
         OrderVO vo = new OrderVO();
         vo.setId(o.getId());
         vo.setTotalAmount(o.getTotalAmount());
-        vo.setStatus(OrderStatus.fromValue(o.getStatus().toLowerCase(Locale.ROOT)).getLabel());
+        vo.setStatus(OrderStatus.findByValue(o.getStatus().toLowerCase(Locale.ROOT)).getLabel());
         vo.setPaymentStatus(PaymentEnum.fromBoolean(o.getPaid()).getLabel());
         vo.setShippingMethod(shippingMethod.getName());
         vo.setTrackingNo(o.getTrackingNo());
@@ -160,7 +178,7 @@ public class OrderAdminService {
         OrderDetailVO vo = new OrderDetailVO();
         vo.setId(o.getId());
         vo.setTotalAmount(o.getTotalAmount());
-        vo.setStatus(OrderStatus.fromValue(o.getStatus().toLowerCase(Locale.ROOT)).getLabel());
+        vo.setStatus(OrderStatus.findByValue(o.getStatus().toLowerCase(Locale.ROOT)).getLabel());
         vo.setPaymentStatus(PaymentEnum.fromBoolean(o.getPaid()).getLabel());
         vo.setShippingMethod(shippingMethod.getName());
         vo.setInvoiceType(o.getInvoiceType());
@@ -186,6 +204,7 @@ public class OrderAdminService {
         return vo;
     }
 
+    @Transactional
     public DeliveryNoteVO getDeliveryNote(String orderId) {
         Orders order = ordersMapper.selectByPrimaryKey(orderId);
         if (order == null) throw new ApiException("訂單不存在");

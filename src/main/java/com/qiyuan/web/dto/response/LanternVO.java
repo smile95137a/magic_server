@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -25,4 +27,6 @@ public class LanternVO {
     private Byte sort;
 
     private Integer count;
+
+    private List<LanternPriceVO> lanternPrice;
 }

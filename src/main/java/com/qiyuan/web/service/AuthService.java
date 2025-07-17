@@ -77,6 +77,7 @@ public class AuthService {
                 .password(passwordEncoder.encode(req.getPassword()))
                 .phone(req.getPhone())
                 .nickname(req.getNickName())
+                .addressName(req.getAddressName())
                 .lineId(req.getLineId())
                 .city(req.getCity())
                 .district(req.getArea())
