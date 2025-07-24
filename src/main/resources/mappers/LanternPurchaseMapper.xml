@@ -14,7 +14,7 @@
     <result column="expired_time" jdbcType="TIMESTAMP" property="expiredTime" />
   </resultMap>
   <resultMap id="LanternBlessingResultMap" type="com.qiyuan.web.dto.LanternBlessingDTO">
-    <id column="id" jdbcType="INTEGER" property="id" />
+    <id column="id" jdbcType="CHAR" property="id" />
     <result column="lantern_code" jdbcType="VARCHAR" property="lanternCode" />
     <result column="user_id" jdbcType="CHAR" property="userId" />
     <result column="name" jdbcType="NVARCHAR" property="name" />
@@ -25,7 +25,7 @@
     <result column="blessing_times" jdbcType="SMALLINT" property="blessingTimes" />
   </resultMap>
   <resultMap id="RecordJoinMap" type="com.qiyuan.web.entity.LanternRecord">
-    <id column="id" jdbcType="INTEGER" property="id" />
+    <id column="id" jdbcType="CHAR" property="id" />
     <result column="lanternName" jdbcType="NVARCHAR" property="lanternName" />
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
   </resultMap>
