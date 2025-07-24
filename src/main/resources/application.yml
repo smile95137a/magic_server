@@ -130,4 +130,8 @@ ap:
 calendar-api:
   url: https://fortune_tall_test.maideax.net/app/api/v1/chinese_calendar/
   token: 8P5fCMlUyEVcEUICXVNFak6fjdAwE1M922LWQflFKEnCGEjAcbeurpNMwHLfl47S
+  
+app:
+  oauth:
+    redirectUrl: https://ingodwetrust.tw/oauth2/redirect
 

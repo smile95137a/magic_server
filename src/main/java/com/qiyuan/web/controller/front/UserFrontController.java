@@ -27,7 +27,6 @@ public class UserFrontController {
     private final AuthService authService;
     private final OfferingService offeringService;
     private final MemberService memberService;
-    private final OAuth2LoginService oAuth2LoginService;
 
     @PostMapping("/register")
     @Operation(summary = "會員註冊", description = "註冊新會員帳號。傳入 email、密碼、手機、暱稱、Line ID、收貨人姓名、收貨地址等資訊。")
@@ -39,12 +38,6 @@ public class UserFrontController {
     @Operation(summary = "會員登入",description = "帳號密碼登入。成功後回傳 accessToken 及 refreshToken。")
     public LoginResponse login(@RequestBody UserLoginRequest req) {
         return authService.login(req);
-    }
-
-    @PostMapping("/refresh")
-    @Operation(summary = "刷新 Access Token", description = "使用 refreshToken 換取新 accessToken。")
-    public LoginResponse refresh(@RequestBody RefreshTokenRequest req) {
-        return authService.refreshToken(req.getRefreshToken());
     }
 
     @PostMapping("/modify")
@@ -103,16 +96,6 @@ public class UserFrontController {
     @PostMapping("/reset-password")
     public boolean resetPassword(@RequestBody ResetPasswordRequest req) {
         return memberService.resetPassword(req);
-    }
-
-    @PostMapping("/oauth2/login")
-    public OAuthLoginResponse oauth2Login(@RequestBody Oauth2LoginRequest request) {
-        return oAuth2LoginService.oauth2Login(
-                request.getProvider(),
-                request.getOauthId(),
-                request.getEmail(),
-                request.getNickname()
-        );
     }
 
 

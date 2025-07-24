@@ -1,34 +1,37 @@
 package com.qiyuan.security.filter;
 
-import com.qiyuan.security.service.UserService;
-import com.qiyuan.security.util.JwtTokenUtil;
-import jakarta.servlet.FilterChain;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.io.IOException;
+
+import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import java.io.IOException;
+import com.qiyuan.security.config.CustomUserDetailsService;
+import com.qiyuan.security.util.JwtTokenUtil;
 
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Component
+@RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    private static final Logger logger = LoggerFactory.getLogger(JwtAuthenticationFilter.class);
-
+	private static final String HEADER_AUTHORIZATION = HttpHeaders.AUTHORIZATION;
+	private static final String BEARER_TOKEN_PREFIX = "Bearer ";
+    
     private final JwtTokenUtil jwtTokenUtil;
-    private final UserService userService;
+    private final CustomUserDetailsService userDetailsService;
 
-    public JwtAuthenticationFilter(JwtTokenUtil jwtTokenUtil, UserService userService) {
-        this.jwtTokenUtil = jwtTokenUtil;
-        this.userService = userService;
-    }
 
     @Override
     protected void doFilterInternal(
@@ -37,35 +40,42 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             FilterChain filterChain
     ) throws ServletException, IOException {
 
-        String authHeader = request.getHeader("Authorization");
+    	final String authHeader = request.getHeader(HEADER_AUTHORIZATION);
 
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            filterChain.doFilter(request, response);
-            return;
-        }
+    	if (authHeader == null || !authHeader.startsWith(BEARER_TOKEN_PREFIX)) {
+			filterChain.doFilter(request, response);
+			return;
+		}
 
-        String jwt = authHeader.substring(7); // 移除 "Bearer "
 
         try {
-            String username = jwtTokenUtil.getUsernameFromToken(jwt);
-
-            // 如果尚未被認證且 token 是有效的
+        	String jwtToken = getJwtToken(request);
+            String username = jwtTokenUtil.getUsernameFromToken(jwtToken);
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            
             if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-                UserDetails userDetails = userService.loadUserByUsername(username);
+                UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
-                if (jwtTokenUtil.validateToken(jwt, userDetails.getUsername())) {
-                    UsernamePasswordAuthenticationToken authentication =
-                            new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-
-                    authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-
+                if (jwtTokenUtil.validateToken(jwtToken, userDetails.getUsername())) {
+                    UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                    authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                     SecurityContextHolder.getContext().setAuthentication(authentication);
                 }
             }
         } catch (Exception e) {
-            logger.warn("JWT 驗證失敗: {}", e.getMessage());
+        	log.warn("JWT 驗證失敗: {}", e.getMessage());
         }
 
         filterChain.doFilter(request, response);
     }
+    
+	private String getJwtToken(HttpServletRequest request) {
+		String header = request.getHeader(HEADER_AUTHORIZATION);
+
+		if (header != null && header.startsWith(BEARER_TOKEN_PREFIX)) {
+			return header.substring(7);
+		}
+
+		return null;
+	}
 }

@@ -16,6 +16,7 @@
     <result column="oauth_id" jdbcType="VARCHAR" property="oauthId" />
     <result column="city" jdbcType="NVARCHAR" property="city" />
     <result column="district" jdbcType="NVARCHAR" property="district" />
+    <result column="provider" jdbcType="VARCHAR" property="provider" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -75,16 +76,19 @@
       </foreach>
     </where>
   </sql>
+  
   <sql id="Base_Column_List">
     id, password, email, phone, nickname, line_id, address_name, address, receipt_type, 
-    username, oauth_type, oauth_id, city, district
+    username, oauth_type, oauth_id, city, district, provider
   </sql>
+  
   <select id="selectByUsername" parameterType="java.lang.String" resultMap="BaseResultMap">
     select
     <include refid="Base_Column_List" />
     from users
     where username = #{username,jdbcType=VARCHAR}
   </select>
+  
   <select id="selectByExample" parameterType="com.qiyuan.web.entity.example.UserExample" resultMap="BaseResultMap">
     select
     <if test="distinct">
@@ -119,12 +123,12 @@
     insert into users (id, password, email,
                        phone, nickname, line_id,
                        address_name, address, receipt_type,
-                       username, oauth_type, oauth_id,
+                       username, oauth_type, oauth_id, provider,
                        city, district)
     values (#{id,jdbcType=CHAR}, #{password,jdbcType=VARCHAR}, #{email,jdbcType=VARCHAR},
             #{phone,jdbcType=VARCHAR}, #{nickname,jdbcType=NVARCHAR}, #{lineId,jdbcType=VARCHAR},
             #{addressName,jdbcType=NVARCHAR}, #{address,jdbcType=NVARCHAR}, #{receiptType,jdbcType=VARCHAR},
-            #{username,jdbcType=VARCHAR}, #{oauthType,jdbcType=VARCHAR}, #{oauthId,jdbcType=VARCHAR},
+            #{username,jdbcType=VARCHAR}, #{oauthType,jdbcType=VARCHAR}, #{oauthId,jdbcType=VARCHAR}, #{provider,jdbcType=VARCHAR},
             #{city,jdbcType=NVARCHAR}, #{district,jdbcType=NVARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.qiyuan.web.entity.User">
@@ -166,6 +170,9 @@
       <if test="oauthId != null">
         oauth_id,
       </if>
+      <if test="provider != null">
+		provider,
+	  </if>
       <if test="city != null">
         city,
       </if>
@@ -210,6 +217,9 @@
       <if test="oauthId != null">
         #{oauthId,jdbcType=VARCHAR},
       </if>
+	  <if test="provider != null">
+	    #{provider,jdbcType=VARCHAR},
+	  </if>
       <if test="city != null">
         #{city,jdbcType=NVARCHAR},
       </if>
@@ -294,6 +304,7 @@
       <include refid="Update_By_Example_Where_Clause" />
     </if>
   </update>
+  
   <update id="updateByPrimaryKeySelective" parameterType="com.qiyuan.web.entity.User">
     update users
     <set>
@@ -330,6 +341,9 @@
       <if test="oauthId != null">
         oauth_id = #{oauthId,jdbcType=VARCHAR},
       </if>
+	  <if test="provider != null">
+	    provider = #{provider,jdbcType=VARCHAR},
+	  </if>
       <if test="city != null">
         city = #{city,jdbcType=NVARCHAR},
       </if>
@@ -352,6 +366,7 @@
         username = #{username,jdbcType=VARCHAR},
         oauth_type = #{oauthType,jdbcType=VARCHAR},
         oauth_id = #{oauthId,jdbcType=VARCHAR},
+        provider = #{provider,jdbcType=VARCHAR},
         city = #{city,jdbcType=NVARCHAR},
         district = #{district,jdbcType=NVARCHAR}
     where id = #{id,jdbcType=CHAR}
