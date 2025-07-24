@@ -10,7 +10,7 @@
     <result column="line_id" jdbcType="VARCHAR" property="lineId" />
     <result column="address_name" jdbcType="NVARCHAR" property="addressName" />
     <result column="address" jdbcType="NVARCHAR" property="address" />
-    <result column="receipt_type" jdbcType="VARCHAR" property="receiptType" />
+    <result column="receipt" jdbcType="VARCHAR" property="receipt" />
     <result column="username" jdbcType="VARCHAR" property="username" />
     <result column="oauth_type" jdbcType="VARCHAR" property="oauthType" />
     <result column="oauth_id" jdbcType="VARCHAR" property="oauthId" />
@@ -78,7 +78,7 @@
   </sql>
   
   <sql id="Base_Column_List">
-    id, password, email, phone, nickname, line_id, address_name, address, receipt_type, 
+    id, password, email, phone, nickname, line_id, address_name, address, receipt,
     username, oauth_type, oauth_id, city, district, provider
   </sql>
   
@@ -122,12 +122,12 @@
   <insert id="insert" parameterType="com.qiyuan.web.entity.User">
     insert into users (id, password, email,
                        phone, nickname, line_id,
-                       address_name, address, receipt_type,
+                       address_name, address, receipt,
                        username, oauth_type, oauth_id, provider,
                        city, district)
     values (#{id,jdbcType=CHAR}, #{password,jdbcType=VARCHAR}, #{email,jdbcType=VARCHAR},
             #{phone,jdbcType=VARCHAR}, #{nickname,jdbcType=NVARCHAR}, #{lineId,jdbcType=VARCHAR},
-            #{addressName,jdbcType=NVARCHAR}, #{address,jdbcType=NVARCHAR}, #{receiptType,jdbcType=VARCHAR},
+            #{addressName,jdbcType=NVARCHAR}, #{address,jdbcType=NVARCHAR}, #{receipt,jdbcType=VARCHAR},
             #{username,jdbcType=VARCHAR}, #{oauthType,jdbcType=VARCHAR}, #{oauthId,jdbcType=VARCHAR}, #{provider,jdbcType=VARCHAR},
             #{city,jdbcType=NVARCHAR}, #{district,jdbcType=NVARCHAR})
   </insert>
@@ -158,8 +158,8 @@
       <if test="address != null">
         address,
       </if>
-      <if test="receiptType != null">
-        receipt_type,
+      <if test="receipt != null">
+        receipt,
       </if>
       <if test="username != null">
         username,
@@ -205,8 +205,8 @@
       <if test="address != null">
         #{address,jdbcType=NVARCHAR},
       </if>
-      <if test="receiptType != null">
-        #{receiptType,jdbcType=VARCHAR},
+      <if test="receipt != null">
+        #{receipt,jdbcType=VARCHAR},
       </if>
       <if test="username != null">
         #{username,jdbcType=VARCHAR},
@@ -261,8 +261,8 @@
       <if test="row.address != null">
         address = #{row.address,jdbcType=NVARCHAR},
       </if>
-      <if test="row.receiptType != null">
-        receipt_type = #{row.receiptType,jdbcType=VARCHAR},
+      <if test="row.receipt != null">
+        receipt = #{row.receipt,jdbcType=VARCHAR},
       </if>
       <if test="row.username != null">
         username = #{row.username,jdbcType=VARCHAR},
@@ -294,7 +294,7 @@
     line_id = #{row.lineId,jdbcType=VARCHAR},
     address_name = #{row.addressName,jdbcType=NVARCHAR},
     address = #{row.address,jdbcType=NVARCHAR},
-    receipt_type = #{row.receiptType,jdbcType=VARCHAR},
+    receipt = #{row.receipt,jdbcType=VARCHAR},
     username = #{row.username,jdbcType=VARCHAR},
     oauth_type = #{row.oauthType,jdbcType=VARCHAR},
     oauth_id = #{row.oauthId,jdbcType=VARCHAR},
@@ -329,8 +329,8 @@
       <if test="address != null">
         address = #{address,jdbcType=NVARCHAR},
       </if>
-      <if test="receiptType != null">
-        receipt_type = #{receiptType,jdbcType=VARCHAR},
+      <if test="receipt != null">
+        receipt = #{receipt,jdbcType=VARCHAR},
       </if>
       <if test="username != null">
         username = #{username,jdbcType=VARCHAR},
@@ -362,7 +362,7 @@
         line_id = #{lineId,jdbcType=VARCHAR},
         address_name = #{addressName,jdbcType=NVARCHAR},
         address = #{address,jdbcType=NVARCHAR},
-        receipt_type = #{receiptType,jdbcType=VARCHAR},
+        receipt = #{receipt,jdbcType=VARCHAR},
         username = #{username,jdbcType=VARCHAR},
         oauth_type = #{oauthType,jdbcType=VARCHAR},
         oauth_id = #{oauthId,jdbcType=VARCHAR},

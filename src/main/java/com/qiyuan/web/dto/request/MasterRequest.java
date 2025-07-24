@@ -1,6 +1,7 @@
 package com.qiyuan.web.dto.request;
 
 
+import com.qiyuan.web.dto.QapItemVO;
 import com.qiyuan.web.dto.response.QaItemVO;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
@@ -42,7 +43,7 @@ public class MasterRequest {
 
     @Schema(description = "老師服務項目")
     @NotNull
-    private List<QaItemVO> serviceItem;
+    private List<QapItemVO> serviceItem;
 
     @Schema(description = "老師是否在架上", example = "true")
     @NotNull
