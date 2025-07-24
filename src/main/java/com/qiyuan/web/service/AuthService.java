@@ -170,6 +170,7 @@ public class AuthService {
         resp.setCity(user.getCity());
         resp.setArea(user.getDistrict());
         resp.setAddress(user.getAddress());
+        resp.setEmail(user.getEmail());
         return resp;
     }
 

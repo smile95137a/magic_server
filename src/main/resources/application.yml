@@ -84,6 +84,7 @@ security:
     - /user/reset-password/**
     - /product/**
     - /test/mail/**
+    - /images/**
   response:
     exclude-paths:
       - /v3/api-docs

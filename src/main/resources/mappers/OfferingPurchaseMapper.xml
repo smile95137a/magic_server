@@ -10,7 +10,7 @@
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
   </resultMap>
   <resultMap id="RecordJoinMap" type="com.qiyuan.web.entity.OfferingRecord">
-    <id column="id" jdbcType="INTEGER" property="id" />
+    <id column="id" jdbcType="CHAR" property="id" />
     <result column="offeringName" jdbcType="NVARCHAR" property="offeringName" />
     <result column="godName" jdbcType="NVARCHAR" property="godName" />
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
