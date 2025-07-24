@@ -1,5 +1,12 @@
 server:
   port: 8443
+  ssl:
+    enabled: true
+    key-store: file:/etc/letsencrypt/live/api.ingodwetrust.tw/keystore.p12
+    key-store-password: WUfan0667.
+    key-store-type: PKCS12
+    key-alias: tomcat
+
 
 spring:
   application:
