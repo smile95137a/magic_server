@@ -664,73 +664,73 @@ public class UserExample {
             return (Criteria) this;
         }
 
-        public Criteria andReceiptTypeIsNull() {
-            addCriterion("receipt_type is null");
+        public Criteria andReceiptIsNull() {
+            addCriterion("receipt is null");
             return (Criteria) this;
         }
 
-        public Criteria andReceiptTypeIsNotNull() {
-            addCriterion("receipt_type is not null");
+        public Criteria andReceiptIsNotNull() {
+            addCriterion("receipt is not null");
             return (Criteria) this;
         }
 
-        public Criteria andReceiptTypeEqualTo(String value) {
-            addCriterion("receipt_type =", value, "receiptType");
+        public Criteria andReceiptEqualTo(String value) {
+            addCriterion("receipt =", value, "receipt");
             return (Criteria) this;
         }
 
-        public Criteria andReceiptTypeNotEqualTo(String value) {
-            addCriterion("receipt_type <>", value, "receiptType");
+        public Criteria andReceiptNotEqualTo(String value) {
+            addCriterion("receipt <>", value, "receipt");
             return (Criteria) this;
         }
 
-        public Criteria andReceiptTypeGreaterThan(String value) {
-            addCriterion("receipt_type >", value, "receiptType");
+        public Criteria andReceiptGreaterThan(String value) {
+            addCriterion("receipt >", value, "receipt");
             return (Criteria) this;
         }
 
-        public Criteria andReceiptTypeGreaterThanOrEqualTo(String value) {
-            addCriterion("receipt_type >=", value, "receiptType");
+        public Criteria andReceiptGreaterThanOrEqualTo(String value) {
+            addCriterion("receipt >=", value, "receipt");
             return (Criteria) this;
         }
 
-        public Criteria andReceiptTypeLessThan(String value) {
-            addCriterion("receipt_type <", value, "receiptType");
+        public Criteria andReceiptLessThan(String value) {
+            addCriterion("receipt <", value, "receipt");
             return (Criteria) this;
         }
 
-        public Criteria andReceiptTypeLessThanOrEqualTo(String value) {
-            addCriterion("receipt_type <=", value, "receiptType");
+        public Criteria andReceiptLessThanOrEqualTo(String value) {
+            addCriterion("receipt <=", value, "receipt");
             return (Criteria) this;
         }
 
-        public Criteria andReceiptTypeLike(String value) {
-            addCriterion("receipt_type like", value, "receiptType");
+        public Criteria andReceiptLike(String value) {
+            addCriterion("receipt like", value, "receipt");
             return (Criteria) this;
         }
 
-        public Criteria andReceiptTypeNotLike(String value) {
-            addCriterion("receipt_type not like", value, "receiptType");
+        public Criteria andReceiptNotLike(String value) {
+            addCriterion("receipt not like", value, "receipt");
             return (Criteria) this;
         }
 
-        public Criteria andReceiptTypeIn(List<String> values) {
-            addCriterion("receipt_type in", values, "receiptType");
+        public Criteria andReceiptIn(List<String> values) {
+            addCriterion("receipt in", values, "receipt");
             return (Criteria) this;
         }
 
-        public Criteria andReceiptTypeNotIn(List<String> values) {
-            addCriterion("receipt_type not in", values, "receiptType");
+        public Criteria andReceiptNotIn(List<String> values) {
+            addCriterion("receipt not in", values, "receipt");
             return (Criteria) this;
         }
 
-        public Criteria andReceiptTypeBetween(String value1, String value2) {
-            addCriterion("receipt_type between", value1, value2, "receiptType");
+        public Criteria andReceiptBetween(String value1, String value2) {
+            addCriterion("receipt between", value1, value2, "receipt");
             return (Criteria) this;
         }
 
-        public Criteria andReceiptTypeNotBetween(String value1, String value2) {
-            addCriterion("receipt_type not between", value1, value2, "receiptType");
+        public Criteria andReceiptNotBetween(String value1, String value2) {
+            addCriterion("receipt not between", value1, value2, "receipt");
             return (Criteria) this;
         }
 

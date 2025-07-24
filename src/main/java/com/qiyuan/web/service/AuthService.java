@@ -6,6 +6,7 @@ import com.qiyuan.security.service.UserService;
 import com.qiyuan.security.util.JwtTokenUtil;
 import com.qiyuan.web.dao.UserMapper;
 import com.qiyuan.web.dao.UserRoleMapper;
+import com.qiyuan.web.dto.InvoiceDTO;
 import com.qiyuan.web.dto.request.UserLoginRequest;
 import com.qiyuan.web.dto.request.UserProfileModifyRequest;
 import com.qiyuan.web.dto.request.UserRegisterRequest;
@@ -14,6 +15,7 @@ import com.qiyuan.web.dto.response.UserProfileResponse;
 import com.qiyuan.web.entity.User;
 import com.qiyuan.web.entity.UserRole;
 import com.qiyuan.web.util.DateUtil;
+import com.qiyuan.web.util.JsonUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -154,6 +156,9 @@ public class AuthService {
         user.setCity(req.getCity());
         user.setDistrict(req.getArea());
         user.setAddress(req.getAddress());
+        if (req.getInvoice() != null) {
+            user.setReceipt(JsonUtil.toJson(req.getInvoice()));
+        }
         return userMapper.updateByPrimaryKeySelective(user) > 0;
     }
 
@@ -171,6 +176,9 @@ public class AuthService {
         resp.setArea(user.getDistrict());
         resp.setAddress(user.getAddress());
         resp.setEmail(user.getEmail());
+        if (user.getReceipt() != null) {
+            resp.setInvoice(JsonUtil.fromJson(user.getReceipt(), InvoiceDTO.class));
+        }
         return resp;
     }
 

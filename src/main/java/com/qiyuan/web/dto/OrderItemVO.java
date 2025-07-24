@@ -17,4 +17,5 @@ public class OrderItemVO {
     private BigDecimal unitPrice;
     private Integer quantity;
     private BigDecimal subtotal;
+    private String productUrl;
 }

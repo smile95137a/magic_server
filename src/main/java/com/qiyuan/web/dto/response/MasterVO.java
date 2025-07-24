@@ -1,5 +1,6 @@
 package com.qiyuan.web.dto.response;
 
+import com.qiyuan.web.dto.QapItemVO;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -35,7 +36,7 @@ public class MasterVO {
     private String personalItems;
 
     @Schema(description = "老師服務項目")
-    private List<QaItemVO> serviceItem;
+    private List<QapItemVO> serviceItem;
 
     @Schema(
             description = "老師圖像（Base64編碼字串，格式如：data:image/jpeg;base64,...）",

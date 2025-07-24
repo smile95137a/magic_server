@@ -24,7 +24,7 @@ public class User {
 
     private String address;
 
-    private String receiptType;
+    private String receipt;
 
     private String username;
 
@@ -100,12 +100,12 @@ public class User {
         this.address = address;
     }
 
-    public String getReceiptType() {
-        return receiptType;
+    public String getReceipt() {
+        return receipt;
     }
 
-    public void setReceiptType(String receiptType) {
-        this.receiptType = receiptType;
+    public void setReceipt(String receipt) {
+        this.receipt = receipt;
     }
 
     public String getUsername() {
