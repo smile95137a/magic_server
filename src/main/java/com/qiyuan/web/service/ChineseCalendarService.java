@@ -4,11 +4,13 @@ import java.nio.charset.StandardCharsets;
 import java.security.PrivateKey;
 import java.security.Signature;
 import java.util.Base64;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -35,10 +37,8 @@ public class ChineseCalendarService {
     @Value("${calendar-api.token}")
     private String ecToken;
     
-    
 
-
-    public String queryCalendar(int year, int month, int day) throws Exception {
+    public List<Map<String, Object>> queryCalendar(int year, int month, int day) throws Exception {
         String ut = String.valueOf(System.currentTimeMillis());
 
         Map<String, Integer> queryParams = new TreeMap<>();
@@ -66,7 +66,13 @@ public class ChineseCalendarService {
 
         HttpEntity<Void> entity = new HttpEntity<>(headers);
 
-        ResponseEntity<String> response = restTemplate.exchange(fullUrl, HttpMethod.GET, entity, String.class);
+        ResponseEntity<List<Map<String, Object>>> response = restTemplate.exchange(
+            fullUrl,
+            HttpMethod.GET,
+            entity,
+            new ParameterizedTypeReference<List<Map<String, Object>>>() {}
+        );
+
         return response.getBody();
     }
 
