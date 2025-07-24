@@ -1,11 +1,5 @@
 server:
   port: 8443
-  ssl:
-    enabled: true
-    key-store: file:/etc/letsencrypt/live/api.ingodwetrust.tw/keystore.p12
-    key-store-password: WUfan0667.
-    key-store-type: PKCS12
-    key-alias: tomcat
 
 spring:
   application:
@@ -123,3 +117,9 @@ gomypay:
     customerNo: 60755266
 ap:
   backend: https://api.ingodwetrust.tw:8443
+
+
+calendar-api:
+  url: https://fortune_tall_test.maideax.net/app/api/v1/chinese_calendar/
+  token: 8P5fCMlUyEVcEUICXVNFak6fjdAwE1M922LWQflFKEnCGEjAcbeurpNMwHLfl47S
+
