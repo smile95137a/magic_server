@@ -1,5 +1,4 @@
-package com.qiyuan.web.entity.example;
-
+package com.qiyuan.web.entity;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -317,286 +316,6 @@ public class PaymentTransactionExample {
             return (Criteria) this;
         }
 
-        public Criteria andSourceIdIsNull() {
-            addCriterion("source_id is null");
-            return (Criteria) this;
-        }
-
-        public Criteria andSourceIdIsNotNull() {
-            addCriterion("source_id is not null");
-            return (Criteria) this;
-        }
-
-        public Criteria andSourceIdEqualTo(String value) {
-            addCriterion("source_id =", value, "sourceId");
-            return (Criteria) this;
-        }
-
-        public Criteria andSourceIdNotEqualTo(String value) {
-            addCriterion("source_id <>", value, "sourceId");
-            return (Criteria) this;
-        }
-
-        public Criteria andSourceIdGreaterThan(String value) {
-            addCriterion("source_id >", value, "sourceId");
-            return (Criteria) this;
-        }
-
-        public Criteria andSourceIdGreaterThanOrEqualTo(String value) {
-            addCriterion("source_id >=", value, "sourceId");
-            return (Criteria) this;
-        }
-
-        public Criteria andSourceIdLessThan(String value) {
-            addCriterion("source_id <", value, "sourceId");
-            return (Criteria) this;
-        }
-
-        public Criteria andSourceIdLessThanOrEqualTo(String value) {
-            addCriterion("source_id <=", value, "sourceId");
-            return (Criteria) this;
-        }
-
-        public Criteria andSourceIdLike(String value) {
-            addCriterion("source_id like", value, "sourceId");
-            return (Criteria) this;
-        }
-
-        public Criteria andSourceIdNotLike(String value) {
-            addCriterion("source_id not like", value, "sourceId");
-            return (Criteria) this;
-        }
-
-        public Criteria andSourceIdIn(List<String> values) {
-            addCriterion("source_id in", values, "sourceId");
-            return (Criteria) this;
-        }
-
-        public Criteria andSourceIdNotIn(List<String> values) {
-            addCriterion("source_id not in", values, "sourceId");
-            return (Criteria) this;
-        }
-
-        public Criteria andSourceIdBetween(String value1, String value2) {
-            addCriterion("source_id between", value1, value2, "sourceId");
-            return (Criteria) this;
-        }
-
-        public Criteria andSourceIdNotBetween(String value1, String value2) {
-            addCriterion("source_id not between", value1, value2, "sourceId");
-            return (Criteria) this;
-        }
-
-        public Criteria andExternalOrderNoIsNull() {
-            addCriterion("external_order_no is null");
-            return (Criteria) this;
-        }
-
-        public Criteria andExternalOrderNoIsNotNull() {
-            addCriterion("external_order_no is not null");
-            return (Criteria) this;
-        }
-
-        public Criteria andExternalOrderNoEqualTo(String value) {
-            addCriterion("external_order_no =", value, "externalOrderNo");
-            return (Criteria) this;
-        }
-
-        public Criteria andExternalOrderNoNotEqualTo(String value) {
-            addCriterion("external_order_no <>", value, "externalOrderNo");
-            return (Criteria) this;
-        }
-
-        public Criteria andExternalOrderNoGreaterThan(String value) {
-            addCriterion("external_order_no >", value, "externalOrderNo");
-            return (Criteria) this;
-        }
-
-        public Criteria andExternalOrderNoGreaterThanOrEqualTo(String value) {
-            addCriterion("external_order_no >=", value, "externalOrderNo");
-            return (Criteria) this;
-        }
-
-        public Criteria andExternalOrderNoLessThan(String value) {
-            addCriterion("external_order_no <", value, "externalOrderNo");
-            return (Criteria) this;
-        }
-
-        public Criteria andExternalOrderNoLessThanOrEqualTo(String value) {
-            addCriterion("external_order_no <=", value, "externalOrderNo");
-            return (Criteria) this;
-        }
-
-        public Criteria andExternalOrderNoLike(String value) {
-            addCriterion("external_order_no like", value, "externalOrderNo");
-            return (Criteria) this;
-        }
-
-        public Criteria andExternalOrderNoNotLike(String value) {
-            addCriterion("external_order_no not like", value, "externalOrderNo");
-            return (Criteria) this;
-        }
-
-        public Criteria andExternalOrderNoIn(List<String> values) {
-            addCriterion("external_order_no in", values, "externalOrderNo");
-            return (Criteria) this;
-        }
-
-        public Criteria andExternalOrderNoNotIn(List<String> values) {
-            addCriterion("external_order_no not in", values, "externalOrderNo");
-            return (Criteria) this;
-        }
-
-        public Criteria andExternalOrderNoBetween(String value1, String value2) {
-            addCriterion("external_order_no between", value1, value2, "externalOrderNo");
-            return (Criteria) this;
-        }
-
-        public Criteria andExternalOrderNoNotBetween(String value1, String value2) {
-            addCriterion("external_order_no not between", value1, value2, "externalOrderNo");
-            return (Criteria) this;
-        }
-
-        public Criteria andPayMethodIsNull() {
-            addCriterion("pay_method is null");
-            return (Criteria) this;
-        }
-
-        public Criteria andPayMethodIsNotNull() {
-            addCriterion("pay_method is not null");
-            return (Criteria) this;
-        }
-
-        public Criteria andPayMethodEqualTo(String value) {
-            addCriterion("pay_method =", value, "payMethod");
-            return (Criteria) this;
-        }
-
-        public Criteria andPayMethodNotEqualTo(String value) {
-            addCriterion("pay_method <>", value, "payMethod");
-            return (Criteria) this;
-        }
-
-        public Criteria andPayMethodGreaterThan(String value) {
-            addCriterion("pay_method >", value, "payMethod");
-            return (Criteria) this;
-        }
-
-        public Criteria andPayMethodGreaterThanOrEqualTo(String value) {
-            addCriterion("pay_method >=", value, "payMethod");
-            return (Criteria) this;
-        }
-
-        public Criteria andPayMethodLessThan(String value) {
-            addCriterion("pay_method <", value, "payMethod");
-            return (Criteria) this;
-        }
-
-        public Criteria andPayMethodLessThanOrEqualTo(String value) {
-            addCriterion("pay_method <=", value, "payMethod");
-            return (Criteria) this;
-        }
-
-        public Criteria andPayMethodLike(String value) {
-            addCriterion("pay_method like", value, "payMethod");
-            return (Criteria) this;
-        }
-
-        public Criteria andPayMethodNotLike(String value) {
-            addCriterion("pay_method not like", value, "payMethod");
-            return (Criteria) this;
-        }
-
-        public Criteria andPayMethodIn(List<String> values) {
-            addCriterion("pay_method in", values, "payMethod");
-            return (Criteria) this;
-        }
-
-        public Criteria andPayMethodNotIn(List<String> values) {
-            addCriterion("pay_method not in", values, "payMethod");
-            return (Criteria) this;
-        }
-
-        public Criteria andPayMethodBetween(String value1, String value2) {
-            addCriterion("pay_method between", value1, value2, "payMethod");
-            return (Criteria) this;
-        }
-
-        public Criteria andPayMethodNotBetween(String value1, String value2) {
-            addCriterion("pay_method not between", value1, value2, "payMethod");
-            return (Criteria) this;
-        }
-
-        public Criteria andProviderIsNull() {
-            addCriterion("provider is null");
-            return (Criteria) this;
-        }
-
-        public Criteria andProviderIsNotNull() {
-            addCriterion("provider is not null");
-            return (Criteria) this;
-        }
-
-        public Criteria andProviderEqualTo(String value) {
-            addCriterion("provider =", value, "provider");
-            return (Criteria) this;
-        }
-
-        public Criteria andProviderNotEqualTo(String value) {
-            addCriterion("provider <>", value, "provider");
-            return (Criteria) this;
-        }
-
-        public Criteria andProviderGreaterThan(String value) {
-            addCriterion("provider >", value, "provider");
-            return (Criteria) this;
-        }
-
-        public Criteria andProviderGreaterThanOrEqualTo(String value) {
-            addCriterion("provider >=", value, "provider");
-            return (Criteria) this;
-        }
-
-        public Criteria andProviderLessThan(String value) {
-            addCriterion("provider <", value, "provider");
-            return (Criteria) this;
-        }
-
-        public Criteria andProviderLessThanOrEqualTo(String value) {
-            addCriterion("provider <=", value, "provider");
-            return (Criteria) this;
-        }
-
-        public Criteria andProviderLike(String value) {
-            addCriterion("provider like", value, "provider");
-            return (Criteria) this;
-        }
-
-        public Criteria andProviderNotLike(String value) {
-            addCriterion("provider not like", value, "provider");
-            return (Criteria) this;
-        }
-
-        public Criteria andProviderIn(List<String> values) {
-            addCriterion("provider in", values, "provider");
-            return (Criteria) this;
-        }
-
-        public Criteria andProviderNotIn(List<String> values) {
-            addCriterion("provider not in", values, "provider");
-            return (Criteria) this;
-        }
-
-        public Criteria andProviderBetween(String value1, String value2) {
-            addCriterion("provider between", value1, value2, "provider");
-            return (Criteria) this;
-        }
-
-        public Criteria andProviderNotBetween(String value1, String value2) {
-            addCriterion("provider not between", value1, value2, "provider");
-            return (Criteria) this;
-        }
-
         public Criteria andAmountIsNull() {
             addCriterion("amount is null");
             return (Criteria) this;
@@ -727,73 +446,73 @@ public class PaymentTransactionExample {
             return (Criteria) this;
         }
 
-        public Criteria andMerchantTradeNoIsNull() {
-            addCriterion("merchant_trade_no is null");
+        public Criteria andPayMethodIsNull() {
+            addCriterion("pay_method is null");
             return (Criteria) this;
         }
 
-        public Criteria andMerchantTradeNoIsNotNull() {
-            addCriterion("merchant_trade_no is not null");
+        public Criteria andPayMethodIsNotNull() {
+            addCriterion("pay_method is not null");
             return (Criteria) this;
         }
 
-        public Criteria andMerchantTradeNoEqualTo(String value) {
-            addCriterion("merchant_trade_no =", value, "merchantTradeNo");
+        public Criteria andPayMethodEqualTo(String value) {
+            addCriterion("pay_method =", value, "payMethod");
             return (Criteria) this;
         }
 
-        public Criteria andMerchantTradeNoNotEqualTo(String value) {
-            addCriterion("merchant_trade_no <>", value, "merchantTradeNo");
+        public Criteria andPayMethodNotEqualTo(String value) {
+            addCriterion("pay_method <>", value, "payMethod");
             return (Criteria) this;
         }
 
-        public Criteria andMerchantTradeNoGreaterThan(String value) {
-            addCriterion("merchant_trade_no >", value, "merchantTradeNo");
+        public Criteria andPayMethodGreaterThan(String value) {
+            addCriterion("pay_method >", value, "payMethod");
             return (Criteria) this;
         }
 
-        public Criteria andMerchantTradeNoGreaterThanOrEqualTo(String value) {
-            addCriterion("merchant_trade_no >=", value, "merchantTradeNo");
+        public Criteria andPayMethodGreaterThanOrEqualTo(String value) {
+            addCriterion("pay_method >=", value, "payMethod");
             return (Criteria) this;
         }
 
-        public Criteria andMerchantTradeNoLessThan(String value) {
-            addCriterion("merchant_trade_no <", value, "merchantTradeNo");
+        public Criteria andPayMethodLessThan(String value) {
+            addCriterion("pay_method <", value, "payMethod");
             return (Criteria) this;
         }
 
-        public Criteria andMerchantTradeNoLessThanOrEqualTo(String value) {
-            addCriterion("merchant_trade_no <=", value, "merchantTradeNo");
+        public Criteria andPayMethodLessThanOrEqualTo(String value) {
+            addCriterion("pay_method <=", value, "payMethod");
             return (Criteria) this;
         }
 
-        public Criteria andMerchantTradeNoLike(String value) {
-            addCriterion("merchant_trade_no like", value, "merchantTradeNo");
+        public Criteria andPayMethodLike(String value) {
+            addCriterion("pay_method like", value, "payMethod");
             return (Criteria) this;
         }
 
-        public Criteria andMerchantTradeNoNotLike(String value) {
-            addCriterion("merchant_trade_no not like", value, "merchantTradeNo");
+        public Criteria andPayMethodNotLike(String value) {
+            addCriterion("pay_method not like", value, "payMethod");
             return (Criteria) this;
         }
 
-        public Criteria andMerchantTradeNoIn(List<String> values) {
-            addCriterion("merchant_trade_no in", values, "merchantTradeNo");
+        public Criteria andPayMethodIn(List<String> values) {
+            addCriterion("pay_method in", values, "payMethod");
             return (Criteria) this;
         }
 
-        public Criteria andMerchantTradeNoNotIn(List<String> values) {
-            addCriterion("merchant_trade_no not in", values, "merchantTradeNo");
+        public Criteria andPayMethodNotIn(List<String> values) {
+            addCriterion("pay_method not in", values, "payMethod");
             return (Criteria) this;
         }
 
-        public Criteria andMerchantTradeNoBetween(String value1, String value2) {
-            addCriterion("merchant_trade_no between", value1, value2, "merchantTradeNo");
+        public Criteria andPayMethodBetween(String value1, String value2) {
+            addCriterion("pay_method between", value1, value2, "payMethod");
             return (Criteria) this;
         }
 
-        public Criteria andMerchantTradeNoNotBetween(String value1, String value2) {
-            addCriterion("merchant_trade_no not between", value1, value2, "merchantTradeNo");
+        public Criteria andPayMethodNotBetween(String value1, String value2) {
+            addCriterion("pay_method not between", value1, value2, "payMethod");
             return (Criteria) this;
         }
 
