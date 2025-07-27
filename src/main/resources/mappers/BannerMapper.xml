@@ -9,6 +9,7 @@
     <result column="available_from" jdbcType="TIMESTAMP" property="availableFrom" />
     <result column="available_until" jdbcType="TIMESTAMP" property="availableUntil" />
     <result column="description" jdbcType="NVARCHAR" property="description" />
+    <result column="url" jdbcType="VARCHAR" property="url" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -69,7 +70,7 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    id, image_name, type, sort, available_from, available_until, description
+    id, image_name, type, sort, available_from, available_until, description, url
   </sql>
   <select id="selectByExample" parameterType="com.qiyuan.web.entity.example.BannerExample" resultMap="BaseResultMap">
     select
@@ -107,7 +108,7 @@
       description)
     values (#{id,jdbcType=INTEGER}, #{imageName,jdbcType=VARCHAR}, #{type,jdbcType=CHAR}, 
       #{sort,jdbcType=SMALLINT}, #{availableFrom,jdbcType=TIMESTAMP}, #{availableUntil,jdbcType=TIMESTAMP}, 
-      #{description,jdbcType=NVARCHAR})
+      #{description,jdbcType=NVARCHAR}, #{url,jdbcType=VARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.qiyuan.web.entity.Banner">
     insert into banner
@@ -133,6 +134,9 @@
       <if test="description != null">
         description,
       </if>
+      <if test="url != null">
+        url,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -156,6 +160,10 @@
       <if test="description != null">
         #{description,jdbcType=NVARCHAR},
       </if>
+      <if test="url != null">
+        #{url,jdbcType=VARCHAR},
+      </if>
+
     </trim>
   </insert>
   <select id="countByExample" parameterType="com.qiyuan.web.entity.example.BannerExample" resultType="java.lang.Long">
@@ -188,6 +196,9 @@
       <if test="record.description != null">
         description = #{record.description,jdbcType=NVARCHAR},
       </if>
+      <if test="record.url != null">
+        url = #{record.url,jdbcType=VARCHAR},
+      </if>
     </set>
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
@@ -201,7 +212,8 @@
       sort = #{record.sort,jdbcType=SMALLINT},
       available_from = #{record.availableFrom,jdbcType=TIMESTAMP},
       available_until = #{record.availableUntil,jdbcType=TIMESTAMP},
-      description = #{record.description,jdbcType=NVARCHAR}
+      description = #{record.description,jdbcType=NVARCHAR},
+      url = #{record.url,jdbcType=VARCHAR}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
     </if>
@@ -227,6 +239,9 @@
       <if test="description != null">
         description = #{description,jdbcType=NVARCHAR},
       </if>
+      <if test="record.url != null">
+        url = #{record.url,jdbcType=VARCHAR},
+      </if>
     </set>
     where id = #{id,jdbcType=INTEGER}
   </update>
@@ -237,7 +252,8 @@
       sort = #{sort,jdbcType=SMALLINT},
       available_from = #{availableFrom,jdbcType=TIMESTAMP},
       available_until = #{availableUntil,jdbcType=TIMESTAMP},
-      description = #{description,jdbcType=NVARCHAR}
+      description = #{description,jdbcType=NVARCHAR},
+      url = #{record.url,jdbcType=VARCHAR}
     where id = #{id,jdbcType=INTEGER}
   </update>
 </mapper>

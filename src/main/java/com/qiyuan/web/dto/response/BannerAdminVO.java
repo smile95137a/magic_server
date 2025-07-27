@@ -27,4 +27,6 @@ public class BannerAdminVO {
     private Date availableUntil;
 
     private String description;
+
+    private String url;
 }
