@@ -31,4 +31,9 @@ public class BannerRequest {
     @Schema(description = "下架日期(yyyy/MM/dd)", example = "2025/07/01")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy/MM/dd")
     private Date availableUntil;
+
+    private String url;
+
+    @Schema(description = "banner說明", example = "愛像一道暢行無阻的綠燈")
+    private String description;
 }

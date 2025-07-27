@@ -44,6 +44,7 @@ public class BannerService {
                 .map(b -> BannerVO.builder()
                         .imgBase64(FileUtil.imageToBase64(FileUtil.concatFilePath(bannerDir, b.getImageName())))
                         .sort(b.getSort())
+                        .url(b.getUrl())
                         .build())
                 .collect(Collectors.toList());
     }
@@ -64,6 +65,7 @@ public class BannerService {
                 .availableFrom(b.getAvailableFrom())
                 .availableUntil(b.getAvailableUntil())
                 .sort(b.getSort())
+                .url(b.getUrl())
                 .build();
     }
 
@@ -85,6 +87,7 @@ public class BannerService {
                 .availableUntil(banner.getAvailableUntil())
                 .availableFrom(banner.getAvailableFrom())
                 .sort(banner.getSort())
+                .url(banner.getUrl())
                 .type(banner.getType())
                 .description(banner.getDescription())
                 .imageName(banner.getFilename())
@@ -94,16 +97,14 @@ public class BannerService {
     }
 
     public boolean modifyBanner(ModifyBannerRequest banner) {
-        BannerExample e = new BannerExample();
-        e.createCriteria().andTypeEqualTo(banner.getType());
-        List<Banner> existed = bannerMapper.selectByExample(e);
-
         Banner target = bannerMapper.selectByPrimaryKey(banner.getId());
         if (target == null) throw new ApiException("查無資料");
 
         target.setSort(banner.getSort());
         target.setAvailableFrom(banner.getAvailableFrom());
         target.setAvailableUntil(banner.getAvailableUntil());
+        target.setUrl(banner.getUrl());
+        target.setDescription(banner.getDescription());
 
         return bannerMapper.updateByPrimaryKeySelective(target) > 0;
 

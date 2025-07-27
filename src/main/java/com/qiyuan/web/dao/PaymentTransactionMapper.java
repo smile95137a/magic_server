@@ -1,8 +1,7 @@
 package com.qiyuan.web.dao;
 
-
 import com.qiyuan.web.entity.PaymentTransaction;
-import com.qiyuan.web.entity.example.PaymentTransactionExample;
+import com.qiyuan.web.entity.PaymentTransactionExample;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -17,8 +16,6 @@ public interface PaymentTransactionMapper {
     int insert(PaymentTransaction row);
 
     int insertSelective(PaymentTransaction row);
-
-    PaymentTransaction selectByExternalOrderNo(String externalOrderNo);
 
     List<PaymentTransaction> selectByExample(PaymentTransactionExample example);
 
