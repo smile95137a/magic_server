@@ -2,6 +2,7 @@ package com.qiyuan.web.service;
 
 import com.qiyuan.security.exception.ApiException;
 import com.qiyuan.web.dao.MasterMapper;
+import com.qiyuan.web.dto.QapItemVO;
 import com.qiyuan.web.dto.request.MasterRequest;
 import com.qiyuan.web.dto.response.MasterAdminVO;
 import com.qiyuan.web.entity.Master;
@@ -132,7 +133,7 @@ public class MasterService {
                 .bio(m.getBio())
                 .experience(m.getExperience())
                 .personalItems(m.getPersonalItems().replace(",", "、"))
-                .serviceItem(JsonUtil.fromJsonList(m.getServicesJson(), QaItemVO.class))
+                .serviceItem(JsonUtil.fromJsonList(m.getServicesJson(), QapItemVO.class))
                 .sort(m.getSort())
                 .imageBase64(FileUtil.imageToBase64(FileUtil.concatFilePath(masterDir,
                         String.format("%s.%s", m.getCode(), m.getImageExt().toLowerCase(Locale.ROOT)))))
@@ -148,7 +149,7 @@ public class MasterService {
                 .bio(m.getBio())
                 .experience(m.getExperience())
                 .personalItems(m.getPersonalItems())
-                .serviceItem(JsonUtil.fromJsonList(m.getServicesJson(), QaItemVO.class))
+                .serviceItem(JsonUtil.fromJsonList(m.getServicesJson(), QapItemVO.class))
                 .sort(m.getSort())
                 .imageBase64(FileUtil.imageToBase64(FileUtil.concatFilePath(masterDir,
                         String.format("%s.%s", m.getCode(), m.getImageExt().toLowerCase(Locale.ROOT)))))

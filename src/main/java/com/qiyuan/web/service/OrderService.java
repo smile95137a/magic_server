@@ -1,5 +1,6 @@
 package com.qiyuan.web.service;
 
+import com.qiyuan.security.config.ImagePathMappingConfig;
 import com.qiyuan.security.exception.ApiException;
 import com.qiyuan.web.dao.*;
 import com.qiyuan.web.dto.CreateOrderItem;
@@ -38,6 +39,7 @@ public class OrderService {
     private final ProductMapper productMapper;
     private final PaymentService paymentService;
     private final StockService stockService;
+    private ImagePathMappingConfig mappingConfig;
 
     @Transactional
     public CreateOrderResponse createOrder(CreateOrderRequest request) {
@@ -103,6 +105,7 @@ public class OrderService {
             recipientPhone = r.getPhone();
             recipientAddress = r.getStoreAddress();
         }
+        total = total.add(BigDecimal.valueOf(shippingMethod.getFee()));
 
         // 4. 建立訂單主表
         Orders order = Orders.builder()
@@ -142,7 +145,6 @@ public class OrderService {
                 .createTime(DateFormatUtils.format(currentDate, "yyyy-MM-dd HH:mm:ss"))
                 .build();
     }
-
 
 
     public List<OrderItem> getOrderItemsByOrderId(String orderId) {
@@ -280,17 +282,26 @@ public class OrderService {
         vo.setCreateTime(o.getCreateTime());
         vo.setUpdateTime(o.getUpdateTime());
         List<OrderItemVO> itemVOList = new ArrayList<>();
+
         for (OrderItem i : items) {
             OrderItemVO itemVO = new OrderItemVO();
+            Product p = productMapper.selectByPrimaryKey(i.getProductId());
             itemVO.setProductId(i.getProductId());
             itemVO.setProductName(i.getProductName());
             itemVO.setUnitPrice(i.getUnitPrice());
             itemVO.setQuantity(i.getQuantity());
             itemVO.setSubtotal(i.getSubtotal());
+            itemVO.setProductUrl(buildMainImageUrl(p));
             itemVOList.add(itemVO);
         }
         vo.setItems(itemVOList);
         return vo;
+    }
+
+    private String buildMainImageUrl(Product p) {
+        if (p.getMainImage() == null) return null;
+        String prefix = mappingConfig.getUrlPrefix("product") + p.getId() + "/" + ProductImageType.MAIN.getFolder() + "/";
+        return prefix + p.getMainImage();
     }
 
     public void markAsPaid(String orderId) {

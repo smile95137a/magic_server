@@ -26,7 +26,7 @@ public class User {
 
     private String address;
 
-    private String receiptType;
+    private String receipt;
 
     private String username;
     

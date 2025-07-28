@@ -3,19 +3,31 @@ package com.qiyuan.web.service;
 import com.qiyuan.security.exception.ApiException;
 import com.qiyuan.web.dao.MasterMapper;
 import com.qiyuan.web.dao.MasterServiceRequestMapper;
+import com.qiyuan.web.dao.PaymentTransactionMapper;
+import com.qiyuan.web.dto.QapItemVO;
 import com.qiyuan.web.dto.request.MasterReservationFilter;
+import com.qiyuan.web.dto.response.AddMasterRequestResponse;
 import com.qiyuan.web.dto.response.MasterServiceRequestVO;
 import com.qiyuan.web.entity.Master;
 import com.qiyuan.web.entity.MasterServiceRequest;
+import com.qiyuan.web.entity.PaymentTransaction;
 import com.qiyuan.web.entity.example.MasterExample;
 import com.qiyuan.web.entity.example.MasterServiceRequestExample;
+import com.qiyuan.web.enums.OrderStatus;
 import com.qiyuan.web.util.Base36Util;
+import com.qiyuan.web.util.DateUtil;
+import com.qiyuan.web.util.JsonUtil;
+import com.qiyuan.web.util.RandomGenerator;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.List;
+import java.util.Locale;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -27,9 +39,12 @@ public class MasterRequestService {
 
     private final MasterMapper masterMapper;
 
-    public MasterRequestService(MasterServiceRequestMapper mapper, MasterMapper masterMapper) {
-        this.masterMapper = masterMapper;
+    private final PaymentTransactionMapper paymentTransactionMapper;
+
+    public MasterRequestService(MasterServiceRequestMapper mapper, MasterMapper masterMapper, PaymentTransactionMapper paymentTransactionMapper) {
         this.mapper = mapper;
+        this.masterMapper = masterMapper;
+        this.paymentTransactionMapper = paymentTransactionMapper;
     }
 
     public List<MasterServiceRequestVO> getMasterReservationByFilter(MasterReservationFilter filter) {
@@ -68,7 +83,7 @@ public class MasterRequestService {
 
 
     @Transactional
-    public String addMasterRequest(com.qiyuan.web.dto.request.MasterServiceRequest req) {
+    public AddMasterRequestResponse addMasterRequest(com.qiyuan.web.dto.request.MasterServiceRequest req) {
         MasterExample e = new MasterExample();
         e.createCriteria().andStatusEqualTo(true).andCodeEqualTo(req.getMasterCode());
         List<Master> masters = masterMapper.selectByExample(e);
@@ -76,21 +91,44 @@ public class MasterRequestService {
             throw new ApiException("請選擇老師！");
         }
 
+        String paymentId = RandomGenerator.getUUID().toLowerCase(Locale.ROOT).substring(0, 25);
+        Master master = masters.get(0);
+        List<QapItemVO> qapItem = JsonUtil.fromJsonList(master.getServicesJson(), QapItemVO.class);
+        Optional<QapItemVO> itemO = qapItem.stream().filter(q -> StringUtils.equals(q.getTitle(), req.getServiceItem())).findFirst();
+
+        if (!itemO.isPresent()) throw new ApiException("查無該服務項目，請重新選擇");
+        QapItemVO item = itemO.get();
+
         MasterServiceRequest request = MasterServiceRequest.builder()
-                .masterCode(req.getMasterCode())
-                .service(req.getServiceItem())
+                .masterCode(master.getCode())
+                .service(item.getTitle())
                 .email(req.getCustomerEmail())
                 .lineId(req.getCustomerLine())
                 .name(req.getCustomerName())
                 .note(req.getNote())
                 .phone(req.getCustomerPhone())
+                .externalOrderNo(paymentId)
                 .build();
+
         if (mapper.insertSelective(request) == 0) {
             throw new ApiException("系統發生錯誤，請聯繫客服！");
         }
+
+        paymentTransactionMapper.insertSelective(PaymentTransaction.builder()
+                .status(OrderStatus.CREATED.getValue())
+                .sourceType("M")
+                .createTime(DateUtil.getCurrentDate())
+                .userId(null)
+                .amount(BigDecimal.valueOf(item.getPrice()))
+                .build());
+
         String serial = String.format("%s-%s", req.getMasterCode(), getOrderIdFromTid(request.getSerial()));
-        logger.info("[老師親算] 成功新建訂單 => 編號: {}, 老師代號:{}, 流水號: {}", serial, req.getMasterCode(), request.getSerial());
-        return serial;
+        logger.info("[老師親算] 成功新建訂單 => 編號: {}, 老師代號:{}, 流水號: {}, 金流訂單編號: {}", serial, req.getMasterCode(), request.getSerial(), paymentId);
+
+        return AddMasterRequestResponse.builder()
+                .orderNo(serial)
+                .externalPaymentNo(paymentId)
+                .build();
     }
 
     public String getOrderIdFromTid(int i) {

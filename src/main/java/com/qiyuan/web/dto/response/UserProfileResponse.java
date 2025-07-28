@@ -1,5 +1,6 @@
 package com.qiyuan.web.dto.response;
 
+import com.qiyuan.web.dto.InvoiceDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -18,4 +19,5 @@ public class UserProfileResponse {
     private String area;
     private String address;
     private String email;
+    private InvoiceDTO invoice;
 }

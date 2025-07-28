@@ -1,3 +1,4 @@
+-- 金流
 UPDATE qiyuan.dbo.lantern_purchase
 SET external_order_no = LEFT(external_order_no, 25);
 
@@ -24,5 +25,4 @@ WHERE LEN(external_order_no) > 25;
 
 ALTER TABLE qiyuan.dbo.payment_transaction
 ALTER COLUMN external_order_no varchar(25) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL;
-
 

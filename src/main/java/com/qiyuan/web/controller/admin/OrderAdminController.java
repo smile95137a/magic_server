@@ -5,10 +5,12 @@ import com.qiyuan.web.dto.request.ShippingMethodRequest;
 import com.qiyuan.web.dto.request.UpdateOrderStatusBatchRequest;
 import com.qiyuan.web.dto.response.*;
 import com.qiyuan.web.enums.OrderStatus;
+import com.qiyuan.web.security.RoleExpressions;
 import com.qiyuan.web.service.OrderAdminService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,6 +19,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/admin/order")
+@PreAuthorize(RoleExpressions.ONLY_ADMIN)
 @Tag(name = "後台訂單管理", description = "提供訂單查詢、物流設定、狀態更新等後台管理功能")
 public class OrderAdminController {
 
@@ -66,7 +69,7 @@ public class OrderAdminController {
     @GetMapping("/status/updatable-list")
     public List<OrderStatusVO> getUpdatableOrderStatusList() {
         return OrderStatus.BACKEND_SET.stream()
-                .map(status -> new OrderStatusVO(status.name(), status.getLabel()))
+                .map(status -> new OrderStatusVO(status.getValue(), status.getLabel()))
                 .collect(Collectors.toList());
     }
 

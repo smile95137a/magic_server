@@ -17,4 +17,5 @@ public class BannerVO implements Serializable {
     private String imgBase64;
     @Schema(description = "排序", example = "1")
     private Short sort;
+    private String url;
 }

@@ -1,51 +1,56 @@
 package com.qiyuan.web.service;
 
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.stream.Collectors;
-
+import com.qiyuan.security.exception.ApiException;
+import com.qiyuan.web.dao.LanternMapper;
+import com.qiyuan.web.dao.LanternPurchaseMapper;
+import com.qiyuan.web.dao.PaymentTransactionMapper;
+import com.qiyuan.web.dto.LanternBlessingDTO;
+import com.qiyuan.web.dto.request.LanternPurchaseInfo;
+import com.qiyuan.web.dto.request.RecordPeriodRequest;
+import com.qiyuan.web.dto.response.LanternPriceVO;
+import com.qiyuan.web.dto.response.PaymentCreateResult;
+import com.qiyuan.web.dto.response.RecordVO;
+import com.qiyuan.web.entity.*;
+import com.qiyuan.web.entity.example.LanternExample;
+import com.qiyuan.web.entity.example.LanternPurchaseExample;
+import com.qiyuan.web.dto.request.LanternPurchaseRequest;
+import com.qiyuan.web.enums.OrderStatus;
+import com.qiyuan.web.enums.RecordItem;
+import com.qiyuan.web.util.DateUtil;
+import com.qiyuan.web.dto.response.LanternBlessingVO;
+import com.qiyuan.web.util.JsonUtil;
+import com.qiyuan.web.util.RandomGenerator;
+import com.qiyuan.web.util.SecurityUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import com.qiyuan.web.dao.LanternMapper;
-import com.qiyuan.web.dao.LanternPurchaseMapper;
-import com.qiyuan.web.dao.UserMapper;
-import com.qiyuan.web.dto.LanternBlessingDTO;
-import com.qiyuan.web.dto.request.LanternPurchaseInfo;
-import com.qiyuan.web.dto.request.LanternPurchaseRequest;
-import com.qiyuan.web.dto.request.RecordPeriodRequest;
-import com.qiyuan.web.dto.response.LanternBlessingVO;
-import com.qiyuan.web.dto.response.RecordVO;
-import com.qiyuan.web.entity.Lantern;
-import com.qiyuan.web.entity.LanternPurchase;
-import com.qiyuan.web.entity.LanternRecord;
-import com.qiyuan.web.entity.User;
-import com.qiyuan.web.entity.example.LanternExample;
-import com.qiyuan.web.entity.example.LanternPurchaseExample;
-import com.qiyuan.web.enums.RecordItem;
-import com.qiyuan.web.util.DateUtil;
-import com.qiyuan.web.util.RandomGenerator;
-import com.qiyuan.web.util.SecurityUtils;
+import java.math.BigDecimal;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class LanternPurchaseService {
-    @Autowired
     private LanternPurchaseMapper lanternPurchaseMapper;
 
-    @Autowired
     private SystemConfigService systemConfigService;
 
-    @Autowired
     private LanternMapper lanternMapper;
     
     @Autowired
     private UserMapper userMapper;
 
-    @Autowired
     private PaymentService paymentService;
+
+    private PaymentTransactionMapper paymentTransactionMapper;
+
+    public LanternPurchaseService(LanternPurchaseMapper lanternPurchaseMapper, SystemConfigService systemConfigService, LanternMapper lanternMapper, PaymentService paymentService, PaymentTransactionMapper paymentTransactionMapper) {
+        this.lanternPurchaseMapper = lanternPurchaseMapper;
+        this.systemConfigService = systemConfigService;
+        this.lanternMapper = lanternMapper;
+        this.paymentService = paymentService;
+        this.paymentTransactionMapper = paymentTransactionMapper;
+    }
 
     public List<LanternPurchase> getByLanternId(String lanternId) {
         LanternPurchaseExample e = new LanternPurchaseExample();
@@ -124,11 +129,11 @@ public class LanternPurchaseService {
     }
 
     @Transactional
-    public boolean addLanternPurchaseRecord(LanternPurchaseRequest req) {
-        String currentUsername = SecurityUtils.getCurrentUsername();
-        User user = userMapper.selectByUsername(currentUsername);
-        String userId = user.getId();
+    public String addLanternPurchaseRecord(LanternPurchaseRequest req) {
+        List<LanternPurchaseInfo> purchaseList = req.getList();
+        if (purchaseList == null || purchaseList.isEmpty()) throw new ApiException("請輸入至少一筆點燈購買資訊");
 
+        String userId = req.getUserId();
         String lanternCode = req.getLanternCode();
 
         LanternExample e = new LanternExample();
@@ -136,13 +141,25 @@ public class LanternPurchaseService {
         Lantern lantern = lanternMapper.selectByExample(e).get(0);
 
         Integer month = req.getMonth();
+        String listJson = lantern.getPriceListJson();
+        List<LanternPriceVO> lanternPrice = JsonUtil.fromJsonList(listJson, LanternPriceVO.class);
+        Optional<LanternPriceVO> vo = lanternPrice.stream().filter(p -> p.getMonth() == month).findFirst();
+        if (!vo.isPresent()) {
+            throw new ApiException("不存在的購買月份，請重新選擇");
+        }
+
+        Integer unitPrice = vo.get().getPrice();
+        BigDecimal totalAmount = BigDecimal.valueOf(unitPrice ).multiply(BigDecimal.valueOf(purchaseList.size()));
         Integer availableDays = month == 12 ? 365 : month * 30;
+        String paymentId = RandomGenerator.getUUID().toLowerCase(Locale.ROOT).substring(0, 25);
+
+        Date currentDate = DateUtil.getCurrentDate();
 
         for (LanternPurchaseInfo info : req.getList()) {
             LanternPurchase entity = new LanternPurchase();
             String id = RandomGenerator.getUUID();
             entity.setId(id);
-            entity.setExternalOrderNo(id);
+            entity.setExternalOrderNo(paymentId);
             entity.setLanternId(lantern.getId());
             entity.setUserId(userId);
             entity.setName(info.getName());
@@ -150,10 +167,20 @@ public class LanternPurchaseService {
             entity.setMessage(info.getMessage());
             entity.setBlessingTimes((short)0);
             entity.setCreateTime(new Date());
-            entity.setExpiredTime(DateUtil.adjustDate(new Date(), availableDays, Date.class));
+            entity.setExpiredTime(DateUtil.adjustDate(currentDate, availableDays, Date.class));
             lanternPurchaseMapper.insertSelective(entity);
         }
 
-        return true;
+
+        paymentTransactionMapper.insertSelective(PaymentTransaction.builder()
+                .id(paymentId)
+                .amount(totalAmount)
+                .userId(userId)
+                .createTime(currentDate)
+                .sourceType("L")
+                .status(OrderStatus.CREATED.getValue())
+                .build());
+
+        return paymentId;
     }
 }

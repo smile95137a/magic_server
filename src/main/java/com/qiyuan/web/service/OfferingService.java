@@ -4,12 +4,14 @@ import com.qiyuan.security.exception.ApiException;
 import com.qiyuan.web.dao.GodMapper;
 import com.qiyuan.web.dao.OfferingMapper;
 import com.qiyuan.web.dao.OfferingPurchaseMapper;
+import com.qiyuan.web.dao.UserMapper;
 import com.qiyuan.web.dto.request.RecordPeriodRequest;
 import com.qiyuan.web.dto.response.OfferingVO;
 import com.qiyuan.web.dto.response.RecordVO;
 import com.qiyuan.web.entity.God;
 import com.qiyuan.web.entity.Offering;
 import com.qiyuan.web.entity.OfferingPurchase;
+import com.qiyuan.web.entity.User;
 import com.qiyuan.web.entity.example.GodExample;
 import com.qiyuan.web.entity.example.OfferingExample;
 import com.qiyuan.web.entity.example.OfferingPurchaseExample;
@@ -42,11 +44,13 @@ public class OfferingService {
     private final OfferingMapper offeringMapper;
     private final OfferingPurchaseMapper offeringPurchaseMapper;
     private final GodMapper godMapper;
+    private final UserMapper userMapper;
 
-    public OfferingService(OfferingMapper offeringMapper, OfferingPurchaseMapper offeringPurchaseMapper, GodMapper godMapper) {
+    public OfferingService(OfferingMapper offeringMapper, OfferingPurchaseMapper offeringPurchaseMapper, GodMapper godMapper, UserMapper userMapper) {
         this.offeringMapper = offeringMapper;
         this.offeringPurchaseMapper = offeringPurchaseMapper;
         this.godMapper = godMapper;
+        this.userMapper = userMapper;
     }
 
     public Offering getOfferingById(String id) {
@@ -138,9 +142,13 @@ public class OfferingService {
     }
 
     public List<RecordVO> getOfferingRecord(@RequestBody @Validated RecordPeriodRequest req) {
+        String username = SecurityUtils.getCurrentUsername();
+        User user = userMapper.selectByUsername(username);
+
         OfferingPurchaseExample e = new OfferingPurchaseExample();
-        e.createCriteria().andCreateTimeBetween(req.getStartTime(), req.getEndTime());
+        e.createCriteria().andUserIdEqualTo(user.getId()).andCreateTimeBetween(req.getStartTime(), req.getEndTime());
         List<OfferingPurchase> purchases = offeringPurchaseMapper.selectByExample(e);
+
         List<String> offeringIds = purchases.stream().map(OfferingPurchase::getOfferingId).collect(Collectors.toList());
         List<String> godIds = purchases.stream().map(OfferingPurchase::getGodId).collect(Collectors.toList());
 

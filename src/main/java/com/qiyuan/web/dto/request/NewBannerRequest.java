@@ -16,6 +16,5 @@ public class NewBannerRequest extends BannerRequest {
     @Schema(description = "圖片Base64編碼", example = "data:xxx;base64,/9j/4AAQSk...")
     @NotBlank
     private String imageBase64;
-    @Schema(description = "banner說明", example = "愛像一道暢行無阻的綠燈")
-    private String description;
+
 }
