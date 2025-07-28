@@ -34,9 +34,8 @@ public class CustomUserDetailsService implements UserDetailsService {
         List<UserRole> roles = userRoleMapper.selectByUserId(user.getId());
 
         List<SimpleGrantedAuthority> authorities = roles.stream()
-                .map(role -> new SimpleGrantedAuthority(role.getRoleId()))
+                .map(role -> new SimpleGrantedAuthority("ROLE_" + role.getRoleId())) // ★ 這裡加上 ROLE_ 前綴
                 .collect(Collectors.toList());
-
         return mapUserToCustomUserDetails(user, authorities);
     }
 
