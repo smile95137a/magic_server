@@ -116,7 +116,10 @@
             #{note,jdbcType=NVARCHAR}, #{service,jdbcType=NVARCHAR}, #{createTime,jdbcType=TIMESTAMP},
             #{id,jdbcType=CHAR}, #{externalOrderNo,jdbcType=VARCHAR})
   </insert>
-  <insert id="insertSelective" parameterType="com.qiyuan.web.entity.MasterServiceRequest">
+  <insert id="insertSelective"
+        parameterType="com.qiyuan.web.entity.MasterServiceRequest"
+        useGeneratedKeys="true"
+        keyProperty="serial">
     insert into master_service_request
     <trim prefix="(" suffix=")" suffixOverrides=",">
       <if test="serial != null">

@@ -1,34 +1,41 @@
 package com.qiyuan.web.service;
 
-import com.qiyuan.security.exception.ApiException;
-import com.qiyuan.web.dao.LanternMapper;
-import com.qiyuan.web.dao.LanternPurchaseMapper;
-import com.qiyuan.web.dao.PaymentTransactionMapper;
-import com.qiyuan.web.dto.LanternBlessingDTO;
-import com.qiyuan.web.dto.request.LanternPurchaseInfo;
-import com.qiyuan.web.dto.request.RecordPeriodRequest;
-import com.qiyuan.web.dto.response.LanternPriceVO;
-import com.qiyuan.web.dto.response.PaymentCreateResult;
-import com.qiyuan.web.dto.response.RecordVO;
-import com.qiyuan.web.entity.*;
-import com.qiyuan.web.entity.example.LanternExample;
-import com.qiyuan.web.entity.example.LanternPurchaseExample;
-import com.qiyuan.web.dto.request.LanternPurchaseRequest;
-import com.qiyuan.web.enums.OrderStatus;
-import com.qiyuan.web.enums.RecordItem;
-import com.qiyuan.web.util.DateUtil;
-import com.qiyuan.web.dto.response.LanternBlessingVO;
-import com.qiyuan.web.util.JsonUtil;
-import com.qiyuan.web.util.RandomGenerator;
-import com.qiyuan.web.util.SecurityUtils;
+import java.math.BigDecimal;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
-import java.util.*;
-import java.util.stream.Collectors;
+import com.qiyuan.security.exception.ApiException;
+import com.qiyuan.web.dao.LanternMapper;
+import com.qiyuan.web.dao.LanternPurchaseMapper;
+import com.qiyuan.web.dao.PaymentTransactionMapper;
+import com.qiyuan.web.dao.UserMapper;
+import com.qiyuan.web.dto.LanternBlessingDTO;
+import com.qiyuan.web.dto.request.LanternPurchaseInfo;
+import com.qiyuan.web.dto.request.LanternPurchaseRequest;
+import com.qiyuan.web.dto.request.RecordPeriodRequest;
+import com.qiyuan.web.dto.response.LanternBlessingVO;
+import com.qiyuan.web.dto.response.LanternPriceVO;
+import com.qiyuan.web.dto.response.RecordVO;
+import com.qiyuan.web.entity.Lantern;
+import com.qiyuan.web.entity.LanternPurchase;
+import com.qiyuan.web.entity.LanternRecord;
+import com.qiyuan.web.entity.PaymentTransaction;
+import com.qiyuan.web.entity.example.LanternExample;
+import com.qiyuan.web.entity.example.LanternPurchaseExample;
+import com.qiyuan.web.enums.OrderStatus;
+import com.qiyuan.web.enums.RecordItem;
+import com.qiyuan.web.util.DateUtil;
+import com.qiyuan.web.util.JsonUtil;
+import com.qiyuan.web.util.RandomGenerator;
 
 @Service
 public class LanternPurchaseService {
@@ -37,6 +44,9 @@ public class LanternPurchaseService {
     private SystemConfigService systemConfigService;
 
     private LanternMapper lanternMapper;
+    
+    @Autowired
+    private UserMapper userMapper;
 
     private PaymentService paymentService;
 

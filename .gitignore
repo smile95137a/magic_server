@@ -1,3 +1,7 @@
+<<<<<<< HEAD
+target/
+target/logs/
+=======
 HELP.md
 target/
 .mvn/wrapper/maven-wrapper.jar
@@ -38,3 +42,4 @@ mvnw.cmd
 .mvn/wrapper/maven-wrapper.properties
 logs/spring-boot-application.log
 src/test/java/
+>>>>>>> dev

@@ -1,13 +1,20 @@
 server:
-  port: 8080
+  port: 8443
+  ssl:
+    enabled: true
+    key-store: file:/etc/letsencrypt/live/api.ingodwetrust.tw/keystore.p12
+    key-store-password: WUfan0667.
+    key-store-type: PKCS12
+    key-alias: tomcat
+
 
 spring:
   application:
     name: qiyuan
   datasource:
-    url: jdbc:sqlserver://localhost:11433;databaseName=qiyuan;encrypt=true;trustServerCertificate=true;
-    username: sa
-    password: 1qaz@WSX
+    url: jdbc:sqlserver://chifu.cdi42o44miez.ap-northeast-1.rds.amazonaws.com:1433;databaseName=qiyuan;encrypt=true;trustServerCertificate=true;
+    username: admin
+    password: WUfan0667.
     driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
     hikari:
       maximum-pool-size: 10  # 可選：調整最大連線池大小
@@ -33,14 +40,14 @@ spring:
       client:
         registration:
           google:
-            client-id: [ your-google-client-id ]
-            client-secret: [ your-google-client-secret ]
+            client-id: sdfgfsdgsfdg 
+            client-secret: sfghfghdfgh
             scope:
               - email
               - profile
           facebook:
-            client-id: [ your-facebook-app-id ]
-            client-secret: [ your-facebook-app-secret ]
+            client-id: dgfhdgfhdghdfh
+            client-secret: dghdgfhdgfh
             scope:
               - email
 
@@ -65,6 +72,8 @@ security:
     - /swagger-ui.html
     - /swagger-ui/**
     - /v3/api-docs/**
+    - /calendar/query
+    - /oauth2/**
     - /banner/**
     - /poem/**
     - /god/**
@@ -88,15 +97,23 @@ security:
       - http://localhost:3000
       - http://localhost:5500
       - http://127.0.0.1:5500
-      - https://myapp.com # 以這為案例將前端URL設置在此處
+      - https://ingodwetrust.tw # 以這為案例將前端URL設置在此處
+      - http://localhost:5173
 
-
+#upload:
+#  image-path:
+#    banner: /home/ec2-user/godtrust/banner
+#    master: /home/ec2-user/godtrust/master
+#    offering: /home/ec2-user/godtrust/offering
+#    product: /home/ec2-user/godtrust/product
+#  url-prefix:
+#    product: /images/product/
 upload:
   image-path:
-    banner: C:\Users\Public\test\banner
-    master: C:\Users\Public\test\master
-    offering: C:\Users\Public\test\offering
-    product: C:\Users\Public\test\product
+    banner: /home/ec2-user/godtrust/banner
+    master: /home/ec2-user/godtrust/master
+    offering: /home/ec2-user/godtrust/offering
+    product: /home/ec2-user/godtrust/product
   url-prefix:
     product: /images/product/
 
@@ -108,7 +125,15 @@ gomypay:
     api: http://testeinvoice.gomypay.asia/
     pwd: jk5rjwzmk2f16h3t1n6qgx87tqhdy3ky
     customerNo: 60755266
-
 ap:
-  backend: http://localhost:8080
+  backend: https://api.ingodwetrust.tw:8443
+
+
+calendar-api:
+  url: https://fortune_tall_test.maideax.net/app/api/v1/chinese_calendar/
+  token: 8P5fCMlUyEVcEUICXVNFak6fjdAwE1M922LWQflFKEnCGEjAcbeurpNMwHLfl47S
+  
+app:
+  oauth:
+    redirectUrl: https://ingodwetrust.tw/oauth2/redirect
 

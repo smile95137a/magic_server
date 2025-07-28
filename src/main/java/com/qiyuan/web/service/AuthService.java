@@ -1,8 +1,11 @@
 package com.qiyuan.web.service;
 
+import java.util.Locale;
+import java.util.UUID;
+
+import com.qiyuan.security.config.CustomUserDetails;
 import com.qiyuan.security.exception.ApiException;
 import com.qiyuan.security.service.TokenStorageService;
-import com.qiyuan.security.service.UserService;
 import com.qiyuan.security.util.JwtTokenUtil;
 import com.qiyuan.web.dao.UserMapper;
 import com.qiyuan.web.dao.UserRoleMapper;
@@ -14,52 +17,39 @@ import com.qiyuan.web.dto.response.LoginResponse;
 import com.qiyuan.web.dto.response.UserProfileResponse;
 import com.qiyuan.web.entity.User;
 import com.qiyuan.web.entity.UserRole;
-import com.qiyuan.web.util.DateUtil;
+import com.qiyuan.web.util.SecurityUtils;
 import com.qiyuan.web.util.JsonUtil;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
-import java.util.Locale;
-import java.util.UUID;
 
+@Slf4j
 @Service
+@RequiredArgsConstructor
 public class AuthService {
 
-    private Logger logger = LoggerFactory.getLogger(AuthService.class);
-
+	private final AuthenticationManager authenticationManager;
     private final UserMapper userMapper;
     private final UserRoleMapper userRoleMapper;
-    private final UserService userService;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenUtil jwtTokenUtil;
     private final TokenStorageService tokenStorageService;
 
-    public AuthService(UserService userService,
-                       UserRoleMapper userRoleMapper,
-                       PasswordEncoder passwordEncoder,
-                       JwtTokenUtil jwtTokenUtil,
-                       UserMapper userMapper,
-                       TokenStorageService tokenStorageService) {
-        this.userService = userService;
-        this.passwordEncoder = passwordEncoder;
-        this.jwtTokenUtil = jwtTokenUtil;
-        this.userMapper = userMapper;
-        this.tokenStorageService = tokenStorageService;
-        this.userRoleMapper = userRoleMapper;
-    }
 
     /**
      * 使用者註冊
      */
     @Transactional
     public boolean register(UserRegisterRequest req) {
+    	
         // 檢查帳號重複
         User exist = userMapper.selectByUsername(req.getEmail());
         if (exist != null) {
@@ -84,6 +74,7 @@ public class AuthService {
                 .city(req.getCity())
                 .district(req.getArea())
                 .address(req.getAddress())
+                .provider("local")
                 .build();
 
         UserRole userRole = UserRole
@@ -99,49 +90,17 @@ public class AuthService {
     }
 
     public LoginResponse login(UserLoginRequest req) {
-        UserDetails userDetails = null;
-        try {
-            userDetails = userService.loadUserByUsername(req.getUsername());
-            if (!passwordEncoder.matches(req.getPassword(), userDetails.getPassword())) {
-                throw new ApiException("帳號或密碼錯誤");
-            }
-        } catch (Exception e) {
-            logger.error(e.getMessage(), e);
-            throw new ApiException("帳號或密碼錯誤");
-        }
+    	Authentication authentication = authenticationManager
+				.authenticate(new UsernamePasswordAuthenticationToken(req.getUsername(), req.getPassword()));
+		SecurityContextHolder.getContext().setAuthentication(authentication);
 
+		CustomUserDetails userDetail = SecurityUtils.getCurrentUserPrinciple();
+		String token = jwtTokenUtil.generateToken(userDetail.getUsername());
 
-        String accessToken = jwtTokenUtil.generateToken(userDetails.getUsername());
-        String refreshToken = jwtTokenUtil.generateRefreshToken(userDetails.getUsername());
-
-        tokenStorageService.cleanupExpiredTokens();
-        Date expiration = jwtTokenUtil.getExpirationFromToken(refreshToken);
-        tokenStorageService.revokeTokensByUsername(userDetails.getUsername());
-        tokenStorageService.saveRefreshToken(userDetails.getUsername(), refreshToken, DateUtil.toLocalDateTime(expiration));
+		User user = userMapper.selectByUsername(userDetail.getUsername());
+		
         return LoginResponse.builder()
-                .accessToken(accessToken)
-                .refreshToken(refreshToken)
-                .build();
-    }
-
-    public LoginResponse refreshToken(String refreshToken) {
-        if (!tokenStorageService.isTokenValid(refreshToken) || !jwtTokenUtil.isRefreshToken(refreshToken)) {
-            throw new ApiException("Refresh Token 無效或已過期");
-        }
-
-        String username = jwtTokenUtil.getUsernameFromToken(refreshToken);
-
-        String newAccessToken = jwtTokenUtil.generateToken(username);
-        String newRefreshToken = jwtTokenUtil.generateRefreshToken(username);
-
-        tokenStorageService.revokeToken(refreshToken);
-
-        Date expiration = jwtTokenUtil.getExpirationFromToken(newRefreshToken);
-        tokenStorageService.saveRefreshToken(username, newRefreshToken, DateUtil.toLocalDateTime(expiration));
-
-        return LoginResponse.builder()
-                .accessToken(newAccessToken)
-                .refreshToken(newRefreshToken)
+                .accessToken(token)
                 .build();
     }
 
