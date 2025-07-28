@@ -286,15 +286,4 @@
     ORDER BY p.create_time ASC
   </select>
 
-
-  <resultMap id="AdminRecord" type="com.qiyuan.web.dto.OfferingAdminRecord">
-    <id column="id" jdbcType="CHAR" property="id" />
-    <result column="external_order_no" jdbcType="VARCHAR" property="externalOrderNo" />
-    <result column="offeringName" jdbcType="NVARCHAR" property="offeringName" />
-    <result column="user_id" jdbcType="CHAR" property="userId" />
-    <result column="username" jdbcType="NVARCHAR" property="username" />
-    <result column="godName" jdbcType="NVARCHAR" property="godName" />
-    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
-  </resultMap>
-
 </mapper>

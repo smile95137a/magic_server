@@ -370,19 +370,19 @@
   </select>
 
 
-  <select id="selectRecordsByUserIdAndPeriod" resultMap="LanternBlessingResultMap">
+  <select id="selectRecordsByUserIdAndPeriod" resultMap="RecordJoinMap">
     SELECT
     <if test="limits != null">
       TOP (#{limits})
     </if>
-    <include refid="Bind_With_Lantern_Table" />
+    p.id id, p.create_time create_time, l.name lanternName
     FROM lantern_purchase p
     LEFT JOIN lantern l ON l.id = p.lantern_id
     WHERE p.user_id = #{userId} AND p.create_time BETWEEN #{startTime} AND #{endTime}
     ORDER By p.create_time ASC
   </select>
 
-  <select id="selectRecordsByPeriod" resultMap="BaseResultMap">
+  <select id="selectRecordsByPeriod" resultMap="RecordJoinMap">
     SELECT
     <if test="limits != null">
       TOP (#{limits})
