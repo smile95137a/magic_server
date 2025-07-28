@@ -2,6 +2,8 @@ package com.qiyuan.web.dto.response;
 
 import lombok.*;
 
+import java.math.BigDecimal;
+
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
@@ -9,4 +11,5 @@ import lombok.*;
 @Builder
 public class PaymentNoVO {
     private String externalPaymentNo;
+    private BigDecimal price;
 }

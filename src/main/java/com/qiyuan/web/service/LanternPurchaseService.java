@@ -8,8 +8,10 @@ import java.util.Locale;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import com.qiyuan.web.dto.response.PaymentNoVO;
+import com.qiyuan.web.entity.*;
+import com.qiyuan.web.util.SecurityUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,10 +27,6 @@ import com.qiyuan.web.dto.request.RecordPeriodRequest;
 import com.qiyuan.web.dto.response.LanternBlessingVO;
 import com.qiyuan.web.dto.response.LanternPriceVO;
 import com.qiyuan.web.dto.response.RecordVO;
-import com.qiyuan.web.entity.Lantern;
-import com.qiyuan.web.entity.LanternPurchase;
-import com.qiyuan.web.entity.LanternRecord;
-import com.qiyuan.web.entity.PaymentTransaction;
 import com.qiyuan.web.entity.example.LanternExample;
 import com.qiyuan.web.entity.example.LanternPurchaseExample;
 import com.qiyuan.web.enums.OrderStatus;
@@ -44,18 +42,18 @@ public class LanternPurchaseService {
     private SystemConfigService systemConfigService;
 
     private LanternMapper lanternMapper;
-    
-    @Autowired
+
     private UserMapper userMapper;
 
     private PaymentService paymentService;
 
     private PaymentTransactionMapper paymentTransactionMapper;
 
-    public LanternPurchaseService(LanternPurchaseMapper lanternPurchaseMapper, SystemConfigService systemConfigService, LanternMapper lanternMapper, PaymentService paymentService, PaymentTransactionMapper paymentTransactionMapper) {
+    public LanternPurchaseService(LanternPurchaseMapper lanternPurchaseMapper, SystemConfigService systemConfigService, LanternMapper lanternMapper, UserMapper userMapper, PaymentService paymentService, PaymentTransactionMapper paymentTransactionMapper) {
         this.lanternPurchaseMapper = lanternPurchaseMapper;
         this.systemConfigService = systemConfigService;
         this.lanternMapper = lanternMapper;
+        this.userMapper = userMapper;
         this.paymentService = paymentService;
         this.paymentTransactionMapper = paymentTransactionMapper;
     }
@@ -84,6 +82,12 @@ public class LanternPurchaseService {
                         .content(l.getLanternName())
                         .build())
                 .collect(Collectors.toList());
+    }
+
+    public List<LanternBlessingDTO> getMyActiveLanterns() {
+        String username = SecurityUtils.getCurrentUsername();
+        User user = userMapper.selectByUsername(username);
+        return lanternPurchaseMapper.selectMyActiveLanterns(user.getId());
     }
 
     public List<LanternBlessingVO> getLatestLanternBlessing(int num) {
@@ -137,7 +141,7 @@ public class LanternPurchaseService {
     }
 
     @Transactional
-    public String addLanternPurchaseRecord(LanternPurchaseRequest req) {
+    public PaymentNoVO addLanternPurchaseRecord(LanternPurchaseRequest req) {
         List<LanternPurchaseInfo> purchaseList = req.getList();
         if (purchaseList == null || purchaseList.isEmpty()) throw new ApiException("請輸入至少一筆點燈購買資訊");
 
@@ -189,6 +193,6 @@ public class LanternPurchaseService {
                 .status(OrderStatus.CREATED.getValue())
                 .build());
 
-        return paymentId;
+        return PaymentNoVO.builder().externalPaymentNo(paymentId).price(totalAmount).build();
     }
 }

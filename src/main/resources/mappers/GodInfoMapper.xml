@@ -12,6 +12,7 @@
     <result column="offshelf_time" jdbcType="TIMESTAMP" property="offshelfTime" />
     <result column="cooldown_time" jdbcType="TIMESTAMP" property="cooldownTime" />
     <result column="offering_list" jdbcType="VARCHAR" property="offeringList" />
+    <result column="offering_replacement" jdbcType="VARCHAR" property="offeringReplacement" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -73,7 +74,7 @@
   </sql>
   <sql id="Base_Column_List">
     user_id, god_id, level, exp, jiaobei_last_time, golden_expiration, onshelf_time, 
-    offshelf_time, cooldown_time, offering_list
+    offshelf_time, cooldown_time, offering_list, offering_replacement
   </sql>
   <select id="selectByExample" parameterType="com.qiyuan.web.entity.example.GodInfoExample" resultMap="BaseResultMap">
     select
@@ -111,11 +112,11 @@
     insert into god_info (user_id, god_id, level, 
       exp, jiaobei_last_time, golden_expiration, 
       onshelf_time, offshelf_time, cooldown_time, 
-      offering_list)
+      offering_list, offering_replacement)
     values (#{userId,jdbcType=CHAR}, #{godId,jdbcType=CHAR}, #{level,jdbcType=TINYINT}, 
       #{exp,jdbcType=TINYINT}, #{jiaobeiLastTime,jdbcType=TIMESTAMP}, #{goldenExpiration,jdbcType=TIMESTAMP}, 
       #{onshelfTime,jdbcType=TIMESTAMP}, #{offshelfTime,jdbcType=TIMESTAMP}, #{cooldownTime,jdbcType=TIMESTAMP}, 
-      #{offeringList,jdbcType=VARCHAR})
+      #{offeringList,jdbcType=VARCHAR}, #{offeringReplacement,jdbcType=VARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.qiyuan.web.entity.GodInfo">
     insert into god_info
@@ -150,6 +151,9 @@
       <if test="offeringList != null">
         offering_list,
       </if>
+      <if test="offeringReplacement != null">
+        offering_replacement,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="userId != null">
@@ -181,6 +185,9 @@
       </if>
       <if test="offeringList != null">
         #{offeringList,jdbcType=VARCHAR},
+      </if>
+      <if test="offeringReplacement != null">
+        #{offeringReplacement,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
@@ -223,6 +230,9 @@
       <if test="record.offeringList != null">
         offering_list = #{record.offeringList,jdbcType=VARCHAR},
       </if>
+      <if test="row.offeringReplacement != null">
+        offering_replacement = #{row.offeringReplacement,jdbcType=VARCHAR},
+      </if>
     </set>
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
@@ -239,7 +249,8 @@
       onshelf_time = #{record.onshelfTime,jdbcType=TIMESTAMP},
       offshelf_time = #{record.offshelfTime,jdbcType=TIMESTAMP},
       cooldown_time = #{record.cooldownTime,jdbcType=TIMESTAMP},
-      offering_list = #{record.offeringList,jdbcType=VARCHAR}
+      offering_list = #{record.offeringList,jdbcType=VARCHAR},
+    offering_replacement = #{row.offeringReplacement,jdbcType=VARCHAR}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
     </if>
@@ -271,6 +282,9 @@
       <if test="offeringList != null">
         offering_list = #{offeringList,jdbcType=VARCHAR},
       </if>
+      <if test="offeringReplacement != null">
+        offering_replacement = #{offeringReplacement,jdbcType=VARCHAR},
+      </if>
     </set>
     where user_id = #{userId,jdbcType=CHAR}
       and god_id = #{godId,jdbcType=CHAR}
@@ -284,7 +298,8 @@
       onshelf_time = #{onshelfTime,jdbcType=TIMESTAMP},
       offshelf_time = #{offshelfTime,jdbcType=TIMESTAMP},
       cooldown_time = #{cooldownTime,jdbcType=TIMESTAMP},
-      offering_list = #{offeringList,jdbcType=VARCHAR}
+      offering_list = #{offeringList,jdbcType=VARCHAR},
+        offering_replacement = #{offeringReplacement,jdbcType=VARCHAR}
     where user_id = #{userId,jdbcType=CHAR}
       and god_id = #{godId,jdbcType=CHAR}
   </update>

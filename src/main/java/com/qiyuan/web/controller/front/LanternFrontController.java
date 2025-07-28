@@ -1,5 +1,6 @@
 package com.qiyuan.web.controller.front;
 
+import com.qiyuan.web.dto.LanternBlessingDTO;
 import com.qiyuan.web.dto.response.PaymentNoVO;
 import com.qiyuan.web.entity.Lantern;
 import com.qiyuan.web.dto.request.CountRequest;
@@ -86,8 +87,15 @@ public class LanternFrontController {
     public PaymentNoVO purchaseLantern(
             @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "購買資料")
             @Validated @RequestBody LanternPurchaseRequest req) {
-        String paymentNo = lanternPurchaseService.addLanternPurchaseRecord(req);
-        return PaymentNoVO.builder().externalPaymentNo(paymentNo).build();
+        return lanternPurchaseService.addLanternPurchaseRecord(req);
     }
+
+    @Operation(summary = "獲取有效的燈", description = "獲取有效的燈")
+    @ApiResponse(responseCode = "200", description = "獲取有效的燈")
+    @PostMapping("/mine")
+    public List<LanternBlessingDTO> getMyActiveLanterns() {
+        return lanternPurchaseService.getMyActiveLanterns();
+    }
+
 
 }

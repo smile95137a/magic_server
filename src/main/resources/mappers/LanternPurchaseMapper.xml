@@ -114,6 +114,28 @@
     from lantern_purchase
     where id = #{id,jdbcType=CHAR}
   </select>
+  <select id="selectMyActiveLanterns" resultMap="LanternBlessingResultMap">
+    SELECT
+           lp.id as id,
+           l.icon_name as lantern_code,
+           lp.user_id as user_id,
+           lp.name as name,
+           lp.birthday as birthday,
+           lp.message as message,
+           lp.create_time as create_time,
+           lp.expired_time as expired_time,
+           lp.blessing_times as blessing_times
+    FROM
+      lantern_purchase lp
+    LEFT JOIN payment_transaction pt ON lp.external_order_no = pt.id
+    LEFT JOIN lantern l ON lp.lantern_id = l.id
+    WHERE
+      pt.status = 'paid'
+      AND lp.expired_time > GETDATE()
+      AND lp.user_id = #{userId}
+    ORDER BY
+      lp.create_time DESC
+  </select>
 
   <delete id="deleteByExample" parameterType="com.qiyuan.web.entity.example.LanternPurchaseExample">
     delete from lantern_purchase

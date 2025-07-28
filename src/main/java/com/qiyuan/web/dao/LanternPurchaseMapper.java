@@ -21,6 +21,8 @@ public interface LanternPurchaseMapper {
 
     int insertSelective(LanternPurchase record);
 
+    List<LanternBlessingDTO> selectMyActiveLanterns(@Param("userId")String userId);
+
     List<LanternPurchase> selectByExample(LanternPurchaseExample example);
     List<LanternBlessingDTO> selectLimitByExample(@Param("example") LanternPurchaseExample example, @Param("limit") int limit);
 

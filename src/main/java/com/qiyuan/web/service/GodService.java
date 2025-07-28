@@ -1,21 +1,19 @@
 package com.qiyuan.web.service;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.qiyuan.security.exception.ApiException;
 import com.qiyuan.web.dao.GodMapper;
+import com.qiyuan.web.dao.PaymentTransactionMapper;
 import com.qiyuan.web.dao.UserMapper;
 import com.qiyuan.web.dto.request.PresentOfferingRequest;
-import com.qiyuan.web.dto.response.GodInfoVO;
-import com.qiyuan.web.dto.response.MyGodInfoVO;
-import com.qiyuan.web.dto.response.OfferingStateVO;
-import com.qiyuan.web.dto.response.OfferingVO;
-import com.qiyuan.web.entity.God;
-import com.qiyuan.web.entity.GodInfo;
-import com.qiyuan.web.entity.Offering;
-import com.qiyuan.web.entity.User;
+import com.qiyuan.web.dto.response.*;
+import com.qiyuan.web.entity.*;
 import com.qiyuan.web.entity.example.GodExample;
+import com.qiyuan.web.entity.example.GodInfoExample;
+import com.qiyuan.web.entity.example.OfferingPurchaseExample;
+import com.qiyuan.web.enums.OrderStatus;
 import com.qiyuan.web.util.DateUtil;
 import com.qiyuan.web.util.JsonUtil;
+import com.qiyuan.web.util.RandomGenerator;
 import com.qiyuan.web.util.SecurityUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
@@ -24,9 +22,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Service
 public class GodService {
@@ -36,12 +34,14 @@ public class GodService {
     private final UserMapper userMapper;
     private final GodInfoService godInfoService;
     private final OfferingService offeringService;
+    private final PaymentTransactionMapper paymentTransactionMapper;
 
-    public GodService(GodMapper godMapper, UserMapper userMapper, GodInfoService godInfoService, OfferingService offeringService) {
+    public GodService(GodMapper godMapper, UserMapper userMapper, GodInfoService godInfoService, OfferingService offeringService, PaymentTransactionMapper paymentTransactionMapper) {
         this.godMapper = godMapper;
         this.userMapper = userMapper;
         this.godInfoService = godInfoService;
         this.offeringService = offeringService;
+        this.paymentTransactionMapper = paymentTransactionMapper;
     }
 
     public List<God> getGodList() {
@@ -138,17 +138,75 @@ public class GodService {
     }
 
     @Transactional
-    public GodInfoVO addOffering(PresentOfferingRequest param) {
+    public PaymentNoVO addOffering(PresentOfferingRequest param) {
         String godCode = param.getGodCode();
-        String prevOfferingId = param.getPrevOfferingId() == null ? null : param.getPrevOfferingId().toLowerCase(Locale.ROOT);
+        String prevOfferingId = StringUtils.defaultString(param.getPrevOfferingId().toLowerCase(Locale.ROOT));
         String newOfferingId = param.getNewOfferingId().toLowerCase(Locale.ROOT);
         String username = SecurityUtils.getCurrentUsername();
         User user = userMapper.selectByUsername(username);
         God god = getGodByCode(godCode);
         GodInfo godInfo = godInfoService.getGodInfo(user.getId(), god.getId());
-        List<OfferingStateVO> offeringInfoList = null;
         if (godInfo == null) throw new ApiException("請先請神成功!");
 
+        Offering offering = offeringService.getOfferingById(newOfferingId);
+        if (offering == null) throw new ApiException("不存在的供品，請重新選擇");
+
+        String replacement = String.format("%s:%s", prevOfferingId, newOfferingId);
+        godInfo.setOfferingReplacement(replacement);
+        godInfoService.updateGodInfo(godInfo);
+
+        String paymentId = RandomGenerator.getUUID();
+
+        // 新增購買紀錄
+        offeringService.addOfferingPurchase(OfferingPurchase.builder()
+                .id(RandomGenerator.getUUID().toLowerCase(Locale.ROOT))
+                .externalOrderNo(paymentId)
+                .offeringId(newOfferingId)
+                .godId(god.getId())
+                .userId(user.getId())
+                .createTime(new Date())
+                .build());
+
+        paymentTransactionMapper.insertSelective(
+                PaymentTransaction.builder()
+                        .id(paymentId)
+                        .userId(user.getId())
+                        .createTime(new Date())
+                        .sourceType("O")
+                        .amount(BigDecimal.valueOf(offering.getPrice()))
+                        .status(OrderStatus.CREATED.getValue())
+                        .build()
+        );
+        return PaymentNoVO.builder().externalPaymentNo(paymentId).price(BigDecimal.valueOf(offering.getPrice())).build();
+    }
+
+    @Transactional
+    public boolean processOfferingAfterPayment(String paymentId) {
+        PaymentTransaction paymentTransaction = paymentTransactionMapper.selectByPrimaryKey(paymentId);
+        String userId = paymentTransaction.getUserId();
+
+        OfferingPurchaseExample pe = new OfferingPurchaseExample();
+        pe.createCriteria().andExternalOrderNoEqualTo(paymentId).andUserIdEqualTo(userId);
+        List<OfferingPurchase> offeringPurchase = offeringService.getOfferingPurchase(pe);
+        if (offeringPurchase == null || offeringPurchase.isEmpty()) throw new ApiException("查無訂單紀錄，請聯繫客服。");
+
+        OfferingPurchase purchase = offeringPurchase.get(0);
+
+        GodInfoExample e = new GodInfoExample();
+        e.createCriteria().andGodIdEqualTo(purchase.getGodId()).andUserIdEqualTo(purchase.getUserId());
+        List<GodInfo> godInfos = godInfoService.selectByExample(e);
+        if (godInfos == null || godInfos.isEmpty()) throw new ApiException("查無神明紀錄，請聯繫客服。");
+
+        GodInfo godInfo = godInfos.get(0);
+        String replacement = godInfo.getOfferingReplacement();
+
+        if (!replacement.contains(":")) throw new ApiException("查無供品購買紀錄，請聯繫客服。");
+        String[] tempSplit = replacement.split(":");
+        String newOfferingId = tempSplit[1];
+        String prevOfferingId = tempSplit[0];
+
+        // 開始新增/置換供品
+        List<OfferingStateVO> offeringInfoList = null;
         if (StringUtils.isBlank(godInfo.getOfferingList())) {
             OfferingStateVO stateVO = OfferingStateVO.builder().id(newOfferingId).buyTime(DateFormatUtils.format(DateUtil.getCurrentDate(), "yyyy/MM/dd HH:mm")).build();
             offeringInfoList = Arrays.asList(stateVO);
@@ -181,6 +239,7 @@ public class GodService {
             godInfo.setOfferingList(JsonUtil.toJson(offeringInfoList));
         }
 
+        godInfo.setOfferingReplacement("");
         Offering offering = offeringService.getOfferingById(newOfferingId);
         int newExp = godInfo.getExp() + offering.getPoints();
         int nextLevel = newExp / 10;
@@ -196,27 +255,28 @@ public class GodService {
         newExp = newExp % 10;
         godInfo.setExp((byte) newExp);
 
-        // 更新請神資訊以及供品購買紀錄
-        if (!(godInfoService.updateGodInfo(godInfo) &&
-                offeringService.addOfferingPurchase(user.getId(), offering.getId(), god.getId()))) {
-            throw new ApiException("交易發生錯誤，請聯繫客服！");
-        }
+        // 更新請神資訊
+        godInfoService.updateGodInfo(godInfo);
+        return true;
 
 
-        List<String> offeringIds = offeringInfoList.stream().map(OfferingStateVO::getId).collect(Collectors.toList());
-        List<Offering> offerings = offeringService.getOfferingByIds(offeringIds);
+//        List<String> offeringIds = offeringInfoList.stream().map(OfferingStateVO::getId).collect(Collectors.toList());
+//        List<Offering> offerings = offeringService.getOfferingByIds(offeringIds);
+//
+//        // 返回請神資訊
+//        return GodInfoVO.builder()
+//                .imageCode(god.getImageCode())
+//                .name(god.getName())
+//                .isGolden(isGolden)
+//                .cooldownTime(godInfo.getCooldownTime())
+//                .onshelfTime(godInfo.getOnshelfTime())
+//                .offshelfTime(godInfo.getOffshelfTime())
+//                .offerings(offerings.stream().map(offeringService::convertToVo).collect(Collectors.toList()))
+//                .build();
 
-        // 返回請神資訊
-        return GodInfoVO.builder()
-                .imageCode(god.getImageCode())
-                .name(god.getName())
-                .isGolden(isGolden)
-                .cooldownTime(godInfo.getCooldownTime())
-                .onshelfTime(godInfo.getOnshelfTime())
-                .offshelfTime(godInfo.getOffshelfTime())
-                .offerings(offerings.stream().map(offeringService::convertToVo).collect(Collectors.toList()))
-                .build();
+
     }
+
 
     public God getGodByCode(String godCode) {
         GodExample e = new GodExample();

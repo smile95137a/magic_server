@@ -32,4 +32,8 @@ public class GodInfoService {
         return godInfoMapper.updateByPrimaryKey(god) > 0;
     }
 
+    @Transactional
+    public List<GodInfo> selectByExample(GodInfoExample e) {
+        return godInfoMapper.selectByExample(e);
+    }
 }

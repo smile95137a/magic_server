@@ -46,3 +46,8 @@ UPDATE qiyuan.dbo.lantern SET icon_name = 'lan-wenchang' WHERE id = 'f5933073624
 
 ALTER TABLE qiyuan.dbo.lantern
     ADD CONSTRAINT UQ_lantern_icon_name UNIQUE (icon_name);
+
+-- 新增供品置換欄位
+ALTER TABLE qiyuan.dbo.god_info
+    ADD offering_replacement VARCHAR(255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL;
+

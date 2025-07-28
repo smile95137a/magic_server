@@ -128,6 +128,7 @@ public class MasterRequestService {
         return AddMasterRequestResponse.builder()
                 .orderNo(serial)
                 .externalPaymentNo(paymentId)
+                .price(BigDecimal.valueOf(item.getPrice()))
                 .build();
     }
 

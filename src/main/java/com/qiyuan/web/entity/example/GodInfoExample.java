@@ -734,6 +734,76 @@ public class GodInfoExample {
             addCriterion("offering_list not between", value1, value2, "offeringList");
             return (Criteria) this;
         }
+
+        public Criteria andOfferingReplacementIsNull() {
+            addCriterion("offering_replacement is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andOfferingReplacementIsNotNull() {
+            addCriterion("offering_replacement is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andOfferingReplacementEqualTo(String value) {
+            addCriterion("offering_replacement =", value, "offeringReplacement");
+            return (Criteria) this;
+        }
+
+        public Criteria andOfferingReplacementNotEqualTo(String value) {
+            addCriterion("offering_replacement <>", value, "offeringReplacement");
+            return (Criteria) this;
+        }
+
+        public Criteria andOfferingReplacementGreaterThan(String value) {
+            addCriterion("offering_replacement >", value, "offeringReplacement");
+            return (Criteria) this;
+        }
+
+        public Criteria andOfferingReplacementGreaterThanOrEqualTo(String value) {
+            addCriterion("offering_replacement >=", value, "offeringReplacement");
+            return (Criteria) this;
+        }
+
+        public Criteria andOfferingReplacementLessThan(String value) {
+            addCriterion("offering_replacement <", value, "offeringReplacement");
+            return (Criteria) this;
+        }
+
+        public Criteria andOfferingReplacementLessThanOrEqualTo(String value) {
+            addCriterion("offering_replacement <=", value, "offeringReplacement");
+            return (Criteria) this;
+        }
+
+        public Criteria andOfferingReplacementLike(String value) {
+            addCriterion("offering_replacement like", value, "offeringReplacement");
+            return (Criteria) this;
+        }
+
+        public Criteria andOfferingReplacementNotLike(String value) {
+            addCriterion("offering_replacement not like", value, "offeringReplacement");
+            return (Criteria) this;
+        }
+
+        public Criteria andOfferingReplacementIn(List<String> values) {
+            addCriterion("offering_replacement in", values, "offeringReplacement");
+            return (Criteria) this;
+        }
+
+        public Criteria andOfferingReplacementNotIn(List<String> values) {
+            addCriterion("offering_replacement not in", values, "offeringReplacement");
+            return (Criteria) this;
+        }
+
+        public Criteria andOfferingReplacementBetween(String value1, String value2) {
+            addCriterion("offering_replacement between", value1, value2, "offeringReplacement");
+            return (Criteria) this;
+        }
+
+        public Criteria andOfferingReplacementNotBetween(String value1, String value2) {
+            addCriterion("offering_replacement not between", value1, value2, "offeringReplacement");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {

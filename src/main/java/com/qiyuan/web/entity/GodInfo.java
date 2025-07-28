@@ -26,6 +26,8 @@ public class GodInfo {
 
     private String offeringList;
 
+    private String offeringReplacement;
+
     public String getUserId() {
         return userId;
     }
@@ -104,5 +106,13 @@ public class GodInfo {
 
     public void setOfferingList(String offeringList) {
         this.offeringList = offeringList;
+    }
+
+    public String getOfferingReplacement() {
+        return offeringReplacement;
+    }
+
+    public void setOfferingReplacement(String offeringReplacement) {
+        this.offeringReplacement = offeringReplacement;
     }
 }

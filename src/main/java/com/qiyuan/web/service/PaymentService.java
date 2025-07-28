@@ -18,11 +18,11 @@ import com.qiyuan.web.util.DateUtil;
 import com.qiyuan.web.util.JsonUtil;
 import com.qiyuan.web.util.RandomGenerator;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
@@ -36,8 +36,9 @@ public class PaymentService {
     private final OfferingPurchaseMapper offeringPurchaseMapper;
     private final MasterServiceRequestMapper masterServiceRequestMapper;
     private final UserMapper userMapper;
+    private final GodService godService;
 
-    public PaymentService(PaymentTransactionMapper paymentTransactionMapper, GomypayClient gomypayClient, OrdersMapper ordersMapper, LanternPurchaseMapper lanternPurchaseMapper, OfferingPurchaseMapper offeringPurchaseMapper, MasterServiceRequestMapper masterServiceRequestMapper, UserMapper userMapper) {
+    public PaymentService(PaymentTransactionMapper paymentTransactionMapper, GomypayClient gomypayClient, OrdersMapper ordersMapper, LanternPurchaseMapper lanternPurchaseMapper, OfferingPurchaseMapper offeringPurchaseMapper, MasterServiceRequestMapper masterServiceRequestMapper, UserMapper userMapper, GodService godService) {
         this.paymentTransactionMapper = paymentTransactionMapper;
         this.gomypayClient = gomypayClient;
         this.ordersMapper = ordersMapper;
@@ -45,6 +46,7 @@ public class PaymentService {
         this.offeringPurchaseMapper = offeringPurchaseMapper;
         this.masterServiceRequestMapper = masterServiceRequestMapper;
         this.userMapper = userMapper;
+        this.godService = godService;
     }
 
     @Value("${gomypay.customerNo}")
@@ -76,6 +78,9 @@ public class PaymentService {
         tx.setUpdateTime(new Date());
         paymentTransactionMapper.updateByPrimaryKey(tx);
 
+        if (StringUtils.equalsIgnoreCase(tx.getSourceType(), "O")) {
+            godService.processOfferingAfterPayment(tx.getId());
+        }
     }
 
 //    public PaymentCreateResult createPayment(User user, String externalOrderNo, BigDecimal amount,

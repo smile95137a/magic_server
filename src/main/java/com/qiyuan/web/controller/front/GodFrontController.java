@@ -6,6 +6,7 @@ import com.qiyuan.web.dto.request.GodExtendPeriodRequest;
 import com.qiyuan.web.dto.request.PresentOfferingRequest;
 import com.qiyuan.web.dto.response.GodInfoVO;
 import com.qiyuan.web.dto.response.OfferingVO;
+import com.qiyuan.web.dto.response.PaymentNoVO;
 import com.qiyuan.web.entity.God;
 import com.qiyuan.web.entity.Offering;
 import com.qiyuan.web.security.RoleExpressions;
@@ -81,7 +82,7 @@ public class GodFrontController {
     @PostMapping("/offering/present")
     @Operation(summary = "供奉供品", description = "提供供品給指定神明")
     @PreAuthorize(RoleExpressions.ONLY_USER)
-    public GodInfoVO presentOffering(@Validated @RequestBody PresentOfferingRequest req) {
+    public PaymentNoVO presentOffering(@Validated @RequestBody PresentOfferingRequest req) {
         return godService.addOffering(req);
     }
 

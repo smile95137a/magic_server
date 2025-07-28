@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
+
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -12,4 +14,5 @@ import lombok.NoArgsConstructor;
 public class AddMasterRequestResponse {
     private String orderNo;
     private String externalPaymentNo;
+    private BigDecimal price;
 }

@@ -118,17 +118,13 @@ public class OfferingService {
     }
 
     @Transactional
-    public boolean addOfferingPurchase(String userId, String offeringId, String godId) {
-        String id = RandomGenerator.getUUID();
-        OfferingPurchase purchase = OfferingPurchase.builder()
-                .id(id)
-                .externalOrderNo(id)
-                .offeringId(offeringId)
-                .userId(userId)
-                .godId(godId)
-                .createTime(DateUtil.getCurrentDate())
-                .build();
+    public boolean addOfferingPurchase(OfferingPurchase purchase) {
         return offeringPurchaseMapper.insertSelective(purchase) > 0;
+    }
+
+    @Transactional
+    public List<OfferingPurchase> getOfferingPurchase(OfferingPurchaseExample purchase) {
+        return offeringPurchaseMapper.selectByExample(purchase);
     }
 
     public OfferingVO convertToVo(Offering o) {
