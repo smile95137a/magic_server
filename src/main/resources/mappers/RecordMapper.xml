@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.qiyuan.web.dao.ReportMapper">
+  <resultMap id="BaseResultMap" type="com.qiyuan.web.dto.MoneyReportVO">
+    <id column="id" jdbcType="VARCHAR" property="id" />
+    <result column="external_order_no" jdbcType="VARCHAR" property="externalOrderNo" />
+    <result column="type" jdbcType="CHAR" property="type" />
+    <result column="status" jdbcType="VARCHAR" property="status" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+  </resultMap>
+
+  <select id="getAllReportByPeriod" resultMap="BaseResultMap">
+    SELECT t.id, t.external_order_no, p.source_type, p.status, p.create_time FROM
+      (
+        SELECT o.id, o.external_order_no, o.create_time FROM offering_purchase o
+        UNION
+        SELECT l.id, l.external_order_no, l.create_time FROM lantern_purchase l
+        UNION
+        SELECT CAST(m.serial AS VARCHAR) AS id, m.external_order_no, m.create_time FROM master_service_request m
+      ) t
+        LEFT JOIN payment_transaction p  ON p.id = t.external_order_no
+    WHERE t.external_order_no IS NOT NULL AND p.create_time BETWEEN #{startTime} AND #{endTime}
+    UNION
+    SELECT o.id, o.external_order_no, 'R', o.status, o.create_time FROM orders o
+  </select>
+</mapper>

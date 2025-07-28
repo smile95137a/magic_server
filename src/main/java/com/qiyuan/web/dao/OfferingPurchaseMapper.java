@@ -1,5 +1,6 @@
 package com.qiyuan.web.dao;
 
+import com.qiyuan.web.dto.OfferingAdminRecord;
 import com.qiyuan.web.entity.OfferingPurchase;
 import com.qiyuan.web.entity.OfferingRecord;
 import com.qiyuan.web.entity.example.OfferingPurchaseExample;
@@ -26,6 +27,7 @@ public interface OfferingPurchaseMapper {
     List<OfferingRecord> selectRecordsByUserIdAndPeriod(@Param("userId")String userId, @Param("startTime") Date startTime, @Param("endTime")Date endTime, @Param("limits") Integer limits);
 
     List<OfferingRecord> selectRecordsByPeriod(@Param("startTime") Date startTime, @Param("endTime")Date endTime, @Param("limits") Integer limits);
+    List<OfferingAdminRecord> selectAdminRecordsByPeriod(@Param("startTime") Date startTime, @Param("endTime")Date endTime);
 
 
     int updateByExampleSelective(@Param("record") OfferingPurchase record, @Param("example") OfferingPurchaseExample example);

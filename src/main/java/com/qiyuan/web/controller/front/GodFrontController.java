@@ -8,7 +8,6 @@ import com.qiyuan.web.dto.response.GodInfoVO;
 import com.qiyuan.web.dto.response.OfferingVO;
 import com.qiyuan.web.dto.response.PaymentNoVO;
 import com.qiyuan.web.entity.God;
-import com.qiyuan.web.entity.Offering;
 import com.qiyuan.web.security.RoleExpressions;
 import com.qiyuan.web.service.GodService;
 import com.qiyuan.web.service.OfferingService;

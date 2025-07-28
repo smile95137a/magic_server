@@ -8,6 +8,7 @@ import java.util.Locale;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import com.qiyuan.web.dto.LanternAdminRecord;
 import com.qiyuan.web.dto.response.PaymentNoVO;
 import com.qiyuan.web.entity.*;
 import com.qiyuan.web.util.SecurityUtils;
@@ -82,6 +83,12 @@ public class LanternPurchaseService {
                         .content(l.getLanternName())
                         .build())
                 .collect(Collectors.toList());
+    }
+
+    public List<LanternAdminRecord> getAdminLanternPurchaseList(RecordPeriodRequest req) {
+        Date startTime = req.getStartTime();
+        Date endTime = DateUtil.getEndOfDate(req.getEndTime());
+        return lanternPurchaseMapper.selectAdminRecordsByPeriod(startTime, endTime);
     }
 
     public List<LanternBlessingDTO> getMyActiveLanterns() {

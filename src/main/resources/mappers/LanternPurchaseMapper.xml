@@ -29,6 +29,19 @@
     <result column="lanternName" jdbcType="NVARCHAR" property="lanternName" />
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
   </resultMap>
+  <resultMap id="AdminRecord" type="com.qiyuan.web.dto.LanternAdminRecord">
+    <id column="id" jdbcType="CHAR" property="id" />
+    <result column="lanternName" jdbcType="NVARCHAR" property="lanternName" />
+    <result column="lantern_code" jdbcType="VARCHAR" property="lanternCode" />
+    <result column="username" jdbcType="NVARCHAR" property="username" />
+    <result column="user_id" jdbcType="CHAR" property="userId" />
+    <result column="name" jdbcType="NVARCHAR" property="name" />
+    <result column="birthday" jdbcType="TIMESTAMP" property="birthday" />
+    <result column="message" jdbcType="NVARCHAR" property="message" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="expired_time" jdbcType="TIMESTAMP" property="expiredTime" />
+    <result column="blessing_times" jdbcType="SMALLINT" property="blessingTimes" />
+  </resultMap>
   <sql id="Example_Where_Clause">
     <where>
       <foreach collection="oredCriteria" item="criteria" separator="or">
@@ -357,19 +370,19 @@
   </select>
 
 
-  <select id="selectRecordsByUserIdAndPeriod" resultMap="RecordJoinMap">
+  <select id="selectRecordsByUserIdAndPeriod" resultMap="LanternBlessingResultMap">
     SELECT
     <if test="limits != null">
       TOP (#{limits})
     </if>
-    p.id id, p.create_time create_time, l.name lanternName
+    <include refid="Bind_With_Lantern_Table" />
     FROM lantern_purchase p
     LEFT JOIN lantern l ON l.id = p.lantern_id
     WHERE p.user_id = #{userId} AND p.create_time BETWEEN #{startTime} AND #{endTime}
     ORDER By p.create_time ASC
   </select>
 
-  <select id="selectRecordsByPeriod" resultMap="RecordJoinMap">
+  <select id="selectRecordsByPeriod" resultMap="BaseResultMap">
     SELECT
     <if test="limits != null">
       TOP (#{limits})
@@ -384,4 +397,24 @@
     delete from lantern_purchase
     where id = #{id,jdbcType=INTEGER}
   </delete>
+
+  <select id="selectAdminRecordsByPeriod" resultMap="AdminRecord">
+    SELECT
+      p.id id,
+      l.name lanternName,
+      l.icon_name lantern_code,
+      p.user_id user_id,
+      u.nickname username,
+      p.name name,
+      p.birthday birthday,
+      p.message message,
+      p.create_time create_time,
+      p.expired_time expired_time,
+      p.blessing_times blessing_times
+    FROM lantern_purchase p
+           LEFT JOIN lantern l ON l.id = p.lantern_id
+           LEFT JOIN users u ON p.user_id  = u.id
+    WHERE p.create_time BETWEEN #{startTime} AND #{endTime}
+    ORDER By p.create_time ASC
+  </select>
 </mapper>

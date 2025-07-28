@@ -15,6 +15,14 @@
     <result column="godName" jdbcType="NVARCHAR" property="godName" />
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
   </resultMap>
+  <resultMap id="AdminRecord" type="com.qiyuan.web.dto.OfferingAdminRecord">
+    <id column="id" jdbcType="CHAR" property="id" />
+    <result column="offeringName" jdbcType="NVARCHAR" property="offeringName" />
+    <result column="user_id" jdbcType="CHAR" property="userId" />
+    <result column="username" jdbcType="NVARCHAR" property="username" />
+    <result column="godName" jdbcType="NVARCHAR" property="godName" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+  </resultMap>
   <sql id="Example_Where_Clause">
     <where>
       <foreach collection="oredCriteria" item="criteria" separator="or">
@@ -260,5 +268,33 @@
     ORDER BY p.create_time ASC
   </select>
 
+
+  <select id="selectAdminRecordsByPeriod" resultMap="AdminRecord">
+    SELECT
+      p.id as id,
+      o.name as offeringName,
+      p.user_id as user_id,
+      u.nickname  as username,
+      g.name as godName,
+      p.create_time as create_time
+    FROM offering_purchase p
+     LEFT JOIN offering o ON o.id = p.offering_id
+     LEFT JOIN god g ON g.id = p.god_id
+     LEFT JOIN users u ON p.user_id = u.id
+    WHERE
+    p.create_time BETWEEN #{startTime} AND #{endTime}
+    ORDER BY p.create_time ASC
+  </select>
+
+
+  <resultMap id="AdminRecord" type="com.qiyuan.web.dto.OfferingAdminRecord">
+    <id column="id" jdbcType="CHAR" property="id" />
+    <result column="external_order_no" jdbcType="VARCHAR" property="externalOrderNo" />
+    <result column="offeringName" jdbcType="NVARCHAR" property="offeringName" />
+    <result column="user_id" jdbcType="CHAR" property="userId" />
+    <result column="username" jdbcType="NVARCHAR" property="username" />
+    <result column="godName" jdbcType="NVARCHAR" property="godName" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+  </resultMap>
 
 </mapper>
