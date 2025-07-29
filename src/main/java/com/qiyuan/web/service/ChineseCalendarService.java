@@ -53,7 +53,7 @@ public class ChineseCalendarService {
         String qr = "?" + queryString + "&ut=" + ut;
         String contentToSign = qr + ut;
 
-        PrivateKey privateKey = rsaKeyUtil.loadRSAPrivateKey("cmp2_ec_private.pem");
+        PrivateKey privateKey = rsaKeyUtil.loadRSAPrivateKey("60755266_private.pem");
         String signature = signSha256WithRSA(contentToSign, privateKey);
 
         HttpHeaders headers = new HttpHeaders();

@@ -130,8 +130,8 @@ ap:
 
 
 calendar-api:
-  url: https://fortune_tall_test.maideax.net/app/api/v1/chinese_calendar/
-  token: 8P5fCMlUyEVcEUICXVNFak6fjdAwE1M922LWQflFKEnCGEjAcbeurpNMwHLfl47S
+  url: https://fortunetell.lifemap.com.tw/app/api/v1/chinese_calendar/
+  token: uKdx9poTRM48nLo5HKPVuAMtqOTzcFSIEPLvk3oM5Fl0iIahlHhInage1kdaB4KT
   
 app:
   oauth:
