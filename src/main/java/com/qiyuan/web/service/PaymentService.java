@@ -2,22 +2,12 @@ package com.qiyuan.web.service;
 
 import com.qiyuan.security.exception.ApiException;
 import com.qiyuan.web.dao.*;
-import com.qiyuan.web.dto.PaymentNotifyDTO;
-import com.qiyuan.web.dto.request.GomypayRequest;
-import com.qiyuan.web.dto.request.PaymentNotifyRequest;
 import com.qiyuan.web.dto.request.PaymentSuccessRequest;
-import com.qiyuan.web.dto.response.GomypayResponse;
-import com.qiyuan.web.dto.response.PaymentCreateResult;
 import com.qiyuan.web.entity.PaymentTransaction;
 import com.qiyuan.web.entity.PaymentTransactionExample;
-import com.qiyuan.web.entity.User;
 import com.qiyuan.web.enums.OrderStatus;
 import com.qiyuan.web.enums.PayMethodEnum;
 import com.qiyuan.web.enums.SourceTypeEnum;
-import com.qiyuan.web.util.DateUtil;
-import com.qiyuan.web.util.JsonUtil;
-import com.qiyuan.web.util.RandomGenerator;
-import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -75,10 +65,11 @@ public class PaymentService {
 
         // 2. 更新付款狀態為成功
         tx.setStatus(OrderStatus.PAID.getValue());
+        tx.setPayMethod(PayMethodEnum.CREDIT_CARD.getCode());
         tx.setUpdateTime(new Date());
         paymentTransactionMapper.updateByPrimaryKey(tx);
 
-        if (StringUtils.equalsIgnoreCase(tx.getSourceType(), "O")) {
+        if (StringUtils.equalsIgnoreCase(tx.getSourceType(), SourceTypeEnum.OFFERING.getCode())) {
             godService.processOfferingAfterPayment(tx.getId());
         }
     }
