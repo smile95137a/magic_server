@@ -30,4 +30,7 @@ public class PaymentTransaction {
     private Date createTime;
 
     private Date updateTime;
+
+    private String providerOrderNo;
+
 }

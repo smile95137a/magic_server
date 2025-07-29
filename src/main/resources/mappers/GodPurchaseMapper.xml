@@ -1,17 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.qiyuan.web.dao.PaymentTransactionMapper">
-  <resultMap id="BaseResultMap" type="com.qiyuan.web.entity.PaymentTransaction">
-    <id column="id" jdbcType="VARCHAR" property="id" />
+<mapper namespace="com.qiyuan.web.dao.GodPurchaseMapper">
+  <resultMap id="BaseResultMap" type="com.qiyuan.web.entity.GodPurchase">
+    <id column="id" jdbcType="CHAR" property="id" />
     <result column="user_id" jdbcType="CHAR" property="userId" />
-    <result column="source_type" jdbcType="CHAR" property="sourceType" />
-    <result column="amount" jdbcType="DECIMAL" property="amount" />
+    <result column="god_id" jdbcType="CHAR" property="godId" />
+    <result column="duration_days" jdbcType="TINYINT" property="durationDays" />
     <result column="status" jdbcType="VARCHAR" property="status" />
-    <result column="pay_method" jdbcType="VARCHAR" property="payMethod" />
-    <result column="raw_data" jdbcType="NVARCHAR" property="rawData" />
+    <result column="external_order_no" jdbcType="VARCHAR" property="externalOrderNo" />
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
     <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
-    <result column="provider_order_no" jdbcType="VARCHAR" property="providerOrderNo" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -72,16 +70,15 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    id, user_id, source_type, amount, status, pay_method, raw_data, create_time, update_time,
-    provider_order_no
+    id, user_id, god_id, duration_days, status, external_order_no, create_time, update_time
   </sql>
-  <select id="selectByExample" parameterType="com.qiyuan.web.entity.PaymentTransactionExample" resultMap="BaseResultMap">
+  <select id="selectByExample" parameterType="com.qiyuan.web.entity.GodPurchaseExample" resultMap="BaseResultMap">
     select
     <if test="distinct">
       distinct
     </if>
     <include refid="Base_Column_List" />
-    from payment_transaction
+    from god_purchase
     <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
     </if>
@@ -90,33 +87,31 @@
     </if>
   </select>
   <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
-    select
+    select 
     <include refid="Base_Column_List" />
-    from payment_transaction
-    where id = #{id,jdbcType=VARCHAR}
+    from god_purchase
+    where id = #{id,jdbcType=CHAR}
   </select>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
-    delete from payment_transaction
-    where id = #{id,jdbcType=VARCHAR}
+    delete from god_purchase
+    where id = #{id,jdbcType=CHAR}
   </delete>
-  <delete id="deleteByExample" parameterType="com.qiyuan.web.entity.PaymentTransactionExample">
-    delete from payment_transaction
+  <delete id="deleteByExample" parameterType="com.qiyuan.web.entity.GodPurchaseExample">
+    delete from god_purchase
     <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
     </if>
   </delete>
-  <insert id="insert" parameterType="com.qiyuan.web.entity.PaymentTransaction">
-    insert into payment_transaction (id, user_id, source_type,
-                                     amount, status, pay_method,
-                                     raw_data, create_time, update_time,
-                                     provider_order_no)
-    values (#{id,jdbcType=VARCHAR}, #{userId,jdbcType=CHAR}, #{sourceType,jdbcType=CHAR},
-            #{amount,jdbcType=DECIMAL}, #{status,jdbcType=VARCHAR}, #{payMethod,jdbcType=VARCHAR},
-            #{rawData,jdbcType=NVARCHAR}, #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP},
-            #{providerOrderNo,jdbcType=VARCHAR})
+  <insert id="insert" parameterType="com.qiyuan.web.entity.GodPurchase">
+    insert into god_purchase (id, user_id, god_id, duration_days, 
+      status, external_order_no, create_time, 
+      update_time)
+    values (#{id,jdbcType=CHAR}, #{userId,jdbcType=CHAR}, #{godId,jdbcType=CHAR}, #{durationDays,jdbcType=TINYINT}, 
+      #{status,jdbcType=VARCHAR}, #{externalOrderNo,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, 
+      #{updateTime,jdbcType=TIMESTAMP})
   </insert>
-  <insert id="insertSelective" parameterType="com.qiyuan.web.entity.PaymentTransaction">
-    insert into payment_transaction
+  <insert id="insertSelective" parameterType="com.qiyuan.web.entity.GodPurchase">
+    insert into god_purchase
     <trim prefix="(" suffix=")" suffixOverrides=",">
       <if test="id != null">
         id,
@@ -124,20 +119,17 @@
       <if test="userId != null">
         user_id,
       </if>
-      <if test="sourceType != null">
-        source_type,
+      <if test="godId != null">
+        god_id,
       </if>
-      <if test="amount != null">
-        amount,
+      <if test="durationDays != null">
+        duration_days,
       </if>
       <if test="status != null">
         status,
       </if>
-      <if test="payMethod != null">
-        pay_method,
-      </if>
-      <if test="rawData != null">
-        raw_data,
+      <if test="externalOrderNo != null">
+        external_order_no,
       </if>
       <if test="createTime != null">
         create_time,
@@ -145,31 +137,25 @@
       <if test="updateTime != null">
         update_time,
       </if>
-      <if test="providerOrderNo != null">
-        provider_order_no,
-      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
-        #{id,jdbcType=VARCHAR},
+        #{id,jdbcType=CHAR},
       </if>
       <if test="userId != null">
         #{userId,jdbcType=CHAR},
       </if>
-      <if test="sourceType != null">
-        #{sourceType,jdbcType=CHAR},
+      <if test="godId != null">
+        #{godId,jdbcType=CHAR},
       </if>
-      <if test="amount != null">
-        #{amount,jdbcType=DECIMAL},
+      <if test="durationDays != null">
+        #{durationDays,jdbcType=TINYINT},
       </if>
       <if test="status != null">
         #{status,jdbcType=VARCHAR},
       </if>
-      <if test="payMethod != null">
-        #{payMethod,jdbcType=VARCHAR},
-      </if>
-      <if test="rawData != null">
-        #{rawData,jdbcType=NVARCHAR},
+      <if test="externalOrderNo != null">
+        #{externalOrderNo,jdbcType=VARCHAR},
       </if>
       <if test="createTime != null">
         #{createTime,jdbcType=TIMESTAMP},
@@ -177,40 +163,34 @@
       <if test="updateTime != null">
         #{updateTime,jdbcType=TIMESTAMP},
       </if>
-      <if test="providerOrderNo != null">
-        #{providerOrderNo,jdbcType=VARCHAR},
-      </if>
     </trim>
   </insert>
-  <select id="countByExample" parameterType="com.qiyuan.web.entity.PaymentTransactionExample" resultType="java.lang.Long">
-    select count(*) from payment_transaction
+  <select id="countByExample" parameterType="com.qiyuan.web.entity.GodPurchaseExample" resultType="java.lang.Long">
+    select count(*) from god_purchase
     <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
     </if>
   </select>
   <update id="updateByExampleSelective" parameterType="map">
-    update payment_transaction
+    update god_purchase
     <set>
       <if test="row.id != null">
-        id = #{row.id,jdbcType=VARCHAR},
+        id = #{row.id,jdbcType=CHAR},
       </if>
       <if test="row.userId != null">
         user_id = #{row.userId,jdbcType=CHAR},
       </if>
-      <if test="row.sourceType != null">
-        source_type = #{row.sourceType,jdbcType=CHAR},
+      <if test="row.godId != null">
+        god_id = #{row.godId,jdbcType=CHAR},
       </if>
-      <if test="row.amount != null">
-        amount = #{row.amount,jdbcType=DECIMAL},
+      <if test="row.durationDays != null">
+        duration_days = #{row.durationDays,jdbcType=TINYINT},
       </if>
       <if test="row.status != null">
         status = #{row.status,jdbcType=VARCHAR},
       </if>
-      <if test="row.payMethod != null">
-        pay_method = #{row.payMethod,jdbcType=VARCHAR},
-      </if>
-      <if test="row.rawData != null">
-        raw_data = #{row.rawData,jdbcType=NVARCHAR},
+      <if test="row.externalOrderNo != null">
+        external_order_no = #{row.externalOrderNo,jdbcType=VARCHAR},
       </if>
       <if test="row.createTime != null">
         create_time = #{row.createTime,jdbcType=TIMESTAMP},
@@ -218,50 +198,42 @@
       <if test="row.updateTime != null">
         update_time = #{row.updateTime,jdbcType=TIMESTAMP},
       </if>
-      <if test="row.providerOrderNo != null">
-        provider_order_no = #{row.providerOrderNo,jdbcType=VARCHAR},
-      </if>
     </set>
     <if test="example != null">
       <include refid="Update_By_Example_Where_Clause" />
     </if>
   </update>
   <update id="updateByExample" parameterType="map">
-    update payment_transaction
-    set id = #{row.id,jdbcType=VARCHAR},
-    user_id = #{row.userId,jdbcType=CHAR},
-    source_type = #{row.sourceType,jdbcType=CHAR},
-    amount = #{row.amount,jdbcType=DECIMAL},
-    status = #{row.status,jdbcType=VARCHAR},
-    pay_method = #{row.payMethod,jdbcType=VARCHAR},
-    raw_data = #{row.rawData,jdbcType=NVARCHAR},
-    create_time = #{row.createTime,jdbcType=TIMESTAMP},
-    update_time = #{row.updateTime,jdbcType=TIMESTAMP},
-    provider_order_no = #{row.providerOrderNo,jdbcType=VARCHAR}
+    update god_purchase
+    set id = #{row.id,jdbcType=CHAR},
+      user_id = #{row.userId,jdbcType=CHAR},
+      god_id = #{row.godId,jdbcType=CHAR},
+      duration_days = #{row.durationDays,jdbcType=TINYINT},
+      status = #{row.status,jdbcType=VARCHAR},
+      external_order_no = #{row.externalOrderNo,jdbcType=VARCHAR},
+      create_time = #{row.createTime,jdbcType=TIMESTAMP},
+      update_time = #{row.updateTime,jdbcType=TIMESTAMP}
     <if test="example != null">
       <include refid="Update_By_Example_Where_Clause" />
     </if>
   </update>
-  <update id="updateByPrimaryKeySelective" parameterType="com.qiyuan.web.entity.PaymentTransaction">
-    update payment_transaction
+  <update id="updateByPrimaryKeySelective" parameterType="com.qiyuan.web.entity.GodPurchase">
+    update god_purchase
     <set>
       <if test="userId != null">
         user_id = #{userId,jdbcType=CHAR},
       </if>
-      <if test="sourceType != null">
-        source_type = #{sourceType,jdbcType=CHAR},
+      <if test="godId != null">
+        god_id = #{godId,jdbcType=CHAR},
       </if>
-      <if test="amount != null">
-        amount = #{amount,jdbcType=DECIMAL},
+      <if test="durationDays != null">
+        duration_days = #{durationDays,jdbcType=TINYINT},
       </if>
       <if test="status != null">
         status = #{status,jdbcType=VARCHAR},
       </if>
-      <if test="payMethod != null">
-        pay_method = #{payMethod,jdbcType=VARCHAR},
-      </if>
-      <if test="rawData != null">
-        raw_data = #{rawData,jdbcType=NVARCHAR},
+      <if test="externalOrderNo != null">
+        external_order_no = #{externalOrderNo,jdbcType=VARCHAR},
       </if>
       <if test="createTime != null">
         create_time = #{createTime,jdbcType=TIMESTAMP},
@@ -269,23 +241,18 @@
       <if test="updateTime != null">
         update_time = #{updateTime,jdbcType=TIMESTAMP},
       </if>
-      <if test="providerOrderNo != null">
-        provider_order_no = #{providerOrderNo,jdbcType=VARCHAR},
-      </if>
     </set>
-    where id = #{id,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=CHAR}
   </update>
-  <update id="updateByPrimaryKey" parameterType="com.qiyuan.web.entity.PaymentTransaction">
-    update payment_transaction
+  <update id="updateByPrimaryKey" parameterType="com.qiyuan.web.entity.GodPurchase">
+    update god_purchase
     set user_id = #{userId,jdbcType=CHAR},
-        source_type = #{sourceType,jdbcType=CHAR},
-        amount = #{amount,jdbcType=DECIMAL},
-        status = #{status,jdbcType=VARCHAR},
-        pay_method = #{payMethod,jdbcType=VARCHAR},
-        raw_data = #{rawData,jdbcType=NVARCHAR},
-        create_time = #{createTime,jdbcType=TIMESTAMP},
-        update_time = #{updateTime,jdbcType=TIMESTAMP},
-        provider_order_no = #{providerOrderNo,jdbcType=VARCHAR}
-    where id = #{id,jdbcType=VARCHAR}
+      god_id = #{godId,jdbcType=CHAR},
+      duration_days = #{durationDays,jdbcType=TINYINT},
+      status = #{status,jdbcType=VARCHAR},
+      external_order_no = #{externalOrderNo,jdbcType=VARCHAR},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=CHAR}
   </update>
 </mapper>
