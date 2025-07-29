@@ -10,7 +10,7 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 public class LanternBlessingDTO {
-    private Integer id;
+    private String id;
 
     private String lanternCode;
 
