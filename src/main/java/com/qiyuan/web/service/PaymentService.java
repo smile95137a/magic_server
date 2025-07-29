@@ -9,6 +9,8 @@ import com.qiyuan.web.enums.OrderStatus;
 import com.qiyuan.web.enums.PayMethodEnum;
 import com.qiyuan.web.enums.SourceTypeEnum;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,6 +20,7 @@ import java.util.List;
 
 @Service
 public class PaymentService {
+    private static final Logger logger = LoggerFactory.getLogger(PaymentService.class);
 
     private final PaymentTransactionMapper paymentTransactionMapper;
     private final GomypayClient gomypayClient;
@@ -60,17 +63,22 @@ public class PaymentService {
 
         PaymentTransaction tx = txList.get(0);
         // 已經標記為成功，直接略過
-        if (OrderStatus.PAID.getValue().equalsIgnoreCase(tx.getStatus())) return;
-
+        if (!OrderStatus.CREATED.getValue().equalsIgnoreCase(tx.getStatus())) {
+            logger.info("付款已處理或非等待狀態, status={}, id={}", tx.getStatus(), tx.getId());
+            return;
+        }
 
         // 2. 更新付款狀態為成功
         tx.setStatus(OrderStatus.PAID.getValue());
+        tx.setProviderOrderNo(request.getProviderOrderNo());
         tx.setPayMethod(PayMethodEnum.CREDIT_CARD.getCode());
         tx.setUpdateTime(new Date());
         paymentTransactionMapper.updateByPrimaryKey(tx);
 
         if (StringUtils.equalsIgnoreCase(tx.getSourceType(), SourceTypeEnum.OFFERING.getCode())) {
             godService.processOfferingAfterPayment(tx.getId());
+        } else if (StringUtils.equalsIgnoreCase(tx.getSourceType(), SourceTypeEnum.GOD.getCode())) {
+            godService.markGodDescendPaid(tx.getId());
         }
     }
 

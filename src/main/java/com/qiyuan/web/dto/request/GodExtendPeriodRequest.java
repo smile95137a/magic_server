@@ -20,7 +20,7 @@ public class GodExtendPeriodRequest {
     @Pattern(regexp = "^g-[a-z]{1,4}$", message = "代號錯誤")
     private String godCode;
 
-    @Schema(description = "延長天數，只允許 7 或 30", example = "30")
+    @Schema(description = "天數，只允許 7 或 30", example = "30")
     @NotNull
     @Pattern(regexp = "^(30|7)$", message = "格式錯誤")
     private String day;

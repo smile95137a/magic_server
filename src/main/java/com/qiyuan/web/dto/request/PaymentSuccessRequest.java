@@ -12,6 +12,9 @@ import lombok.NoArgsConstructor;
 @Builder
 @Data
 public class PaymentSuccessRequest {
+
+    private String providerOrderNo;
+
     @NotBlank
     private String externalOrderNo;
     @NotBlank

@@ -2,15 +2,19 @@ package com.qiyuan.web.service;
 
 import com.qiyuan.security.exception.ApiException;
 import com.qiyuan.web.dao.GodMapper;
+import com.qiyuan.web.dao.GodPurchaseMapper;
 import com.qiyuan.web.dao.PaymentTransactionMapper;
 import com.qiyuan.web.dao.UserMapper;
+import com.qiyuan.web.dto.request.GodExtendPeriodRequest;
 import com.qiyuan.web.dto.request.PresentOfferingRequest;
 import com.qiyuan.web.dto.response.*;
 import com.qiyuan.web.entity.*;
 import com.qiyuan.web.entity.example.GodExample;
 import com.qiyuan.web.entity.example.GodInfoExample;
+import com.qiyuan.web.entity.example.GodPurchaseExample;
 import com.qiyuan.web.entity.example.OfferingPurchaseExample;
 import com.qiyuan.web.enums.OrderStatus;
+import com.qiyuan.web.enums.SourceTypeEnum;
 import com.qiyuan.web.util.DateUtil;
 import com.qiyuan.web.util.JsonUtil;
 import com.qiyuan.web.util.RandomGenerator;
@@ -35,13 +39,15 @@ public class GodService {
     private final GodInfoService godInfoService;
     private final OfferingService offeringService;
     private final PaymentTransactionMapper paymentTransactionMapper;
+    private final GodPurchaseMapper godPurchaseMapper;
 
-    public GodService(GodMapper godMapper, UserMapper userMapper, GodInfoService godInfoService, OfferingService offeringService, PaymentTransactionMapper paymentTransactionMapper) {
+    public GodService(GodMapper godMapper, UserMapper userMapper, GodInfoService godInfoService, OfferingService offeringService, PaymentTransactionMapper paymentTransactionMapper, GodPurchaseMapper godPurchaseMapper) {
         this.godMapper = godMapper;
         this.userMapper = userMapper;
         this.godInfoService = godInfoService;
         this.offeringService = offeringService;
         this.paymentTransactionMapper = paymentTransactionMapper;
+        this.godPurchaseMapper = godPurchaseMapper;
     }
 
     public List<God> getGodList() {
@@ -52,28 +58,94 @@ public class GodService {
     }
 
     @Transactional
-    public boolean godDescend(String godCode) {
+    public PaymentNoVO prepareGodDescendPurchase(GodExtendPeriodRequest request) {
         String username = SecurityUtils.getCurrentUsername();
         User user = userMapper.selectByUsername(username);
+        String godCode = request.getGodCode().toLowerCase(Locale.ROOT);
         God god = getGodByCode(godCode);
-        GodInfo godInfo = godInfoService.getGodInfo(user.getId(), god.getId());
         Date now = DateUtil.getCurrentDate();
+
+        String id = RandomGenerator.getUUID().toLowerCase(Locale.ROOT);
+        String paymentId = id.substring(0, 25);
+        Byte day = Byte.valueOf(request.getDay());
+        GodPurchase record = GodPurchase.builder()
+                .id(id)
+                .userId(user.getId())
+                .godId(god.getId())
+                .durationDays(day)
+                .status(OrderStatus.CREATED.getValue())
+                .externalOrderNo(paymentId)
+                .createTime(now)
+                .build();
+        // 請神價格： 7天20元、30天60元
+        BigDecimal price = BigDecimal.valueOf(day == 30 ? 60 : 20);
+        PaymentTransaction tx = PaymentTransaction.builder()
+                .id(paymentId)
+                .userId(user.getId())
+                .status(OrderStatus.CREATED.getValue())
+                .amount(price)
+                .sourceType(SourceTypeEnum.GOD.getCode())
+                .createTime(now)
+                .build();
+
+        godPurchaseMapper.insertSelective(record);
+        paymentTransactionMapper.insertSelective(tx);
+        return PaymentNoVO.builder()
+                .externalPaymentNo(paymentId)
+                .price(price)
+                .build();
+    }
+
+    @Transactional
+    public boolean markGodDescendPaid(String paymentId) {
+        String username = SecurityUtils.getCurrentUsername();
+        User user = userMapper.selectByUsername(username);
+
+        GodPurchaseExample pe = new GodPurchaseExample();
+        pe.createCriteria().andExternalOrderNoEqualTo(paymentId).andUserIdEqualTo(user.getId());
+        List<GodPurchase> godPurchases = godPurchaseMapper.selectByExample(pe);
+        if (godPurchases == null || godPurchases.isEmpty()) throw new ApiException("查無資料");
+
+        GodPurchase purchase = godPurchases.get(0);
+        String godId = purchase.getGodId();
+        GodInfo godInfo = godInfoService.getGodInfo(user.getId(), godId);
+        Date now = DateUtil.getCurrentDate();
+
+        // 更新付款狀態
+        purchase.setStatus(OrderStatus.PAID.getValue());
+        purchase.setUpdateTime(now);
+        godPurchaseMapper.updateByPrimaryKey(purchase);
+
+        // 更新神明資訊
+        Byte addDays = purchase.getDurationDays();
+        // 第一次請神
         if (godInfo == null) {
             godInfo = GodInfo.builder()
-                    .godId(god.getId())
+                    .godId(godId)
                     .userId(user.getId())
                     .exp((byte) 0)
                     .level((byte) 1)
                     .jiaobeiLastTime(now)
                     .onshelfTime(now)
-                    .offshelfTime(DateUtil.adjustDate(now, 1, Date.class))
-                    .cooldownTime(DateUtil.adjustDate(now, 2, Date.class))
+                    .offshelfTime(DateUtil.adjustDate(now, addDays, Date.class))
+                    .cooldownTime(DateUtil.adjustDate(now, addDays + 1, Date.class))
                     .build();
             return godInfoService.addGodInfo(godInfo);
         } else {
+            boolean isExtend = godInfo.getOffshelfTime() != null && godInfo.getOffshelfTime().after(now);
             godInfo.setJiaobeiLastTime(now);
-            godInfo.setOnshelfTime(now);
-            godInfo.setOffshelfTime(DateUtil.adjustDate(now, 1, Date.class));
+            if (isExtend) {
+                // 延長
+                Date expiredDay = DateUtil.adjustDate(godInfo.getOffshelfTime(), addDays, Date.class);
+                godInfo.setOffshelfTime(expiredDay);
+                godInfo.setCooldownTime(DateUtil.adjustDate(expiredDay,  1, Date.class));
+            } else {
+                // 請神
+                godInfo.setOnshelfTime(now);
+                godInfo.setOffshelfTime(DateUtil.adjustDate(now, addDays, Date.class));
+                godInfo.setCooldownTime(DateUtil.adjustDate(now, addDays + 1, Date.class));
+            }
+
             return godInfoService.updateGodInfo(godInfo);
         }
     }
@@ -121,20 +193,6 @@ public class GodService {
 
         }
         return vo;
-    }
-
-    public boolean extendGodPeriod(String godCode, int day) {
-        String username = SecurityUtils.getCurrentUsername();
-        User user = userMapper.selectByUsername(username);
-        God god = getGodByCode(godCode);
-        GodInfo godInfo = godInfoService.getGodInfo(user.getId(), god.getId());
-        Date now = DateUtil.getCurrentDate();
-        godInfo.setJiaobeiLastTime(now);
-        Date newOffshelf = DateUtil.adjustDate(godInfo.getOffshelfTime(), day, Date.class);
-        Date newCooldown = DateUtil.adjustDate(godInfo.getOffshelfTime(), day + 1, Date.class);
-        godInfo.setOffshelfTime(newOffshelf);
-        godInfo.setCooldownTime(newCooldown);
-        return godInfoService.updateGodInfo(godInfo);
     }
 
     @Transactional

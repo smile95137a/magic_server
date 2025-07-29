@@ -43,14 +43,6 @@ public class GodFrontController {
         return godService.getGodList();
     }
 
-    @PostMapping("/descend")
-    @PreAuthorize(RoleExpressions.ONLY_USER)
-    @Operation(summary = "神明降臨", description = "讓指定神明降臨，需傳入神明代碼")
-    public boolean godDescend(@RequestBody @Validated GodInfoRequest req) {
-        String godCode = req.getGodCode().toLowerCase(Locale.ROOT);
-        return godService.godDescend(godCode);
-    }
-
     @PostMapping("/info")
     @PreAuthorize(RoleExpressions.ONLY_USER)
     @Operation(summary = "查詢神明資訊", description = "取得指定神明的詳細資訊")
@@ -64,11 +56,11 @@ public class GodFrontController {
         }
     }
 
-    @PostMapping("/extend")
+    @PostMapping("/descend")
     @PreAuthorize(RoleExpressions.ONLY_USER)
-    @Operation(summary = "延長神明降臨期間", description = "延長指定神明降臨的天數")
-    public boolean extendDescendPeriod(@Validated @RequestBody GodExtendPeriodRequest req) {
-        return godService.extendGodPeriod(req.getGodCode(), Integer.parseInt(req.getDay()));
+    @Operation(summary = "神明降臨", description = "讓指定神明降臨，需傳入神明代碼及降臨天數")
+    public PaymentNoVO godDescend(@RequestBody @Validated GodExtendPeriodRequest req) {
+        return godService.prepareGodDescendPurchase(req);
     }
 
     @PostMapping("/offering/list")
