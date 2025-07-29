@@ -39,7 +39,7 @@ public class OrderService {
     private final ProductMapper productMapper;
     private final PaymentService paymentService;
     private final StockService stockService;
-    private ImagePathMappingConfig mappingConfig;
+    private final ImagePathMappingConfig mappingConfig;
 
     @Transactional
     public CreateOrderResponse createOrder(CreateOrderRequest request) {
