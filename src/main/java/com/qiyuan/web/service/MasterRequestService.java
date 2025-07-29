@@ -4,6 +4,7 @@ import com.qiyuan.security.exception.ApiException;
 import com.qiyuan.web.dao.MasterMapper;
 import com.qiyuan.web.dao.MasterServiceRequestMapper;
 import com.qiyuan.web.dao.PaymentTransactionMapper;
+import com.qiyuan.web.dao.UserMapper;
 import com.qiyuan.web.dto.QapItemVO;
 import com.qiyuan.web.dto.request.MasterReservationFilter;
 import com.qiyuan.web.dto.response.AddMasterRequestResponse;
@@ -11,16 +12,16 @@ import com.qiyuan.web.dto.response.MasterServiceRequestVO;
 import com.qiyuan.web.entity.Master;
 import com.qiyuan.web.entity.MasterServiceRequest;
 import com.qiyuan.web.entity.PaymentTransaction;
+import com.qiyuan.web.entity.User;
 import com.qiyuan.web.entity.example.MasterExample;
 import com.qiyuan.web.entity.example.MasterServiceRequestExample;
 import com.qiyuan.web.enums.OrderStatus;
-import com.qiyuan.web.util.Base36Util;
-import com.qiyuan.web.util.DateUtil;
-import com.qiyuan.web.util.JsonUtil;
-import com.qiyuan.web.util.RandomGenerator;
+import com.qiyuan.web.enums.SourceTypeEnum;
+import com.qiyuan.web.util.*;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -41,10 +42,13 @@ public class MasterRequestService {
 
     private final PaymentTransactionMapper paymentTransactionMapper;
 
-    public MasterRequestService(MasterServiceRequestMapper mapper, MasterMapper masterMapper, PaymentTransactionMapper paymentTransactionMapper) {
+    private final UserMapper userMapper;
+
+    public MasterRequestService(MasterServiceRequestMapper mapper, MasterMapper masterMapper, PaymentTransactionMapper paymentTransactionMapper, UserMapper userMapper) {
         this.mapper = mapper;
         this.masterMapper = masterMapper;
         this.paymentTransactionMapper = paymentTransactionMapper;
+        this.userMapper = userMapper;
     }
 
     public List<MasterServiceRequestVO> getMasterReservationByFilter(MasterReservationFilter filter) {
@@ -114,12 +118,20 @@ public class MasterRequestService {
             throw new ApiException("系統發生錯誤，請聯繫客服！");
         }
 
+        String userId = null;
+        Authentication authentication = SecurityUtils.getAuthentication();
+        if (authentication != null) {
+            User user = userMapper.selectByUsername(authentication.getName());
+            userId = user.getId();
+        }
+
         paymentTransactionMapper.insertSelective(PaymentTransaction.builder()
-                .status(OrderStatus.CREATED.getValue())
-                .sourceType("M")
-                .createTime(DateUtil.getCurrentDate())
-                .userId(null)
+                .id(paymentId)
+                .userId(userId)
+                .sourceType(SourceTypeEnum.MASTER_SERVICE.getCode())
                 .amount(BigDecimal.valueOf(item.getPrice()))
+                .status(OrderStatus.CREATED.getValue())
+                .createTime(DateUtil.getCurrentDate())
                 .build());
 
         String serial = String.format("%s-%s", req.getMasterCode(), getOrderIdFromTid(request.getSerial()));
