@@ -13,4 +13,7 @@ import lombok.NoArgsConstructor;
 public class PaySuccessRequest {
     @NotBlank
     private String orderId;
+    @NotBlank
+    private String externalOrderNo;
+    private String providerOrderNo;
 }

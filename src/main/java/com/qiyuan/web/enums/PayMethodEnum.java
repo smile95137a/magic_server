@@ -10,7 +10,7 @@ public enum PayMethodEnum {
     UNIONPAY("unionpay", "銀聯卡", "1", false),
     CVS_BARCODE("cvs_barcode", "超商條碼繳費", "2", false),
     WEBATM("webatm", "WebATM", "3", false),
-    ATM_VIRTUAL("atm_virtual", "虛擬帳號", "4", false),
+    ATM_VIRTUAL("atm_virtual", "虛擬帳號轉帳", "4", false),
     CVS_CODE("cvs_code", "超商代碼繳費", "6", false),
     LINEPAY("linepay", "LINE Pay", "7", false);
 
@@ -19,7 +19,7 @@ public enum PayMethodEnum {
     private final String apiValue;
     private final boolean installment; // 是否為分期
 
-    public static Set<PayMethodEnum> allows = Set.of(CREDIT_CARD, CREDIT_CARD_INSTALLMENT, CVS_CODE, CVS_BARCODE);
+    public static Set<PayMethodEnum> allows = Set.of(CREDIT_CARD, ATM_VIRTUAL);
 
     public static List<PayMethodEnum> getAllowsMethod () {
         return new ArrayList<>(allows);

@@ -14,3 +14,22 @@ CREATE TABLE qiyuan.dbo.god_purchase (
      update_time DATETIME2 NOT NULL DEFAULT GETDATE(),
      CONSTRAINT PK_god_purchase PRIMARY KEY (id)
 );
+
+
+-- 調整訂單表欄位長度 external_order_no
+UPDATE qiyuan.dbo.orders
+SET external_order_no = LEFT(external_order_no, 25)
+WHERE LEN(external_order_no) > 25;
+
+UPDATE qiyuan.dbo.orders
+SET external_order_no = LEFT(external_order_no, 25)
+WHERE LEN(external_order_no) > 25;
+
+ALTER TABLE qiyuan.dbo.orders
+DROP CONSTRAINT UQ__orders__83AD2A3DFD0A32E6;
+
+ALTER TABLE qiyuan.dbo.orders
+ALTER COLUMN external_order_no VARCHAR(25) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL;
+
+ALTER TABLE qiyuan.dbo.orders
+    ADD CONSTRAINT UQ_orders_external_order_no UNIQUE (external_order_no);

@@ -18,6 +18,8 @@ import com.qiyuan.web.util.SecurityUtils;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,42 +31,55 @@ import java.util.Locale;
 
 
 @Service
-@RequiredArgsConstructor
 public class OrderService {
+
+    private static final Logger logger = LoggerFactory.getLogger(OrderService.class);
 
     private final OrdersMapper ordersMapper;
     private final OrderItemMapper orderItemMapper;
     private final ShippingMethodMapper shippingMethodMapper;
     private final UserMapper userMapper;
     private final ProductMapper productMapper;
+    private final PaymentTransactionMapper paymentTransactionMapper;
     private final PaymentService paymentService;
     private final StockService stockService;
     private final ImagePathMappingConfig mappingConfig;
 
+    public OrderService(OrdersMapper ordersMapper, OrderItemMapper orderItemMapper, ShippingMethodMapper shippingMethodMapper, UserMapper userMapper, ProductMapper productMapper, PaymentTransactionMapper paymentTransactionMapper, PaymentService paymentService, StockService stockService, ImagePathMappingConfig mappingConfig) {
+        this.ordersMapper = ordersMapper;
+        this.orderItemMapper = orderItemMapper;
+        this.shippingMethodMapper = shippingMethodMapper;
+        this.userMapper = userMapper;
+        this.productMapper = productMapper;
+        this.paymentTransactionMapper = paymentTransactionMapper;
+        this.paymentService = paymentService;
+        this.stockService = stockService;
+        this.mappingConfig = mappingConfig;
+    }
+
     @Transactional
     public CreateOrderResponse createOrder(CreateOrderRequest request) {
+        List<CreateOrderItem> items = request.getItems();
+        if (items == null || items.isEmpty()) throw new ApiException("請選擇購買商品");
+
         // 1. 取得登入會員
         String currentUsername = SecurityUtils.getCurrentUsername();
         User user = userMapper.selectByUsername(currentUsername);
         if (user == null) throw new ApiException("會員不存在");
 
         Date currentDate = DateUtil.getCurrentDate();
-        List<CreateOrderItem> items = request.getItems();
-        if (items == null || items.isEmpty())
-            throw new ApiException("請選擇購買商品");
-
-        String orderId = RandomGenerator.getUUID();
+        String orderId = RandomGenerator.getUUID().toLowerCase(Locale.ROOT);
 
         BigDecimal total = BigDecimal.ZERO;
         // 2. 處理每個商品（驗證 + 扣庫存 + 建明細）
         for (CreateOrderItem item : items) {
             Product product = productMapper.selectByPrimaryKey(item.getProductId());
             if (product == null || !Boolean.TRUE.equals(product.getStatus()))
-                throw new ApiException("商品不存在或已下架");
+                throw new ApiException(item.getProductId() + " 商品不存在或已下架");
 
             int needQty = item.getQuantity() == null ? 1 : item.getQuantity();
             if (product.getStock() == null || product.getStock() < needQty)
-                throw new ApiException("[" + product.getName() + "]庫存不足");
+                throw new ApiException("[" + product.getName() + "] 庫存不足");
 
             // 扣庫存
             stockService.reserveStock(product.getId(), needQty, null);
@@ -108,9 +123,10 @@ public class OrderService {
         total = total.add(BigDecimal.valueOf(shippingMethod.getFee()));
 
         // 4. 建立訂單主表
+        String paymentId = orderId.substring(0, 25);
         Orders order = Orders.builder()
                 .id(orderId)
-                .externalOrderNo(orderId)
+                .externalOrderNo(paymentId)
                 .userId(user.getId())
                 .totalAmount(total)
                 .paid(false)
@@ -127,18 +143,26 @@ public class OrderService {
                 .build();
         ordersMapper.insertSelective(order);
 
-        // 5. 金流處理
-//        PayMethodEnum payMethod = PayMethodEnum.fromCode(request.getPayMethod());
-//        PaymentCreateResult paymentResult = paymentService.createPayment(
-//                user, externalOrderNo, total, payMethod, SourceTypeEnum.REAL, orderId
-//        );
+        // 建立金流單
+        PaymentTransaction tx = PaymentTransaction.builder()
+                .id(paymentId)
+                .userId(user.getId())
+                .sourceType(SourceTypeEnum.REAL.getCode())
+                .amount(total)
+                .createTime(currentDate)
+                .build();
 
+        paymentTransactionMapper.insertSelective(tx);
+
+        // TODO: 金流待實作虛擬轉帳及信用卡部分
+        // 金流選擇參考: /order/pay-method/list
+        // 依據不同的金流，回傳資訊不同
         return CreateOrderResponse.builder()
                 .orderId(orderId)
-                .externalOrderNo(orderId)
+                .externalOrderNo(paymentId)
                 .totalAmount(total)
                 .status(OrderStatus.CREATED.getValue())
-                .paymentStatus("pending")
+                .paymentStatus(OrderStatus.CREATED.getLabel())
                 .payMethod(request.getPayMethod())
                 .shippingMethod(order.getShippingMethodId())
 //                .paymentUrl(paymentResult.getPaymentUrl())
@@ -304,14 +328,33 @@ public class OrderService {
         return prefix + p.getMainImage();
     }
 
-    public void markAsPaid(String orderId) {
+    public void markAsPaid(PaySuccessRequest r) {
+        String paymentId = r.getExternalOrderNo();
+        String providerOrderNo = r.getProviderOrderNo();
+        String orderId = r.getOrderId();
+
+        PaymentTransaction tx = paymentTransactionMapper.selectByPrimaryKey(paymentId);
+        if (tx == null) throw new ApiException("查無金流紀錄");
         Orders order = ordersMapper.selectByPrimaryKey(orderId);
-        if (order == null) {
-            throw new ApiException("找不到訂單");
+        if (order == null)  throw new ApiException("查無訂單");
+
+        if (!OrderStatus.CREATED.getValue().equalsIgnoreCase(tx.getStatus())) {
+            logger.info("付款已處理或非等待狀態, status={}, id={}", tx.getStatus(), tx.getId());
+            return;
         }
+
+        // 2. 更新付款狀態為成功
+        tx.setStatus(OrderStatus.PAID.getValue());
+        tx.setProviderOrderNo(providerOrderNo);
+        tx.setPayMethod(PayMethodEnum.CREDIT_CARD.getCode());
+        tx.setUpdateTime(new Date());
+        paymentTransactionMapper.updateByPrimaryKey(tx);
+
+        // 更新訂單狀態
         Orders update = new Orders();
         update.setId(orderId);
         update.setPaid(true);
+        update.setStatus(OrderStatus.PAID.getValue());
         update.setUpdateTime(new Date());
         ordersMapper.updateByPrimaryKeySelective(update);
     }

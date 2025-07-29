@@ -59,11 +59,10 @@ public class OrderFrontController {
         return true;
     }
 
-
-    @Operation(summary = "付款完成", description = "通知後台該訂單已完成付款")
+    @Operation(summary = "信用卡付款完成", description = "通知後台該訂單已完成付款")
     @PostMapping("/pay-success")
     public boolean paySuccess(@RequestBody @Validated PaySuccessRequest request) {
-        orderService.markAsPaid(request.getOrderId());
+        orderService.markAsPaid(request);
         return true;
     }
 
