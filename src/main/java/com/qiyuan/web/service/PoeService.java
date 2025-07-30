@@ -1,9 +1,11 @@
 package com.qiyuan.web.service;
 
 import com.qiyuan.web.dao.PoeRankMapper;
+import com.qiyuan.web.dao.PoeThrowMapper;
 import com.qiyuan.web.dao.UserMapper;
 import com.qiyuan.web.dto.response.PoeRankVO;
 import com.qiyuan.web.entity.PoeRank;
+import com.qiyuan.web.entity.PoeThrow;
 import com.qiyuan.web.entity.User;
 import com.qiyuan.web.entity.example.PoeRankExample;
 import com.qiyuan.web.util.DateUtil;
@@ -26,6 +28,9 @@ public class PoeService {
 
     @Autowired
     private PoeRankMapper poeRankMapper;
+
+    @Autowired
+    private PoeThrowMapper poeThrowMapper;
 
     @Autowired
     private UserMapper userMapper;
@@ -67,4 +72,49 @@ public class PoeService {
             return poeRankMapper.updateByPrimaryKey(poeRank) > 0;
         }
     }
+
+    public boolean addNormalPoe(int n) {
+        String currentUsername = SecurityUtils.getCurrentUsername();
+        if (StringUtils.isBlank(currentUsername)) {
+            logger.debug("anonymous user gets SiunnPoe");
+            return false;
+        }
+        User user = userMapper.selectByUsername(currentUsername);
+        PoeThrow poeThrow = poeThrowMapper.selectByPrimaryKey(user.getId());
+        Date now = DateUtil.getCurrentDate();
+        if (poeThrow == null) {
+            PoeThrow t = PoeThrow.builder()
+                    .userId(user.getId())
+                    .times(n)
+                    .createTime(now)
+                    .updateTime(now)
+                    .build();
+            return poeThrowMapper.insertSelective(t) > 0;
+        } else {
+            poeThrow.setTimes(poeThrow.getTimes() + n);
+            poeThrow.setUpdateTime(now);
+            return poeThrowMapper.updateByPrimaryKey(poeThrow) > 0;
+        }
+    }
+
+    public PoeThrow getNormalPoe() {
+        String currentUsername = SecurityUtils.getCurrentUsername();
+        if (StringUtils.isBlank(currentUsername)) {
+            logger.debug("anonymous user queries throw");
+            return null;
+        }
+        User user = userMapper.selectByUsername(currentUsername);
+        return poeThrowMapper.selectByPrimaryKey(user.getId());
+    }
+
+    public PoeRank getSiunnPoe() {
+        String currentUsername = SecurityUtils.getCurrentUsername();
+        if (StringUtils.isBlank(currentUsername)) {
+            logger.debug("anonymous user queries siunnPoe");
+            return null;
+        }
+        User user = userMapper.selectByUsername(currentUsername);
+        return poeRankMapper.selectByPrimaryKey(user.getId());
+    }
+
 }
