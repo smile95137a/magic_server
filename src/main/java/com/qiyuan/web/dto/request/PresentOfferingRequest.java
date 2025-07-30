@@ -26,4 +26,6 @@ public class PresentOfferingRequest {
     @NotBlank
     @Pattern(regexp = "^[a-fA-F0-9]{32}$", message = "代號錯誤")
     private String newOfferingId;
+    
+    private String paymentMethod;
 }

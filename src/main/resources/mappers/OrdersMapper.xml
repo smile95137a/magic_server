@@ -400,5 +400,13 @@
       OFFSET #{offset} ROWS FETCH NEXT #{size} ROWS ONLY
     </if>
   </select>
+  
+	<select id="selectByExternalOrderNo" parameterType="java.lang.String" resultMap="BaseResultMap">
+	  select
+	    <include refid="Base_Column_List" />
+	  from orders
+	  where external_order_no = #{externalOrderNo, jdbcType=VARCHAR}
+	</select>
+
 
 </mapper>

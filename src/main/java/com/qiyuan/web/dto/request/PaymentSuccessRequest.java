@@ -18,6 +18,6 @@ public class PaymentSuccessRequest {
     @NotBlank
     private String externalOrderNo;
     @NotBlank
-    @Pattern(regexp = "^[LOM]$", message = "sourceType 僅允許 L、O、M")
+    @Pattern(regexp = "^[LOMG]$", message = "sourceType 僅允許 L、O、M")
     private String sourceType;
 }

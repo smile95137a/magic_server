@@ -76,12 +76,13 @@ public class GodService {
                 .externalOrderNo(paymentId)
                 .createTime(now)
                 .build();
-        // 請神價格： 7天20元、30天60元
-        BigDecimal price = BigDecimal.valueOf(day == 30 ? 60 : 20);
+        // 請神價格： 7天200元、30天800元
+        BigDecimal price = BigDecimal.valueOf(day == 30 ? 800 : 200);
         PaymentTransaction tx = PaymentTransaction.builder()
                 .id(paymentId)
                 .userId(user.getId())
                 .status(OrderStatus.CREATED.getValue())
+                .payMethod(request.getPaymentMethod())
                 .amount(price)
                 .sourceType(SourceTypeEnum.GOD.getCode())
                 .createTime(now)
@@ -197,7 +198,9 @@ public class GodService {
     @Transactional
     public PaymentNoVO addOffering(PresentOfferingRequest param) {
         String godCode = param.getGodCode();
-        String prevOfferingId = StringUtils.defaultString(param.getPrevOfferingId().toLowerCase(Locale.ROOT));
+        String prevOfferingId = Optional.ofNullable(param.getPrevOfferingId())
+            .map(id -> id.toLowerCase(Locale.ROOT))
+            .orElse("");
         String newOfferingId = param.getNewOfferingId().toLowerCase(Locale.ROOT);
         String username = SecurityUtils.getCurrentUsername();
         User user = userMapper.selectByUsername(username);
@@ -211,8 +214,9 @@ public class GodService {
         String replacement = String.format("%s:%s", prevOfferingId, newOfferingId);
         godInfo.setOfferingReplacement(replacement);
         godInfoService.updateGodInfo(godInfo);
-
-        String paymentId = RandomGenerator.getUUID();
+        
+        String id = RandomGenerator.getUUID().toLowerCase(Locale.ROOT);
+        String paymentId = id.substring(0, 25);
 
         // 新增購買紀錄
         offeringService.addOfferingPurchase(OfferingPurchase.builder()
@@ -232,10 +236,15 @@ public class GodService {
                         .sourceType("O")
                         .amount(BigDecimal.valueOf(offering.getPrice()))
                         .status(OrderStatus.CREATED.getValue())
+                        .payMethod(param.getPaymentMethod())
                         .build()
         );
-        return PaymentNoVO.builder().externalPaymentNo(paymentId).price(BigDecimal.valueOf(offering.getPrice())).build();
+        return PaymentNoVO.builder()
+                .externalPaymentNo(paymentId)
+                .price(BigDecimal.valueOf(offering.getPrice()))
+                .build();
     }
+
 
     @Transactional
     public boolean processOfferingAfterPayment(String paymentId) {
