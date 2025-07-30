@@ -152,7 +152,9 @@ public class LanternPurchaseService {
         List<LanternPurchaseInfo> purchaseList = req.getList();
         if (purchaseList == null || purchaseList.isEmpty()) throw new ApiException("請輸入至少一筆點燈購買資訊");
 
-        String userId = req.getUserId();
+        String username = SecurityUtils.getCurrentUsername();
+        User user = userMapper.selectByUsername(username);
+        String userId = user.getId();
         String lanternCode = req.getLanternCode();
 
         LanternExample e = new LanternExample();
@@ -198,6 +200,7 @@ public class LanternPurchaseService {
                 .createTime(currentDate)
                 .sourceType("L")
                 .status(OrderStatus.CREATED.getValue())
+                .payMethod(req.getPaymentMethod())
                 .build());
 
         return PaymentNoVO.builder().externalPaymentNo(paymentId).price(totalAmount).build();

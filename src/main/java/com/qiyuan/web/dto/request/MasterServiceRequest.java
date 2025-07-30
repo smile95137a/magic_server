@@ -33,6 +33,8 @@ public class MasterServiceRequest implements Serializable {
 
     @NotBlank(message = "電話不可為空")
     private String customerPhone;
+    
+    private String paymentMethod; 
 
     private String note;
 }

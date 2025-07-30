@@ -131,6 +131,7 @@ public class MasterRequestService {
                 .sourceType(SourceTypeEnum.MASTER_SERVICE.getCode())
                 .amount(BigDecimal.valueOf(item.getPrice()))
                 .status(OrderStatus.CREATED.getValue())
+                .payMethod(req.getPaymentMethod())
                 .createTime(DateUtil.getCurrentDate())
                 .build());
 

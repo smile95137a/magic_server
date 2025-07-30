@@ -150,6 +150,8 @@ public class OrderService {
                 .sourceType(SourceTypeEnum.REAL.getCode())
                 .amount(total)
                 .createTime(currentDate)
+                .status(OrderStatus.CREATED.getValue())
+                .payMethod(request.getPayMethod())
                 .build();
 
         paymentTransactionMapper.insertSelective(tx);
@@ -331,11 +333,11 @@ public class OrderService {
     public void markAsPaid(PaySuccessRequest r) {
         String paymentId = r.getExternalOrderNo();
         String providerOrderNo = r.getProviderOrderNo();
-        String orderId = r.getOrderId();
 
         PaymentTransaction tx = paymentTransactionMapper.selectByPrimaryKey(paymentId);
         if (tx == null) throw new ApiException("查無金流紀錄");
-        Orders order = ordersMapper.selectByPrimaryKey(orderId);
+        Orders order = ordersMapper.selectByExternalOrderNo(paymentId);
+
         if (order == null)  throw new ApiException("查無訂單");
 
         if (!OrderStatus.CREATED.getValue().equalsIgnoreCase(tx.getStatus())) {
@@ -352,7 +354,7 @@ public class OrderService {
 
         // 更新訂單狀態
         Orders update = new Orders();
-        update.setId(orderId);
+        update.setId(order.getId());
         update.setPaid(true);
         update.setStatus(OrderStatus.PAID.getValue());
         update.setUpdateTime(new Date());

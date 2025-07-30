@@ -33,4 +33,7 @@ public interface OrdersMapper {
     int updateByPrimaryKeySelective(Orders record);
 
     int updateByPrimaryKey(Orders record);
+    
+    Orders selectByExternalOrderNo(@Param("externalOrderNo") String externalOrderNo);
+
 }
