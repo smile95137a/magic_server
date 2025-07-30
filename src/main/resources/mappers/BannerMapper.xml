@@ -239,8 +239,8 @@
       <if test="description != null">
         description = #{description,jdbcType=NVARCHAR},
       </if>
-      <if test="record.url != null">
-        url = #{record.url,jdbcType=VARCHAR},
+      <if test="url != null">
+        url = #{url,jdbcType=VARCHAR},
       </if>
     </set>
     where id = #{id,jdbcType=INTEGER}
@@ -253,7 +253,7 @@
       available_from = #{availableFrom,jdbcType=TIMESTAMP},
       available_until = #{availableUntil,jdbcType=TIMESTAMP},
       description = #{description,jdbcType=NVARCHAR},
-      url = #{record.url,jdbcType=VARCHAR}
+      url = #{url,jdbcType=VARCHAR}
     where id = #{id,jdbcType=INTEGER}
   </update>
 </mapper>

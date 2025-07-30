@@ -61,7 +61,7 @@ public class MasterRequestService {
             criteria.andCreateTimeGreaterThanOrEqualTo(filter.getStartTime());
         }
         if (filter.getEndTime() != null) {
-            criteria.andCreateTimeLessThanOrEqualTo(filter.getEndTime());
+            criteria.andCreateTimeLessThanOrEqualTo(DateUtil.getEndOfDate(filter.getEndTime()));
         }
 
         if (filter.getOrderId() != null) {

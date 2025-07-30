@@ -66,7 +66,7 @@ public class ReportController {
     @PostMapping("/money")
     @Operation(summary = "付款紀錄表")
     public List<MoneyReportVO> getMoneyReport(@Validated @RequestBody PeriodTypeRequest req) {
-        return this.reportMapper.getAllReportByPeriod(req.getStartTime(), req.getEndTime());
+        return this.reportMapper.getAllReportByPeriod(req.getStartTime(), DateUtil.getEndOfDate(req.getEndTime()));
     }
 
 

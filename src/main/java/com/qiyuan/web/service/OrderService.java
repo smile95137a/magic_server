@@ -192,7 +192,7 @@ public class OrderService {
             criteria.andCreateTimeGreaterThanOrEqualTo(request.getStartTime());
         }
         if (request.getEndTime() != null) {
-            criteria.andCreateTimeLessThanOrEqualTo(request.getEndTime());
+            criteria.andCreateTimeLessThanOrEqualTo(DateUtil.getEndOfDate(request.getEndTime()));
         }
         // 處理分頁
         int page = (request.getPage() != null && request.getPage() > 0) ? request.getPage() : 1;

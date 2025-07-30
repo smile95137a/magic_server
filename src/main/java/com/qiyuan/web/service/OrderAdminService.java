@@ -57,7 +57,7 @@ public class OrderAdminService {
             criteria.andCreateTimeGreaterThanOrEqualTo(request.getStartTime());
         }
         if (request.getEndTime() != null) {
-            criteria.andCreateTimeLessThanOrEqualTo(request.getEndTime());
+            criteria.andCreateTimeLessThanOrEqualTo(DateUtil.getEndOfDate(request.getEndTime()));
         }
 
         example.setOrderByClause("create_time desc");

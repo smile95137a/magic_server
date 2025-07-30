@@ -142,7 +142,7 @@ public class OfferingService {
         User user = userMapper.selectByUsername(username);
 
         OfferingPurchaseExample e = new OfferingPurchaseExample();
-        e.createCriteria().andUserIdEqualTo(user.getId()).andCreateTimeBetween(req.getStartTime(), req.getEndTime());
+        e.createCriteria().andUserIdEqualTo(user.getId()).andCreateTimeBetween(req.getStartTime(), DateUtil.getEndOfDate(req.getEndTime()));
         List<OfferingPurchase> purchases = offeringPurchaseMapper.selectByExample(e);
 
         List<String> offeringIds = purchases.stream().map(OfferingPurchase::getOfferingId).collect(Collectors.toList());

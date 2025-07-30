@@ -53,7 +53,6 @@ public class GodService {
     public List<God> getGodList() {
         GodExample e = new GodExample();
         e.setOrderByClause("sort ASC");
-        e.createCriteria();
         return godMapper.selectByExample(e);
     }
 
@@ -265,38 +264,45 @@ public class GodService {
 
         // 開始新增/置換供品
         List<OfferingStateVO> offeringInfoList = null;
+        // 首次購買供品
         if (StringUtils.isBlank(godInfo.getOfferingList())) {
             OfferingStateVO stateVO = OfferingStateVO.builder().id(newOfferingId).buyTime(DateFormatUtils.format(DateUtil.getCurrentDate(), "yyyy/MM/dd HH:mm")).build();
             offeringInfoList = Arrays.asList(stateVO);
-            godInfo.setOfferingList(JsonUtil.toJson(offeringInfoList));
         } else {
             offeringInfoList = JsonUtil.fromJsonList(godInfo.getOfferingList(), OfferingStateVO.class);
+
             int target = -1;
-            for (int i =0; i < offeringInfoList.size(); i++) {
-                OfferingStateVO vo = offeringInfoList.get(i);
-                if (StringUtils.equals(vo.getId(), prevOfferingId)) {
-                    target = i;
-                    break;
+            if (StringUtils.isNotBlank(prevOfferingId)) {
+                // 舊換新
+                for (int i = 0; i < offeringInfoList.size(); i++) {
+                    OfferingStateVO vo = offeringInfoList.get(i);
+                    if (StringUtils.equalsIgnoreCase(vo.getId(), prevOfferingId)) {
+                        target = i;
+                        break;
+                    }
                 }
             }
 
-            // 舊換新
-            if (StringUtils.isNoneBlank(prevOfferingId, godInfo.getOfferingList()) && target != -1) {
-                OfferingStateVO replacementTarget = offeringInfoList.get(target);
-                replacementTarget.setId(newOfferingId);
-                replacementTarget.setBuyTime(DateFormatUtils.format(DateUtil.getCurrentDate(), "yyyy/MM/dd HH:mm"));
-            } else {
-                // 新增
+            if (target == -1) {
+                // 查無舊供品或是新增
                 if (offeringInfoList.size() > 2) {
                     throw new ApiException("購買供品發生系統錯誤，請聯繫客服！");
                 }
 
-                OfferingStateVO stateVO = OfferingStateVO.builder().id(newOfferingId).buyTime(DateFormatUtils.format(DateUtil.getCurrentDate(), "yyyy/MM/dd HH:mm")).build();
+                OfferingStateVO stateVO = OfferingStateVO
+                        .builder()
+                        .id(newOfferingId)
+                        .buyTime(DateFormatUtils.format(DateUtil.getCurrentDate(), "yyyy/MM/dd HH:mm"))
+                        .build();
                 offeringInfoList.add(stateVO);
+            } else {
+                OfferingStateVO replacementTarget = offeringInfoList.get(target);
+                replacementTarget.setId(newOfferingId);
+                replacementTarget.setBuyTime(DateFormatUtils.format(DateUtil.getCurrentDate(), "yyyy/MM/dd HH:mm"));
             }
-            godInfo.setOfferingList(JsonUtil.toJson(offeringInfoList));
         }
 
+        godInfo.setOfferingList(JsonUtil.toJson(offeringInfoList));
         godInfo.setOfferingReplacement("");
         Offering offering = offeringService.getOfferingById(newOfferingId);
         int newExp = godInfo.getExp() + offering.getPoints();
@@ -316,23 +322,6 @@ public class GodService {
         // 更新請神資訊
         godInfoService.updateGodInfo(godInfo);
         return true;
-
-
-//        List<String> offeringIds = offeringInfoList.stream().map(OfferingStateVO::getId).collect(Collectors.toList());
-//        List<Offering> offerings = offeringService.getOfferingByIds(offeringIds);
-//
-//        // 返回請神資訊
-//        return GodInfoVO.builder()
-//                .imageCode(god.getImageCode())
-//                .name(god.getName())
-//                .isGolden(isGolden)
-//                .cooldownTime(godInfo.getCooldownTime())
-//                .onshelfTime(godInfo.getOnshelfTime())
-//                .offshelfTime(godInfo.getOffshelfTime())
-//                .offerings(offerings.stream().map(offeringService::convertToVo).collect(Collectors.toList()))
-//                .build();
-
-
     }
 
 
