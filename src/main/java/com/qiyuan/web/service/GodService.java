@@ -211,6 +211,17 @@ public class GodService {
         Offering offering = offeringService.getOfferingById(newOfferingId);
         if (offering == null) throw new ApiException("不存在的供品，請重新選擇");
 
+        // 免費供品直接更新
+        if (offering.getPrice() == 0) {
+            List<OfferingStateVO> offeringInfoList = this.addOffering(godInfo.getOfferingList(), newOfferingId, prevOfferingId);
+            godInfo.setOfferingList(JsonUtil.toJson(offeringInfoList));
+            godInfoService.updateGodInfo(godInfo);
+            return PaymentNoVO.builder()
+                    .externalPaymentNo(null)
+                    .price(BigDecimal.valueOf(offering.getPrice()))
+                    .build();
+        }
+
         String replacement = String.format("%s:%s", prevOfferingId, newOfferingId);
         godInfo.setOfferingReplacement(replacement);
         godInfoService.updateGodInfo(godInfo);
@@ -272,13 +283,39 @@ public class GodService {
         String prevOfferingId = tempSplit[0];
 
         // 開始新增/置換供品
+        List<OfferingStateVO> offeringInfoList = this.addOffering(godInfo.getOfferingList(), newOfferingId, prevOfferingId);
+
+        godInfo.setOfferingList(JsonUtil.toJson(offeringInfoList));
+        godInfo.setOfferingReplacement("");
+        Offering offering = offeringService.getOfferingById(newOfferingId);
+        int newExp = godInfo.getExp() + offering.getPoints();
+        int nextLevel = newExp / 10;
+        int newGodLevel = nextLevel > 0 ? godInfo.getLevel() + nextLevel : godInfo.getLevel();
+        boolean isGolden = false;
+        if (newGodLevel >= 5) {
+            isGolden = true;
+            godInfo.setLevel((byte) 1);
+            godInfo.setGoldenExpiration(DateUtil.adjustDate(DateUtil.getCurrentDate(), 1, Date.class));
+        } else {
+            godInfo.setLevel((byte) newGodLevel);
+        }
+        newExp = newExp % 10;
+        godInfo.setExp((byte) newExp);
+
+        // 更新請神資訊
+        godInfoService.updateGodInfo(godInfo);
+        return true;
+    }
+
+    private List<OfferingStateVO> addOffering(String offeringList, String newOfferingId, String prevOfferingId) {
+        // 開始新增/置換供品
         List<OfferingStateVO> offeringInfoList = null;
         // 首次購買供品
-        if (StringUtils.isBlank(godInfo.getOfferingList())) {
+        if (StringUtils.isBlank(offeringList)) {
             OfferingStateVO stateVO = OfferingStateVO.builder().id(newOfferingId).buyTime(DateFormatUtils.format(DateUtil.getCurrentDate(), "yyyy/MM/dd HH:mm")).build();
             offeringInfoList = Arrays.asList(stateVO);
         } else {
-            offeringInfoList = JsonUtil.fromJsonList(godInfo.getOfferingList(), OfferingStateVO.class);
+            offeringInfoList = JsonUtil.fromJsonList(offeringList, OfferingStateVO.class);
 
             int target = -1;
             if (StringUtils.isNotBlank(prevOfferingId)) {
@@ -310,27 +347,7 @@ public class GodService {
                 replacementTarget.setBuyTime(DateFormatUtils.format(DateUtil.getCurrentDate(), "yyyy/MM/dd HH:mm"));
             }
         }
-
-        godInfo.setOfferingList(JsonUtil.toJson(offeringInfoList));
-        godInfo.setOfferingReplacement("");
-        Offering offering = offeringService.getOfferingById(newOfferingId);
-        int newExp = godInfo.getExp() + offering.getPoints();
-        int nextLevel = newExp / 10;
-        int newGodLevel = nextLevel > 0 ? godInfo.getLevel() + nextLevel : godInfo.getLevel();
-        boolean isGolden = false;
-        if (newGodLevel >= 5) {
-            isGolden = true;
-            godInfo.setLevel((byte) 1);
-            godInfo.setGoldenExpiration(DateUtil.adjustDate(DateUtil.getCurrentDate(), 1, Date.class));
-        } else {
-            godInfo.setLevel((byte) newGodLevel);
-        }
-        newExp = newExp % 10;
-        godInfo.setExp((byte) newExp);
-
-        // 更新請神資訊
-        godInfoService.updateGodInfo(godInfo);
-        return true;
+        return offeringInfoList;
     }
 
 
