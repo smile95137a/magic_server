@@ -5,7 +5,9 @@ import com.qiyuan.web.dao.GodMapper;
 import com.qiyuan.web.dao.GodPurchaseMapper;
 import com.qiyuan.web.dao.PaymentTransactionMapper;
 import com.qiyuan.web.dao.UserMapper;
+import com.qiyuan.web.dto.OfferingReplacementDto;
 import com.qiyuan.web.dto.request.GodExtendPeriodRequest;
+import com.qiyuan.web.dto.request.OfferingPresentRequest;
 import com.qiyuan.web.dto.request.PresentOfferingRequest;
 import com.qiyuan.web.dto.response.*;
 import com.qiyuan.web.entity.*;
@@ -29,6 +31,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 @Service
 public class GodService {
@@ -198,46 +201,85 @@ public class GodService {
     @Transactional
     public PaymentNoVO addOffering(PresentOfferingRequest param) {
         String godCode = param.getGodCode();
-        String prevOfferingId = Optional.ofNullable(param.getPrevOfferingId())
-            .map(id -> id.toLowerCase(Locale.ROOT))
-            .orElse("");
-        String newOfferingId = param.getNewOfferingId().toLowerCase(Locale.ROOT);
         String username = SecurityUtils.getCurrentUsername();
         User user = userMapper.selectByUsername(username);
         God god = getGodByCode(godCode);
         GodInfo godInfo = godInfoService.getGodInfo(user.getId(), god.getId());
         if (godInfo == null) throw new ApiException("請先請神成功!");
 
-        Offering offering = offeringService.getOfferingById(newOfferingId);
-        if (offering == null) throw new ApiException("不存在的供品，請重新選擇");
+        List<OfferingPresentRequest> list = param.getList();
+        List<String> offeringIds = list.stream().map(OfferingPresentRequest::getNewOfferingId).collect(Collectors.toList());
+        List<Offering> offerings = offeringService.getOfferingByIds(offeringIds);
+        if (offerings == null || offerings.isEmpty() || offerings.size() != offeringIds.size()) throw new ApiException("包含不存在的供品，請重新選擇");
+
+        Map<String, Offering> offeringMap = offerings.stream().collect(Collectors.toMap(Offering::getId, o -> o));
+
+        final Map<Integer, String> indexToOldId = new HashMap<>();
+        if (godInfo.getOfferingList() != null) {
+            List<OfferingStateVO>  currentOfferings = JsonUtil.fromJsonList(godInfo.getOfferingList(), OfferingStateVO.class);
+            for (int i = 0; i < currentOfferings.size(); i++) {
+                indexToOldId.put(i, currentOfferings.get(i).getId());
+            }
+        }
+
+        List<OfferingReplacementDto> replacements = list.stream().map(req -> {
+            Integer index = req.getIndex();
+            String newId = req.getNewOfferingId();
+            String oldId = indexToOldId.get(index);
+            Offering offering = offeringMap.get(newId);
+            return OfferingReplacementDto.builder()
+                    .index(index)
+                    .newOfferingId(newId)
+                    .oldOfferingId(oldId)
+                    .offering(offering)
+                    .build();
+        }).collect(Collectors.toList());
+
 
         // 免費供品直接更新
-        if (offering.getPrice() == 0) {
-            List<OfferingStateVO> offeringInfoList = this.addOffering(godInfo.getOfferingList(), newOfferingId, prevOfferingId);
-            godInfo.setOfferingList(JsonUtil.toJson(offeringInfoList));
+        List<OfferingReplacementDto> freeOffering = replacements.stream().filter(dto -> dto.getOffering().getPrice() == 0).collect(Collectors.toList());
+        List<OfferingStateVO> newOfferingState = null;
+
+        // 免費供品置換
+        if (freeOffering.size() > 0) {
+            newOfferingState = this.addOffering(godInfo.getOfferingList(), freeOffering);
+        }
+
+        if (newOfferingState != null) {
+            godInfo.setOfferingList(JsonUtil.toJson(newOfferingState));
+        }
+
+        // 收費供品紀錄
+        List<OfferingReplacementDto> payOffering = replacements.stream().filter(dto -> dto.getOffering().getPrice() != 0).collect(Collectors.toList());
+        if (payOffering.size() == 0) {
             godInfoService.updateGodInfo(godInfo);
+
             return PaymentNoVO.builder()
                     .externalPaymentNo(null)
-                    .price(BigDecimal.valueOf(offering.getPrice()))
+                    .price(BigDecimal.ZERO)
                     .build();
         }
 
-        String replacement = String.format("%s:%s", prevOfferingId, newOfferingId);
-        godInfo.setOfferingReplacement(replacement);
+        String replacementStr = payOffering.stream().map(po -> String.format("%d:%s", po.getIndex(), po.getNewOfferingId())).collect(Collectors.joining(","));
+        godInfo.setOfferingReplacement(replacementStr);
         godInfoService.updateGodInfo(godInfo);
-        
+
         String id = RandomGenerator.getUUID().toLowerCase(Locale.ROOT);
         String paymentId = id.substring(0, 25);
-
-        // 新增購買紀錄
-        offeringService.addOfferingPurchase(OfferingPurchase.builder()
-                .id(RandomGenerator.getUUID().toLowerCase(Locale.ROOT))
-                .externalOrderNo(paymentId)
-                .offeringId(newOfferingId)
-                .godId(god.getId())
-                .userId(user.getId())
-                .createTime(new Date())
-                .build());
+        BigDecimal total = BigDecimal.ZERO;
+        for (OfferingReplacementDto dto : payOffering) {
+            total = total.add(BigDecimal.valueOf(dto.getOffering().getPrice()));
+            // 新增購買紀錄
+            offeringService.addOfferingPurchase(
+                    OfferingPurchase.builder()
+                    .id(RandomGenerator.getUUID().toLowerCase(Locale.ROOT))
+                    .externalOrderNo(paymentId)
+                    .offeringId(dto.getNewOfferingId())
+                    .godId(god.getId())
+                    .userId(user.getId())
+                    .createTime(new Date())
+                    .build());
+        }
 
         paymentTransactionMapper.insertSelective(
                 PaymentTransaction.builder()
@@ -245,14 +287,14 @@ public class GodService {
                         .userId(user.getId())
                         .createTime(new Date())
                         .sourceType("O")
-                        .amount(BigDecimal.valueOf(offering.getPrice()))
+                        .amount(total)
                         .status(OrderStatus.CREATED.getValue())
                         .payMethod(param.getPaymentMethod())
                         .build()
         );
         return PaymentNoVO.builder()
                 .externalPaymentNo(paymentId)
-                .price(BigDecimal.valueOf(offering.getPrice()))
+                .price(total)
                 .build();
     }
 
@@ -277,18 +319,28 @@ public class GodService {
         GodInfo godInfo = godInfos.get(0);
         String replacement = godInfo.getOfferingReplacement();
 
-        if (!replacement.contains(":")) throw new ApiException("查無供品購買紀錄，請聯繫客服。");
-        String[] tempSplit = replacement.split(":");
-        String newOfferingId = tempSplit[1];
-        String prevOfferingId = tempSplit[0];
+        if (replacement == null || !replacement.contains(":")) throw new ApiException("查無供品購買紀錄，請聯繫客服。");
+        List<String> replacements = Arrays.stream(replacement.split(",")).filter(StringUtils::isNotBlank).collect(Collectors.toList());
+        List<OfferingReplacementDto> dtoList = replacements.stream().map(r -> {
+            String[] tempSplit = r.split(":");
+            String newOfferingId = tempSplit[1];
+            String prevIndex = tempSplit[0];
+            return OfferingReplacementDto.builder()
+                    .newOfferingId(newOfferingId)
+                    .index(Integer.valueOf(prevIndex))
+                    .build();
+        }).collect(Collectors.toList());
 
-        // 開始新增/置換供品
-        List<OfferingStateVO> offeringInfoList = this.addOffering(godInfo.getOfferingList(), newOfferingId, prevOfferingId);
-
+        List<OfferingStateVO> offeringInfoList = this.addOffering(godInfo.getOfferingList(), dtoList);
         godInfo.setOfferingList(JsonUtil.toJson(offeringInfoList));
         godInfo.setOfferingReplacement("");
-        Offering offering = offeringService.getOfferingById(newOfferingId);
-        int newExp = godInfo.getExp() + offering.getPoints();
+
+        // 升級計算
+        List<String> offeringIds = offeringInfoList.stream().map(OfferingStateVO::getId).collect(Collectors.toList());
+        List<Offering> offering = offeringService.getOfferingByIds(offeringIds);
+        int totolPoints = offering.stream().mapToInt(Offering::getPoints).sum();
+
+        int newExp = godInfo.getExp() + totolPoints;
         int nextLevel = newExp / 10;
         int newGodLevel = nextLevel > 0 ? godInfo.getLevel() + nextLevel : godInfo.getLevel();
         boolean isGolden = false;
@@ -307,49 +359,22 @@ public class GodService {
         return true;
     }
 
-    private List<OfferingStateVO> addOffering(String offeringList, String newOfferingId, String prevOfferingId) {
-        // 開始新增/置換供品
+    private List<OfferingStateVO> addOffering(String offeringList, List<OfferingReplacementDto> replacementDtos) {
         List<OfferingStateVO> offeringInfoList = null;
-        // 首次購買供品
+        // 開始新增/置換供品
         if (StringUtils.isBlank(offeringList)) {
-            OfferingStateVO stateVO = OfferingStateVO.builder().id(newOfferingId).buyTime(DateFormatUtils.format(DateUtil.getCurrentDate(), "yyyy/MM/dd HH:mm")).build();
-            offeringInfoList = Arrays.asList(stateVO);
-        } else {
-            offeringInfoList = JsonUtil.fromJsonList(offeringList, OfferingStateVO.class);
+            offeringInfoList = IntStream.range(0, 2)
+                            .mapToObj(i -> OfferingStateVO.builder().build())
+                            .collect(Collectors.toList());
+        }
 
-            int target = -1;
-            if (StringUtils.isNotBlank(prevOfferingId)) {
-                // 舊換新
-                for (int i = 0; i < offeringInfoList.size(); i++) {
-                    OfferingStateVO vo = offeringInfoList.get(i);
-                    if (StringUtils.equalsIgnoreCase(vo.getId(), prevOfferingId)) {
-                        target = i;
-                        break;
-                    }
-                }
-            }
-
-            if (target == -1) {
-                // 查無舊供品或是新增
-                if (offeringInfoList.size() > 2) {
-                    throw new ApiException("購買供品發生系統錯誤，請聯繫客服！");
-                }
-
-                OfferingStateVO stateVO = OfferingStateVO
-                        .builder()
-                        .id(newOfferingId)
-                        .buyTime(DateFormatUtils.format(DateUtil.getCurrentDate(), "yyyy/MM/dd HH:mm"))
-                        .build();
-                offeringInfoList.add(stateVO);
-            } else {
-                OfferingStateVO replacementTarget = offeringInfoList.get(target);
-                replacementTarget.setId(newOfferingId);
-                replacementTarget.setBuyTime(DateFormatUtils.format(DateUtil.getCurrentDate(), "yyyy/MM/dd HH:mm"));
-            }
+        for (OfferingReplacementDto dto: replacementDtos) {
+            OfferingStateVO vo = offeringInfoList.get(dto.getIndex());
+            vo.setId(dto.getNewOfferingId());
+            vo.setBuyTime(DateFormatUtils.format(DateUtil.getCurrentDate(), "yyyy/MM/dd HH:mm"));
         }
         return offeringInfoList;
     }
-
 
     public God getGodByCode(String godCode) {
         GodExample e = new GodExample();

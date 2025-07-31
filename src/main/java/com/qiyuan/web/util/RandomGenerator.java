@@ -24,4 +24,13 @@ public class RandomGenerator {
         return ThreadLocalRandom.current().nextInt(start, end + 1);
     }
 
+    public static String generatePaymentId() {
+        long timestamp = System.currentTimeMillis();
+        String randomPart = ThreadLocalRandom.current()
+                .ints('a', 'z' + 1)
+                .limit(12)
+                .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
+                .toString();
+        return timestamp + randomPart;
+    }
 }
