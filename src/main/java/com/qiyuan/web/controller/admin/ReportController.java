@@ -68,9 +68,4 @@ public class ReportController {
     public List<MoneyReportVO> getMoneyReport(@Validated @RequestBody PeriodTypeRequest req) {
         return this.reportMapper.getAllReportByPeriod(req.getStartTime(), DateUtil.getEndOfDate(req.getEndTime()));
     }
-
-
-
-    // 如果之後有 mall 報表，可直接複製 pattern
-    public void getMallPurchaseReport() { }
 }

@@ -1315,6 +1315,76 @@ public class InvoiceExample {
             addCriterion("update_time not between", value1, value2, "updateTime");
             return (Criteria) this;
         }
+
+        public Criteria andExternalOrderNoIsNull() {
+            addCriterion("external_order_no is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andExternalOrderNoIsNotNull() {
+            addCriterion("external_order_no is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andExternalOrderNoEqualTo(String value) {
+            addCriterion("external_order_no =", value, "externalOrderNo");
+            return (Criteria) this;
+        }
+
+        public Criteria andExternalOrderNoNotEqualTo(String value) {
+            addCriterion("external_order_no <>", value, "externalOrderNo");
+            return (Criteria) this;
+        }
+
+        public Criteria andExternalOrderNoGreaterThan(String value) {
+            addCriterion("external_order_no >", value, "externalOrderNo");
+            return (Criteria) this;
+        }
+
+        public Criteria andExternalOrderNoGreaterThanOrEqualTo(String value) {
+            addCriterion("external_order_no >=", value, "externalOrderNo");
+            return (Criteria) this;
+        }
+
+        public Criteria andExternalOrderNoLessThan(String value) {
+            addCriterion("external_order_no <", value, "externalOrderNo");
+            return (Criteria) this;
+        }
+
+        public Criteria andExternalOrderNoLessThanOrEqualTo(String value) {
+            addCriterion("external_order_no <=", value, "externalOrderNo");
+            return (Criteria) this;
+        }
+
+        public Criteria andExternalOrderNoLike(String value) {
+            addCriterion("external_order_no like", value, "externalOrderNo");
+            return (Criteria) this;
+        }
+
+        public Criteria andExternalOrderNoNotLike(String value) {
+            addCriterion("external_order_no not like", value, "externalOrderNo");
+            return (Criteria) this;
+        }
+
+        public Criteria andExternalOrderNoIn(List<String> values) {
+            addCriterion("external_order_no in", values, "externalOrderNo");
+            return (Criteria) this;
+        }
+
+        public Criteria andExternalOrderNoNotIn(List<String> values) {
+            addCriterion("external_order_no not in", values, "externalOrderNo");
+            return (Criteria) this;
+        }
+
+        public Criteria andExternalOrderNoBetween(String value1, String value2) {
+            addCriterion("external_order_no between", value1, value2, "externalOrderNo");
+            return (Criteria) this;
+        }
+
+        public Criteria andExternalOrderNoNotBetween(String value1, String value2) {
+            addCriterion("external_order_no not between", value1, value2, "externalOrderNo");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {

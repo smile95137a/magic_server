@@ -43,6 +43,8 @@ public class Invoice {
 
     private Date updateTime;
 
+    private String externalOrderNo;
+
     public String getId() {
         return id;
     }
@@ -185,5 +187,13 @@ public class Invoice {
 
     public void setUpdateTime(Date updateTime) {
         this.updateTime = updateTime;
+    }
+
+    public String getExternalOrderNo() {
+        return externalOrderNo;
+    }
+
+    public void setExternalOrderNo(String externalOrderNo) {
+        this.externalOrderNo = externalOrderNo;
     }
 }

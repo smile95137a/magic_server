@@ -20,6 +20,7 @@
     <result column="raw_response" jdbcType="NVARCHAR" property="rawResponse" />
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
     <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="external_order_no" jdbcType="VARCHAR" property="externalOrderNo" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -80,9 +81,9 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    id, order_id, invoice_number, invoice_date, random_number, buyer_identifier, buyer_name, 
-    carrier_type, carrier_id, npoban, print_mark, amount, tax, status, response_msg, 
-    raw_response, create_time, update_time
+    id, order_id, invoice_number, invoice_date, random_number, buyer_identifier, buyer_name,
+    carrier_type, carrier_id, npoban, print_mark, amount, tax, status, response_msg,
+    raw_response, create_time, update_time, external_order_no
   </sql>
   <select id="selectByExample" parameterType="com.qiyuan.web.entity.example.InvoiceExample" resultMap="BaseResultMap">
     select
@@ -115,20 +116,20 @@
     </if>
   </delete>
   <insert id="insert" parameterType="com.qiyuan.web.entity.Invoice">
-    insert into invoice (id, order_id, invoice_number, 
-      invoice_date, random_number, buyer_identifier, 
-      buyer_name, carrier_type, carrier_id, 
-      npoban, print_mark, amount, 
-      tax, status, response_msg, 
-      raw_response, create_time, update_time
-      )
-    values (#{id,jdbcType=CHAR}, #{orderId,jdbcType=CHAR}, #{invoiceNumber,jdbcType=VARCHAR}, 
-      #{invoiceDate,jdbcType=TIMESTAMP}, #{randomNumber,jdbcType=VARCHAR}, #{buyerIdentifier,jdbcType=VARCHAR}, 
-      #{buyerName,jdbcType=NVARCHAR}, #{carrierType,jdbcType=VARCHAR}, #{carrierId,jdbcType=VARCHAR}, 
-      #{npoban,jdbcType=VARCHAR}, #{printMark,jdbcType=CHAR}, #{amount,jdbcType=DECIMAL}, 
-      #{tax,jdbcType=DECIMAL}, #{status,jdbcType=VARCHAR}, #{responseMsg,jdbcType=NVARCHAR}, 
-      #{rawResponse,jdbcType=NVARCHAR}, #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}
-      )
+    insert into invoice (id, order_id, invoice_number,
+                         invoice_date, random_number, buyer_identifier,
+                         buyer_name, carrier_type, carrier_id,
+                         npoban, print_mark, amount,
+                         tax, status, response_msg,
+                         raw_response, create_time, update_time,
+                         external_order_no)
+    values (#{id,jdbcType=CHAR}, #{orderId,jdbcType=CHAR}, #{invoiceNumber,jdbcType=VARCHAR},
+            #{invoiceDate,jdbcType=TIMESTAMP}, #{randomNumber,jdbcType=VARCHAR}, #{buyerIdentifier,jdbcType=VARCHAR},
+            #{buyerName,jdbcType=NVARCHAR}, #{carrierType,jdbcType=VARCHAR}, #{carrierId,jdbcType=VARCHAR},
+            #{npoban,jdbcType=VARCHAR}, #{printMark,jdbcType=CHAR}, #{amount,jdbcType=DECIMAL},
+            #{tax,jdbcType=DECIMAL}, #{status,jdbcType=VARCHAR}, #{responseMsg,jdbcType=NVARCHAR},
+            #{rawResponse,jdbcType=NVARCHAR}, #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP},
+            #{externalOrderNo,jdbcType=VARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.qiyuan.web.entity.Invoice">
     insert into invoice
@@ -187,6 +188,9 @@
       <if test="updateTime != null">
         update_time,
       </if>
+      <if test="externalOrderNo != null">
+        external_order_no,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -242,6 +246,9 @@
       </if>
       <if test="updateTime != null">
         #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="externalOrderNo != null">
+        #{externalOrderNo,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
@@ -308,6 +315,9 @@
       <if test="row.updateTime != null">
         update_time = #{row.updateTime,jdbcType=TIMESTAMP},
       </if>
+      <if test="row.externalOrderNo != null">
+        external_order_no = #{row.externalOrderNo,jdbcType=VARCHAR},
+      </if>
     </set>
     <if test="example != null">
       <include refid="Update_By_Example_Where_Clause" />
@@ -316,23 +326,24 @@
   <update id="updateByExample" parameterType="map">
     update invoice
     set id = #{row.id,jdbcType=CHAR},
-      order_id = #{row.orderId,jdbcType=CHAR},
-      invoice_number = #{row.invoiceNumber,jdbcType=VARCHAR},
-      invoice_date = #{row.invoiceDate,jdbcType=TIMESTAMP},
-      random_number = #{row.randomNumber,jdbcType=VARCHAR},
-      buyer_identifier = #{row.buyerIdentifier,jdbcType=VARCHAR},
-      buyer_name = #{row.buyerName,jdbcType=NVARCHAR},
-      carrier_type = #{row.carrierType,jdbcType=VARCHAR},
-      carrier_id = #{row.carrierId,jdbcType=VARCHAR},
-      npoban = #{row.npoban,jdbcType=VARCHAR},
-      print_mark = #{row.printMark,jdbcType=CHAR},
-      amount = #{row.amount,jdbcType=DECIMAL},
-      tax = #{row.tax,jdbcType=DECIMAL},
-      status = #{row.status,jdbcType=VARCHAR},
-      response_msg = #{row.responseMsg,jdbcType=NVARCHAR},
-      raw_response = #{row.rawResponse,jdbcType=NVARCHAR},
-      create_time = #{row.createTime,jdbcType=TIMESTAMP},
-      update_time = #{row.updateTime,jdbcType=TIMESTAMP}
+    order_id = #{row.orderId,jdbcType=CHAR},
+    invoice_number = #{row.invoiceNumber,jdbcType=VARCHAR},
+    invoice_date = #{row.invoiceDate,jdbcType=TIMESTAMP},
+    random_number = #{row.randomNumber,jdbcType=VARCHAR},
+    buyer_identifier = #{row.buyerIdentifier,jdbcType=VARCHAR},
+    buyer_name = #{row.buyerName,jdbcType=NVARCHAR},
+    carrier_type = #{row.carrierType,jdbcType=VARCHAR},
+    carrier_id = #{row.carrierId,jdbcType=VARCHAR},
+    npoban = #{row.npoban,jdbcType=VARCHAR},
+    print_mark = #{row.printMark,jdbcType=CHAR},
+    amount = #{row.amount,jdbcType=DECIMAL},
+    tax = #{row.tax,jdbcType=DECIMAL},
+    status = #{row.status,jdbcType=VARCHAR},
+    response_msg = #{row.responseMsg,jdbcType=NVARCHAR},
+    raw_response = #{row.rawResponse,jdbcType=NVARCHAR},
+    create_time = #{row.createTime,jdbcType=TIMESTAMP},
+    update_time = #{row.updateTime,jdbcType=TIMESTAMP},
+    external_order_no = #{row.externalOrderNo,jdbcType=VARCHAR}
     <if test="example != null">
       <include refid="Update_By_Example_Where_Clause" />
     </if>
@@ -391,28 +402,32 @@
       <if test="updateTime != null">
         update_time = #{updateTime,jdbcType=TIMESTAMP},
       </if>
+      <if test="externalOrderNo != null">
+        external_order_no = #{externalOrderNo,jdbcType=VARCHAR},
+      </if>
     </set>
     where id = #{id,jdbcType=CHAR}
   </update>
   <update id="updateByPrimaryKey" parameterType="com.qiyuan.web.entity.Invoice">
     update invoice
     set order_id = #{orderId,jdbcType=CHAR},
-      invoice_number = #{invoiceNumber,jdbcType=VARCHAR},
-      invoice_date = #{invoiceDate,jdbcType=TIMESTAMP},
-      random_number = #{randomNumber,jdbcType=VARCHAR},
-      buyer_identifier = #{buyerIdentifier,jdbcType=VARCHAR},
-      buyer_name = #{buyerName,jdbcType=NVARCHAR},
-      carrier_type = #{carrierType,jdbcType=VARCHAR},
-      carrier_id = #{carrierId,jdbcType=VARCHAR},
-      npoban = #{npoban,jdbcType=VARCHAR},
-      print_mark = #{printMark,jdbcType=CHAR},
-      amount = #{amount,jdbcType=DECIMAL},
-      tax = #{tax,jdbcType=DECIMAL},
-      status = #{status,jdbcType=VARCHAR},
-      response_msg = #{responseMsg,jdbcType=NVARCHAR},
-      raw_response = #{rawResponse,jdbcType=NVARCHAR},
-      create_time = #{createTime,jdbcType=TIMESTAMP},
-      update_time = #{updateTime,jdbcType=TIMESTAMP}
+        invoice_number = #{invoiceNumber,jdbcType=VARCHAR},
+        invoice_date = #{invoiceDate,jdbcType=TIMESTAMP},
+        random_number = #{randomNumber,jdbcType=VARCHAR},
+        buyer_identifier = #{buyerIdentifier,jdbcType=VARCHAR},
+        buyer_name = #{buyerName,jdbcType=NVARCHAR},
+        carrier_type = #{carrierType,jdbcType=VARCHAR},
+        carrier_id = #{carrierId,jdbcType=VARCHAR},
+        npoban = #{npoban,jdbcType=VARCHAR},
+        print_mark = #{printMark,jdbcType=CHAR},
+        amount = #{amount,jdbcType=DECIMAL},
+        tax = #{tax,jdbcType=DECIMAL},
+        status = #{status,jdbcType=VARCHAR},
+        response_msg = #{responseMsg,jdbcType=NVARCHAR},
+        raw_response = #{rawResponse,jdbcType=NVARCHAR},
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+        external_order_no = #{externalOrderNo,jdbcType=VARCHAR}
     where id = #{id,jdbcType=CHAR}
   </update>
 </mapper>

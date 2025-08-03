@@ -145,6 +145,7 @@ public class InvoiceServiceImpl implements InvoiceService {
                 Invoice invoice = Invoice.builder()
                         .id(RandomGenerator.getUUID().toLowerCase(Locale.ROOT))
                         .orderId(orderId)
+                        .externalOrderNo(paymentId)
                         .invoiceNumber(result.getInvoiceNumber())
                         .invoiceDate(format.parse(dateStr))
                         .randomNumber(result.getRandomNumber())
