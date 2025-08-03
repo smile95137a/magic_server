@@ -46,7 +46,6 @@ public class InvoiceServiceImpl implements InvoiceService {
     private final VirtualOrdersMapper virtualOrdersMapper;
     private final VirtualOrderItemMapper virtualOrderItemMapper;
     private final PaymentTransactionMapper paymentTransactionMapper;
-    private final GomypayInvoiceClient gomypayInvoiceClient;
     private final GomypayEinvoiceProperties einvoiceProps;
     private final RestTemplate restTemplate;
 
