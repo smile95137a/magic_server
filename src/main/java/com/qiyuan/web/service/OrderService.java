@@ -15,7 +15,6 @@ import com.qiyuan.web.enums.*;
 import com.qiyuan.web.util.DateUtil;
 import com.qiyuan.web.util.RandomGenerator;
 import com.qiyuan.web.util.SecurityUtils;
-import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.slf4j.Logger;
@@ -44,8 +43,9 @@ public class OrderService {
     private final PaymentService paymentService;
     private final StockService stockService;
     private final ImagePathMappingConfig mappingConfig;
+    private final InvoiceService invoiceService;
 
-    public OrderService(OrdersMapper ordersMapper, OrderItemMapper orderItemMapper, ShippingMethodMapper shippingMethodMapper, UserMapper userMapper, ProductMapper productMapper, PaymentTransactionMapper paymentTransactionMapper, PaymentService paymentService, StockService stockService, ImagePathMappingConfig mappingConfig) {
+    public OrderService(OrdersMapper ordersMapper, OrderItemMapper orderItemMapper, ShippingMethodMapper shippingMethodMapper, UserMapper userMapper, ProductMapper productMapper, PaymentTransactionMapper paymentTransactionMapper, PaymentService paymentService, StockService stockService, ImagePathMappingConfig mappingConfig, InvoiceService invoiceService) {
         this.ordersMapper = ordersMapper;
         this.orderItemMapper = orderItemMapper;
         this.shippingMethodMapper = shippingMethodMapper;
@@ -55,6 +55,7 @@ public class OrderService {
         this.paymentService = paymentService;
         this.stockService = stockService;
         this.mappingConfig = mappingConfig;
+        this.invoiceService = invoiceService;
     }
 
     @Transactional
@@ -156,9 +157,6 @@ public class OrderService {
 
         paymentTransactionMapper.insertSelective(tx);
 
-        // TODO: 金流待實作虛擬轉帳及信用卡部分
-        // 金流選擇參考: /order/pay-method/list
-        // 依據不同的金流，回傳資訊不同
         return CreateOrderResponse.builder()
                 .orderId(orderId)
                 .externalOrderNo(paymentId)
@@ -330,6 +328,7 @@ public class OrderService {
         return prefix + p.getMainImage();
     }
 
+    @Transactional
     public void markAsPaid(PaySuccessRequest r) {
         String paymentId = r.getExternalOrderNo();
         String providerOrderNo = r.getProviderOrderNo();
@@ -345,6 +344,8 @@ public class OrderService {
             return;
         }
 
+
+
         // 2. 更新付款狀態為成功
         tx.setStatus(OrderStatus.PAID.getValue());
         tx.setProviderOrderNo(providerOrderNo);
@@ -359,6 +360,9 @@ public class OrderService {
         update.setStatus(OrderStatus.PAID.getValue());
         update.setUpdateTime(new Date());
         ordersMapper.updateByPrimaryKeySelective(update);
+
+        // 成立發票
+        invoiceService.issueInvoice(paymentId);
     }
 
 

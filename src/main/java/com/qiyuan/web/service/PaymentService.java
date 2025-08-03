@@ -26,6 +26,7 @@ public class PaymentService {
     private static final Logger logger = LoggerFactory.getLogger(PaymentService.class);
 
     private final PaymentTransactionMapper paymentTransactionMapper;
+    private final InvoiceService invoiceService;
     private final GomypayClient gomypayClient;
     private final OrdersMapper ordersMapper;
     private final LanternPurchaseMapper lanternPurchaseMapper;
@@ -34,8 +35,9 @@ public class PaymentService {
     private final UserMapper userMapper;
     private final GodService godService;
 
-    public PaymentService(PaymentTransactionMapper paymentTransactionMapper, GomypayClient gomypayClient, OrdersMapper ordersMapper, LanternPurchaseMapper lanternPurchaseMapper, OfferingPurchaseMapper offeringPurchaseMapper, MasterServiceRequestMapper masterServiceRequestMapper, UserMapper userMapper, GodService godService) {
+    public PaymentService(PaymentTransactionMapper paymentTransactionMapper, InvoiceService invoiceService, GomypayClient gomypayClient, OrdersMapper ordersMapper, LanternPurchaseMapper lanternPurchaseMapper, OfferingPurchaseMapper offeringPurchaseMapper, MasterServiceRequestMapper masterServiceRequestMapper, UserMapper userMapper, GodService godService) {
         this.paymentTransactionMapper = paymentTransactionMapper;
+        this.invoiceService = invoiceService;
         this.gomypayClient = gomypayClient;
         this.ordersMapper = ordersMapper;
         this.lanternPurchaseMapper = lanternPurchaseMapper;
@@ -44,9 +46,6 @@ public class PaymentService {
         this.userMapper = userMapper;
         this.godService = godService;
     }
-
-    @Value("${gomypay.customerNo}")
-    private String customerNo;
 
     /**
      * 虛擬商品的信用卡付款(不含實體商品)
@@ -114,6 +113,7 @@ public class PaymentService {
                 ordersMapper.updateByPrimaryKey(target);
             }
         }
+        invoiceService.issueInvoice(paymentId);
         paymentTransactionMapper.updateByPrimaryKey(tx);
     }
 
