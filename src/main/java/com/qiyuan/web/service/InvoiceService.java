@@ -1,11 +1,19 @@
 package com.qiyuan.web.service;
 
-import com.qiyuan.web.dto.request.InvoiceRequest;
-import com.qiyuan.web.dto.response.InvoiceResult;
+import com.qiyuan.web.dto.response.InvoiceVo;
+import com.qiyuan.web.enums.InvoiceType;
+
 
 public interface InvoiceService {
-    InvoiceResult createInvoice(InvoiceRequest req);
-    InvoiceResult getInvoiceByOrderId(String orderId);
-    InvoiceResult voidInvoice(String invoiceNumber, String invoiceDate, String reason);
+
+    /**
+     * 檢查發票資訊是否正確（手機條碼、捐贈碼等）
+     */
+    boolean validateInfo(InvoiceType type, String code);
+
+    /**
+     * 開立發票
+     */
+    InvoiceVo issueInvoice(String paymentId);
 }
 
