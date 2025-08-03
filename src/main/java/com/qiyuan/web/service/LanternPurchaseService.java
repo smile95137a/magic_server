@@ -13,8 +13,10 @@ import com.qiyuan.web.dto.InvoiceDTO;
 import com.qiyuan.web.dto.LanternAdminRecord;
 import com.qiyuan.web.dto.response.PaymentNoVO;
 import com.qiyuan.web.entity.*;
+import com.qiyuan.web.enums.InvoiceType;
 import com.qiyuan.web.enums.SourceTypeEnum;
 import com.qiyuan.web.util.SecurityUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -156,6 +158,7 @@ public class LanternPurchaseService {
         List<LanternPurchaseInfo> purchaseList = req.getList();
         if (purchaseList == null || purchaseList.isEmpty()) throw new ApiException("請輸入至少一筆點燈購買資訊");
 
+
         String username = SecurityUtils.getCurrentUsername();
         User user = userMapper.selectByUsername(username);
         String userId = user.getId();
@@ -171,6 +174,16 @@ public class LanternPurchaseService {
         Optional<LanternPriceVO> vo = lanternPrice.stream().filter(p -> p.getMonth() == month).findFirst();
         if (!vo.isPresent()) {
             throw new ApiException("不存在的購買月份，請重新選擇");
+        }
+
+        InvoiceDTO invoiceDTO = null;
+        try {
+            invoiceDTO = JsonUtil.fromJson(user.getReceipt(), InvoiceDTO.class);
+        } catch (Exception ex) {
+            throw new ApiException("請先至會員中心填寫發票資訊");
+        }
+        if (invoiceDTO == null || (!invoiceDTO.getType().equals(InvoiceType.CITIZEN) && StringUtils.isBlank(invoiceDTO.getValue()))) {
+            throw new ApiException("請先至會員中心填寫發票資訊");
         }
 
         Integer unitPrice = vo.get().getPrice();
@@ -198,7 +211,6 @@ public class LanternPurchaseService {
         }
 
         // 新增訂單
-        InvoiceDTO invoiceDTO = JsonUtil.fromJson(user.getReceipt(), InvoiceDTO.class);
         VirtualOrders orders = VirtualOrders.builder()
                 .id(orderId)
                 .externalOrderNo(paymentId)

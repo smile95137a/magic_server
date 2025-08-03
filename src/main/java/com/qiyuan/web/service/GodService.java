@@ -11,6 +11,7 @@ import com.qiyuan.web.dto.request.PresentOfferingRequest;
 import com.qiyuan.web.dto.response.*;
 import com.qiyuan.web.entity.*;
 import com.qiyuan.web.entity.example.*;
+import com.qiyuan.web.enums.InvoiceType;
 import com.qiyuan.web.enums.OrderStatus;
 import com.qiyuan.web.enums.SourceTypeEnum;
 import com.qiyuan.web.util.DateUtil;
@@ -66,6 +67,15 @@ public class GodService {
         String godCode = request.getGodCode().toLowerCase(Locale.ROOT);
         God god = getGodByCode(godCode);
         Date now = DateUtil.getCurrentDate();
+        InvoiceDTO invoiceDTO = null;
+        try {
+            invoiceDTO = JsonUtil.fromJson(user.getReceipt(), InvoiceDTO.class);
+        } catch (Exception e) {
+            throw new ApiException("請先至會員中心填寫發票資訊");
+        }
+        if (invoiceDTO == null || (!invoiceDTO.getType().equals(InvoiceType.CITIZEN) && StringUtils.isBlank(invoiceDTO.getValue()))) {
+            throw new ApiException("請先至會員中心填寫發票資訊");
+        }
 
         String id = RandomGenerator.getUUID().toLowerCase(Locale.ROOT);
         String paymentId = id.substring(0, 25);
@@ -93,7 +103,7 @@ public class GodService {
 
         // 建立請神訂單
         String orderId = RandomGenerator.getUUID().toLowerCase(Locale.ROOT);
-        InvoiceDTO invoiceDTO = JsonUtil.fromJson(user.getReceipt(), InvoiceDTO.class);
+
         VirtualOrders order = VirtualOrders.builder()
                 .id(orderId)
                 .externalOrderNo(paymentId)
@@ -234,6 +244,16 @@ public class GodService {
         GodInfo godInfo = godInfoService.getGodInfo(user.getId(), god.getId());
         if (godInfo == null) throw new ApiException("請先請神成功!");
 
+        InvoiceDTO invoiceDTO = null;
+        try {
+            invoiceDTO = JsonUtil.fromJson(user.getReceipt(), InvoiceDTO.class);
+        } catch (Exception e) {
+            throw new ApiException("請先至會員中心填寫發票資訊");
+        }
+        if (invoiceDTO == null || (!invoiceDTO.getType().equals(InvoiceType.CITIZEN) && StringUtils.isBlank(invoiceDTO.getValue()))) {
+            throw new ApiException("請先至會員中心填寫發票資訊");
+        }
+
         List<OfferingPresentRequest> list = param.getList();
         List<String> offeringIds = list.stream().map(OfferingPresentRequest::getNewOfferingId).collect(Collectors.toList());
         List<Offering> offerings = offeringService.getOfferingByIds(offeringIds);
@@ -329,7 +349,6 @@ public class GodService {
             }
         }
 
-        InvoiceDTO invoiceDTO = JsonUtil.fromJson(user.getReceipt(), InvoiceDTO.class);
         VirtualOrders orders = VirtualOrders.builder()
                 .id(orderId)
                 .externalOrderNo(paymentId)

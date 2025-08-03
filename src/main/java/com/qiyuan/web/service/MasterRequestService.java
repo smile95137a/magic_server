@@ -10,6 +10,7 @@ import com.qiyuan.web.dto.response.MasterServiceRequestVO;
 import com.qiyuan.web.entity.*;
 import com.qiyuan.web.entity.example.MasterExample;
 import com.qiyuan.web.entity.example.MasterServiceRequestExample;
+import com.qiyuan.web.enums.InvoiceType;
 import com.qiyuan.web.enums.OrderStatus;
 import com.qiyuan.web.enums.SourceTypeEnum;
 import com.qiyuan.web.util.*;
@@ -125,9 +126,18 @@ public class MasterRequestService {
         User user = userMapper.selectByUsername(authentication.getName());
         userId = user.getId();
 
-        BigDecimal total = BigDecimal.valueOf(item.getPrice());
-        InvoiceDTO invoiceDTO = JsonUtil.fromJson(user.getReceipt(), InvoiceDTO.class);
+        InvoiceDTO invoiceDTO = null;
+        try {
+            invoiceDTO = JsonUtil.fromJson(user.getReceipt(), InvoiceDTO.class);
+        } catch (Exception ex) {
+            throw new ApiException("請先至會員中心填寫發票資訊");
+        }
+        if (invoiceDTO == null || (!invoiceDTO.getType().equals(InvoiceType.CITIZEN) && StringUtils.isBlank(invoiceDTO.getValue()))) {
+            throw new ApiException("請先至會員中心填寫發票資訊");
+        }
 
+        BigDecimal total = BigDecimal.valueOf(item.getPrice());
+        
         // 新增訂單
         VirtualOrders orders = VirtualOrders.builder()
                 .id(orderId)
