@@ -6,12 +6,23 @@
     <result column="external_order_no" jdbcType="VARCHAR" property="externalOrderNo" />
     <result column="provider_order_no" jdbcType="VARCHAR" property="providerOrderNo" />
     <result column="type" jdbcType="CHAR" property="type" />
+    <result column="invoice_number" jdbcType="VARCHAR" property="invoiceNumber" />
+    <result column="random_number" jdbcType="VARCHAR" property="randomNumber" />
     <result column="status" jdbcType="VARCHAR" property="status" />
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
   </resultMap>
 
   <select id="getAllReportByPeriod" resultMap="BaseResultMap">
-    SELECT t.id, t.external_order_no, p.provider_order_no, p.source_type, p.status, p.create_time FROM
+    SELECT
+           t.id  id,
+           t.external_order_no  external_order_no,
+           p.provider_order_no provider_order_no,
+           p.source_type type,
+           i.invoice_number invoice_number,
+           i.random_number random_number,
+           p.status status,
+           p.create_time create_time
+    FROM
       (
         SELECT o.id, o.external_order_no, o.create_time FROM offering_purchase o
         UNION
@@ -21,7 +32,8 @@
         UNION
         SELECT os.id, os.external_order_no, os.create_time FROM orders os
       ) t
-        LEFT JOIN payment_transaction p  ON p.id = t.external_order_no
+    LEFT JOIN payment_transaction p  ON p.id = t.external_order_no
+    LEFT JOIN invoice i ON i.external_order_no = p.id
     WHERE t.external_order_no IS NOT NULL AND p.create_time BETWEEN #{startTime} AND #{endTime}
   </select>
 </mapper>

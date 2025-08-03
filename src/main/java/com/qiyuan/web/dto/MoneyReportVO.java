@@ -23,6 +23,12 @@ public class MoneyReportVO {
     @Schema(description = "第三方訂單編號")
     private String providerOrderNo;
 
+    @Schema(description = "發票號碼")
+    private String invoiceNumber;
+
+    @Schema(description = "發票隨機號碼")
+    private String randomNumber;
+
     @Schema(description = "類型 (O:供品, M:老師, G:請神, L:點燈, R: 實體商品)", example = "O")
     private String type;
 
