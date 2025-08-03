@@ -1,20 +1,16 @@
 package com.qiyuan.web.service;
 
 import com.qiyuan.security.exception.ApiException;
-import com.qiyuan.web.dao.GodMapper;
-import com.qiyuan.web.dao.GodPurchaseMapper;
-import com.qiyuan.web.dao.PaymentTransactionMapper;
-import com.qiyuan.web.dao.UserMapper;
+import com.qiyuan.web.dao.*;
+import com.qiyuan.web.dto.InvoiceDTO;
 import com.qiyuan.web.dto.OfferingReplacementDto;
 import com.qiyuan.web.dto.request.GodExtendPeriodRequest;
+import com.qiyuan.web.dto.request.IssueInvoiceDto;
 import com.qiyuan.web.dto.request.OfferingPresentRequest;
 import com.qiyuan.web.dto.request.PresentOfferingRequest;
 import com.qiyuan.web.dto.response.*;
 import com.qiyuan.web.entity.*;
-import com.qiyuan.web.entity.example.GodExample;
-import com.qiyuan.web.entity.example.GodInfoExample;
-import com.qiyuan.web.entity.example.GodPurchaseExample;
-import com.qiyuan.web.entity.example.OfferingPurchaseExample;
+import com.qiyuan.web.entity.example.*;
 import com.qiyuan.web.enums.OrderStatus;
 import com.qiyuan.web.enums.SourceTypeEnum;
 import com.qiyuan.web.util.DateUtil;
@@ -43,14 +39,18 @@ public class GodService {
     private final OfferingService offeringService;
     private final PaymentTransactionMapper paymentTransactionMapper;
     private final GodPurchaseMapper godPurchaseMapper;
+    private final VirtualOrdersMapper virtualOrdersMapper;
+    private final VirtualOrderItemMapper virtualOrderItemMapper;
 
-    public GodService(GodMapper godMapper, UserMapper userMapper, GodInfoService godInfoService, OfferingService offeringService, PaymentTransactionMapper paymentTransactionMapper, GodPurchaseMapper godPurchaseMapper) {
+    public GodService(GodMapper godMapper, UserMapper userMapper, GodInfoService godInfoService, OfferingService offeringService, PaymentTransactionMapper paymentTransactionMapper, GodPurchaseMapper godPurchaseMapper, VirtualOrdersMapper virtualOrdersMapper, VirtualOrderItemMapper virtualOrderItemMapper) {
         this.godMapper = godMapper;
         this.userMapper = userMapper;
         this.godInfoService = godInfoService;
         this.offeringService = offeringService;
         this.paymentTransactionMapper = paymentTransactionMapper;
         this.godPurchaseMapper = godPurchaseMapper;
+        this.virtualOrdersMapper = virtualOrdersMapper;
+        this.virtualOrderItemMapper = virtualOrderItemMapper;
     }
 
     public List<God> getGodList() {
@@ -90,6 +90,33 @@ public class GodService {
                 .sourceType(SourceTypeEnum.GOD.getCode())
                 .createTime(now)
                 .build();
+
+        // 建立請神訂單
+        String orderId = RandomGenerator.getUUID();
+        InvoiceDTO invoiceDTO = JsonUtil.fromJson(user.getReceipt(), InvoiceDTO.class);
+        VirtualOrders order = VirtualOrders.builder()
+                .id(orderId)
+                .externalOrderNo(paymentId)
+                .userId(user.getId())
+                .totalAmount(price)
+                .status(OrderStatus.CREATED.getValue())
+                .invoiceType(invoiceDTO.getType().getValue())
+                .invoiceTarget(invoiceDTO.getValue())
+                .sourceType(SourceTypeEnum.GOD.getCode())
+                .createTime(new Date())
+                .updateTime(new Date())
+                .build();
+        virtualOrdersMapper.insertSelective(order);
+
+        VirtualOrderItem orderItem = VirtualOrderItem.builder()
+                .orderId(orderId)
+                .description(String.format("%s-%s-%d天", SourceTypeEnum.GOD.getLabel(), god.getName(), day))
+                .quantity(1)
+                .unitPrice(price)
+                .amount(price)
+                .createTime(new Date())
+                .build();
+        virtualOrderItemMapper.insertSelective(orderItem);
 
         godPurchaseMapper.insertSelective(record);
         paymentTransactionMapper.insertSelective(tx);
@@ -236,7 +263,7 @@ public class GodService {
         }).collect(Collectors.toList());
 
 
-        // 免費供品直接更新
+        // ========== 免費供品直接更新 ==========
         List<OfferingReplacementDto> freeOffering = replacements.stream().filter(dto -> dto.getOffering().getPrice() == 0).collect(Collectors.toList());
         List<OfferingStateVO> newOfferingState = null;
 
@@ -249,7 +276,7 @@ public class GodService {
             godInfo.setOfferingList(JsonUtil.toJson(newOfferingState));
         }
 
-        // 收費供品紀錄
+        // ========== 收費供品紀錄 ==========
         List<OfferingReplacementDto> payOffering = replacements.stream().filter(dto -> dto.getOffering().getPrice() != 0).collect(Collectors.toList());
         if (payOffering.size() == 0) {
             godInfoService.updateGodInfo(godInfo);
@@ -264,9 +291,11 @@ public class GodService {
         godInfo.setOfferingReplacement(replacementStr);
         godInfoService.updateGodInfo(godInfo);
 
-        String id = RandomGenerator.getUUID().toLowerCase(Locale.ROOT);
-        String paymentId = id.substring(0, 25);
+        String orderId = RandomGenerator.getUUID().toLowerCase(Locale.ROOT);
+        String paymentId = orderId.substring(0, 25);
         BigDecimal total = BigDecimal.ZERO;
+
+        Map<String, VirtualOrderItem> orderItemMap = new LinkedHashMap<>();
         for (OfferingReplacementDto dto : payOffering) {
             total = total.add(BigDecimal.valueOf(dto.getOffering().getPrice()));
             // 新增購買紀錄
@@ -279,6 +308,46 @@ public class GodService {
                     .userId(user.getId())
                     .createTime(new Date())
                     .build());
+
+            // 新增訂單
+            VirtualOrderItem existing = orderItemMap.get(dto.getNewOfferingId());
+            BigDecimal unit = BigDecimal.valueOf(dto.getOffering().getPrice());
+            if (existing == null) {
+
+                orderItemMap.put(dto.getNewOfferingId(),
+                        VirtualOrderItem.builder()
+                        .orderId(orderId)
+                        .description(String.format("%s-%s", SourceTypeEnum.OFFERING.getLabel(), dto.getOffering().getName()))
+                        .quantity(1)
+                        .unitPrice(unit)
+                        .amount(unit)
+                        .createTime(new Date())
+                        .build());
+            } else {
+                existing.setQuantity(existing.getQuantity() + 1);
+                existing.setAmount(existing.getAmount().add(unit));
+            }
+        }
+
+        InvoiceDTO invoiceDTO = JsonUtil.fromJson(user.getReceipt(), InvoiceDTO.class);
+        VirtualOrders orders = VirtualOrders.builder()
+                .id(orderId)
+                .externalOrderNo(paymentId)
+                .userId(user.getId())
+                .totalAmount(total)
+                .status(OrderStatus.CREATED.getValue())
+                .invoiceType(invoiceDTO.getType().getValue())
+                .invoiceTarget(invoiceDTO.getValue())
+                .sourceType(SourceTypeEnum.GOD.getCode())
+                .createTime(new Date())
+                .updateTime(new Date())
+                .build();
+
+        virtualOrdersMapper.insertSelective(orders);
+        List<VirtualOrderItem> itemList = new ArrayList<>(orderItemMap.values());
+
+        for (VirtualOrderItem item : itemList) {
+            virtualOrderItemMapper.insertSelective(item);
         }
 
         paymentTransactionMapper.insertSelective(

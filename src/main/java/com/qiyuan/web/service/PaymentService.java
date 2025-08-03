@@ -7,14 +7,15 @@ import com.qiyuan.web.dto.request.PaymentSuccessRequest;
 import com.qiyuan.web.entity.Orders;
 import com.qiyuan.web.entity.PaymentTransaction;
 import com.qiyuan.web.entity.PaymentTransactionExample;
+import com.qiyuan.web.entity.VirtualOrders;
 import com.qiyuan.web.entity.example.OrdersExample;
+import com.qiyuan.web.entity.example.VirtualOrdersExample;
 import com.qiyuan.web.enums.OrderStatus;
 import com.qiyuan.web.enums.PayMethodEnum;
 import com.qiyuan.web.enums.SourceTypeEnum;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,17 +30,19 @@ public class PaymentService {
     private final InvoiceService invoiceService;
     private final GomypayClient gomypayClient;
     private final OrdersMapper ordersMapper;
+    private final VirtualOrdersMapper virtualOrdersMapper;
     private final LanternPurchaseMapper lanternPurchaseMapper;
     private final OfferingPurchaseMapper offeringPurchaseMapper;
     private final MasterServiceRequestMapper masterServiceRequestMapper;
     private final UserMapper userMapper;
     private final GodService godService;
 
-    public PaymentService(PaymentTransactionMapper paymentTransactionMapper, InvoiceService invoiceService, GomypayClient gomypayClient, OrdersMapper ordersMapper, LanternPurchaseMapper lanternPurchaseMapper, OfferingPurchaseMapper offeringPurchaseMapper, MasterServiceRequestMapper masterServiceRequestMapper, UserMapper userMapper, GodService godService) {
+    public PaymentService(PaymentTransactionMapper paymentTransactionMapper, InvoiceService invoiceService, GomypayClient gomypayClient, OrdersMapper ordersMapper, VirtualOrdersMapper virtualOrdersMapper, LanternPurchaseMapper lanternPurchaseMapper, OfferingPurchaseMapper offeringPurchaseMapper, MasterServiceRequestMapper masterServiceRequestMapper, UserMapper userMapper, GodService godService) {
         this.paymentTransactionMapper = paymentTransactionMapper;
         this.invoiceService = invoiceService;
         this.gomypayClient = gomypayClient;
         this.ordersMapper = ordersMapper;
+        this.virtualOrdersMapper = virtualOrdersMapper;
         this.lanternPurchaseMapper = lanternPurchaseMapper;
         this.offeringPurchaseMapper = offeringPurchaseMapper;
         this.masterServiceRequestMapper = masterServiceRequestMapper;
@@ -81,6 +84,16 @@ public class PaymentService {
         tx.setUpdateTime(new Date());
         paymentTransactionMapper.updateByPrimaryKey(tx);
 
+        // 更新訂單狀態
+        VirtualOrdersExample voe = new VirtualOrdersExample();
+        voe.createCriteria().andExternalOrderNoEqualTo(externalOrderNo);
+        List<VirtualOrders> virtualOrders = virtualOrdersMapper.selectByExample(voe);
+        virtualOrders.get(0).setStatus(OrderStatus.PAID.getValue());
+        virtualOrdersMapper.updateByPrimaryKeySelective(virtualOrders.get(0));
+
+        // 發票開立
+        invoiceService.issueInvoice(externalOrderNo);
+
         if (StringUtils.equalsIgnoreCase(tx.getSourceType(), SourceTypeEnum.OFFERING.getCode())) {
             godService.processOfferingAfterPayment(tx.getId());
         } else if (StringUtils.equalsIgnoreCase(tx.getSourceType(), SourceTypeEnum.GOD.getCode())) {
@@ -113,6 +126,7 @@ public class PaymentService {
                 ordersMapper.updateByPrimaryKey(target);
             }
         }
+        // 發票開立
         invoiceService.issueInvoice(paymentId);
         paymentTransactionMapper.updateByPrimaryKey(tx);
     }

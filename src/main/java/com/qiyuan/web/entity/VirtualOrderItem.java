@@ -1,8 +1,11 @@
 package com.qiyuan.web.entity;
 
+import lombok.Builder;
+
 import java.math.BigDecimal;
 import java.util.Date;
 
+@Builder
 public class VirtualOrderItem {
     private Integer id;
 
