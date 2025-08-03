@@ -74,7 +74,7 @@ public class OfferingService {
             throw new ApiException("新增失敗, 參數不可為空");
         }
 
-        String uuid = RandomGenerator.getUUID();
+        String uuid = RandomGenerator.getUUID().toLowerCase(Locale.ROOT);
 
         String path = FileUtil.base64ToImage(r.getImageBase64(), offeringDir, uuid);
         String fileName = Paths.get(path).getFileName().toString();

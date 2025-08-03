@@ -32,6 +32,7 @@ import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.Collectors;
 
 @Service
@@ -142,7 +143,7 @@ public class InvoiceServiceImpl implements InvoiceService {
                 String dateStr = result.getInvoiceDate() + " " + result.getInvoiceTime();
                 SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
                 Invoice invoice = Invoice.builder()
-                        .id(RandomGenerator.getUUID())
+                        .id(RandomGenerator.getUUID().toLowerCase(Locale.ROOT))
                         .orderId(orderId)
                         .invoiceNumber(result.getInvoiceNumber())
                         .invoiceDate(format.parse(dateStr))

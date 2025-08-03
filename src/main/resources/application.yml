@@ -87,7 +87,6 @@ security:
     - /product/**
     - /test/mail/**
     - /images/**
-    - /master/reservation
   response:
     exclude-paths:
       - /v3/api-docs

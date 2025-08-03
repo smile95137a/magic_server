@@ -1,18 +1,13 @@
 package com.qiyuan.web.service;
 
 import com.qiyuan.security.exception.ApiException;
-import com.qiyuan.web.dao.MasterMapper;
-import com.qiyuan.web.dao.MasterServiceRequestMapper;
-import com.qiyuan.web.dao.PaymentTransactionMapper;
-import com.qiyuan.web.dao.UserMapper;
+import com.qiyuan.web.dao.*;
+import com.qiyuan.web.dto.InvoiceDTO;
 import com.qiyuan.web.dto.QapItemVO;
 import com.qiyuan.web.dto.request.MasterReservationFilter;
 import com.qiyuan.web.dto.response.AddMasterRequestResponse;
 import com.qiyuan.web.dto.response.MasterServiceRequestVO;
-import com.qiyuan.web.entity.Master;
-import com.qiyuan.web.entity.MasterServiceRequest;
-import com.qiyuan.web.entity.PaymentTransaction;
-import com.qiyuan.web.entity.User;
+import com.qiyuan.web.entity.*;
 import com.qiyuan.web.entity.example.MasterExample;
 import com.qiyuan.web.entity.example.MasterServiceRequestExample;
 import com.qiyuan.web.enums.OrderStatus;
@@ -26,6 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
@@ -44,11 +40,16 @@ public class MasterRequestService {
 
     private final UserMapper userMapper;
 
-    public MasterRequestService(MasterServiceRequestMapper mapper, MasterMapper masterMapper, PaymentTransactionMapper paymentTransactionMapper, UserMapper userMapper) {
+    private VirtualOrdersMapper virtualOrdersMapper;
+    private VirtualOrderItemMapper virtualOrderItemMapper;
+
+    public MasterRequestService(MasterServiceRequestMapper mapper, MasterMapper masterMapper, PaymentTransactionMapper paymentTransactionMapper, UserMapper userMapper, VirtualOrdersMapper virtualOrdersMapper, VirtualOrderItemMapper virtualOrderItemMapper) {
         this.mapper = mapper;
         this.masterMapper = masterMapper;
         this.paymentTransactionMapper = paymentTransactionMapper;
         this.userMapper = userMapper;
+        this.virtualOrdersMapper = virtualOrdersMapper;
+        this.virtualOrderItemMapper = virtualOrderItemMapper;
     }
 
     public List<MasterServiceRequestVO> getMasterReservationByFilter(MasterReservationFilter filter) {
@@ -95,7 +96,8 @@ public class MasterRequestService {
             throw new ApiException("請選擇老師！");
         }
 
-        String paymentId = RandomGenerator.getUUID().toLowerCase(Locale.ROOT).substring(0, 25);
+        String orderId = RandomGenerator.getUUID().toLowerCase(Locale.ROOT);
+        String paymentId = orderId.substring(0, 25);
         Master master = masters.get(0);
         List<QapItemVO> qapItem = JsonUtil.fromJsonList(master.getServicesJson(), QapItemVO.class);
         Optional<QapItemVO> itemO = qapItem.stream().filter(q -> StringUtils.equals(q.getTitle(), req.getServiceItem())).findFirst();
@@ -120,16 +122,44 @@ public class MasterRequestService {
 
         String userId = null;
         Authentication authentication = SecurityUtils.getAuthentication();
-        if (authentication != null) {
-            User user = userMapper.selectByUsername(authentication.getName());
-            userId = user.getId();
-        }
+        User user = userMapper.selectByUsername(authentication.getName());
+        userId = user.getId();
+
+        BigDecimal total = BigDecimal.valueOf(item.getPrice());
+        InvoiceDTO invoiceDTO = JsonUtil.fromJson(user.getReceipt(), InvoiceDTO.class);
+
+        // 新增訂單
+        VirtualOrders orders = VirtualOrders.builder()
+                .id(orderId)
+                .externalOrderNo(paymentId)
+                .userId(userId)
+                .totalAmount(total)
+                .status(OrderStatus.CREATED.getValue())
+                .invoiceType(invoiceDTO.getType().getValue())
+                .invoiceTarget(invoiceDTO.getValue())
+                .sourceType(SourceTypeEnum.MASTER_SERVICE.getCode())
+                .createTime(new Date())
+                .updateTime(new Date())
+                .build();
+
+        virtualOrdersMapper.insertSelective(orders);
+
+        VirtualOrderItem orderItem = VirtualOrderItem.builder()
+                .orderId(orderId)
+                .description(String.format("%s-%s", SourceTypeEnum.MASTER_SERVICE.getLabel(), item.getTitle()))
+                .quantity(1)
+                .unitPrice(total)
+                .amount(total)
+                .createTime(new Date())
+                .build();
+
+        virtualOrderItemMapper.insertSelective(orderItem);
 
         paymentTransactionMapper.insertSelective(PaymentTransaction.builder()
                 .id(paymentId)
                 .userId(userId)
                 .sourceType(SourceTypeEnum.MASTER_SERVICE.getCode())
-                .amount(BigDecimal.valueOf(item.getPrice()))
+                .amount(total)
                 .status(OrderStatus.CREATED.getValue())
                 .payMethod(req.getPaymentMethod())
                 .createTime(DateUtil.getCurrentDate())

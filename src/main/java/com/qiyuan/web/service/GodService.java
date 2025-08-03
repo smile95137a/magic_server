@@ -92,7 +92,7 @@ public class GodService {
                 .build();
 
         // 建立請神訂單
-        String orderId = RandomGenerator.getUUID();
+        String orderId = RandomGenerator.getUUID().toLowerCase(Locale.ROOT);
         InvoiceDTO invoiceDTO = JsonUtil.fromJson(user.getReceipt(), InvoiceDTO.class);
         VirtualOrders order = VirtualOrders.builder()
                 .id(orderId)

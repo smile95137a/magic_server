@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.Collectors;
 
 @Service
@@ -28,7 +29,7 @@ public class ProductCategoryService {
     public boolean addCategory(CategoryAdminRequest req) {
         Date now = DateUtil.getCurrentDate();
         ProductCategory r = ProductCategory.builder()
-                .id(RandomGenerator.getUUID())
+                .id(RandomGenerator.getUUID().toLowerCase(Locale.ROOT))
                 .description(StringUtils.defaultString(req.getDescription()))
                 .name(req.getName())
                 .status(true)

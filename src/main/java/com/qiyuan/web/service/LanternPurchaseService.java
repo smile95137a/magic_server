@@ -8,19 +8,18 @@ import java.util.Locale;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import com.qiyuan.web.dao.*;
+import com.qiyuan.web.dto.InvoiceDTO;
 import com.qiyuan.web.dto.LanternAdminRecord;
 import com.qiyuan.web.dto.response.PaymentNoVO;
 import com.qiyuan.web.entity.*;
+import com.qiyuan.web.enums.SourceTypeEnum;
 import com.qiyuan.web.util.SecurityUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.qiyuan.security.exception.ApiException;
-import com.qiyuan.web.dao.LanternMapper;
-import com.qiyuan.web.dao.LanternPurchaseMapper;
-import com.qiyuan.web.dao.PaymentTransactionMapper;
-import com.qiyuan.web.dao.UserMapper;
 import com.qiyuan.web.dto.LanternBlessingDTO;
 import com.qiyuan.web.dto.request.LanternPurchaseInfo;
 import com.qiyuan.web.dto.request.LanternPurchaseRequest;
@@ -50,13 +49,18 @@ public class LanternPurchaseService {
 
     private PaymentTransactionMapper paymentTransactionMapper;
 
-    public LanternPurchaseService(LanternPurchaseMapper lanternPurchaseMapper, SystemConfigService systemConfigService, LanternMapper lanternMapper, UserMapper userMapper, PaymentService paymentService, PaymentTransactionMapper paymentTransactionMapper) {
+    private VirtualOrdersMapper virtualOrdersMapper;
+    private VirtualOrderItemMapper virtualOrderItemMapper;
+
+    public LanternPurchaseService(LanternPurchaseMapper lanternPurchaseMapper, SystemConfigService systemConfigService, LanternMapper lanternMapper, UserMapper userMapper, PaymentService paymentService, PaymentTransactionMapper paymentTransactionMapper, VirtualOrdersMapper virtualOrdersMapper, VirtualOrderItemMapper virtualOrderItemMapper) {
         this.lanternPurchaseMapper = lanternPurchaseMapper;
         this.systemConfigService = systemConfigService;
         this.lanternMapper = lanternMapper;
         this.userMapper = userMapper;
         this.paymentService = paymentService;
         this.paymentTransactionMapper = paymentTransactionMapper;
+        this.virtualOrdersMapper = virtualOrdersMapper;
+        this.virtualOrderItemMapper = virtualOrderItemMapper;
     }
 
     public List<LanternPurchase> getByLanternId(String lanternId) {
@@ -170,15 +174,16 @@ public class LanternPurchaseService {
         }
 
         Integer unitPrice = vo.get().getPrice();
-        BigDecimal totalAmount = BigDecimal.valueOf(unitPrice ).multiply(BigDecimal.valueOf(purchaseList.size()));
+        BigDecimal totalAmount = BigDecimal.valueOf(unitPrice).multiply(BigDecimal.valueOf(purchaseList.size()));
         Integer availableDays = month == 12 ? 365 : month * 30;
-        String paymentId = RandomGenerator.getUUID().toLowerCase(Locale.ROOT).substring(0, 25);
+        String orderId = RandomGenerator.getUUID().toLowerCase(Locale.ROOT);
+        String paymentId = orderId.substring(0, 25);
 
         Date currentDate = DateUtil.getCurrentDate();
 
         for (LanternPurchaseInfo info : req.getList()) {
             LanternPurchase entity = new LanternPurchase();
-            String id = RandomGenerator.getUUID();
+            String id = RandomGenerator.getUUID().toLowerCase(Locale.ROOT);
             entity.setId(id);
             entity.setExternalOrderNo(paymentId);
             entity.setLanternId(lantern.getId());
@@ -192,7 +197,34 @@ public class LanternPurchaseService {
             lanternPurchaseMapper.insertSelective(entity);
         }
 
+        // 新增訂單
+        InvoiceDTO invoiceDTO = JsonUtil.fromJson(user.getReceipt(), InvoiceDTO.class);
+        VirtualOrders orders = VirtualOrders.builder()
+                .id(orderId)
+                .externalOrderNo(paymentId)
+                .userId(userId)
+                .totalAmount(totalAmount)
+                .status(OrderStatus.CREATED.getValue())
+                .invoiceType(invoiceDTO.getType().getValue())
+                .invoiceTarget(invoiceDTO.getValue())
+                .sourceType(SourceTypeEnum.LANTERN.getCode())
+                .createTime(new Date())
+                .updateTime(new Date())
+                .build();
+        virtualOrdersMapper.insertSelective(orders);
 
+        VirtualOrderItem virtualOrderItem = VirtualOrderItem
+                .builder()
+                .orderId(orderId)
+                .description(String.format("%s-%s", SourceTypeEnum.LANTERN.getLabel(), lantern.getName()))
+                .quantity(purchaseList.size())
+                .unitPrice(BigDecimal.valueOf(unitPrice))
+                .amount(totalAmount)
+                .createTime(new Date())
+                .build();
+        virtualOrderItemMapper.insertSelective(virtualOrderItem);
+
+        // 金流訂單
         paymentTransactionMapper.insertSelective(PaymentTransaction.builder()
                 .id(paymentId)
                 .amount(totalAmount)
