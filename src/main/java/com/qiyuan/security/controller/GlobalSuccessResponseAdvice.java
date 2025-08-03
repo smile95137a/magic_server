@@ -5,6 +5,7 @@ import com.qiyuan.security.response.ApiResponse;
 
 import org.springframework.core.MethodParameter;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
@@ -44,6 +45,8 @@ public class GlobalSuccessResponseAdvice implements ResponseBodyAdvice<Object> {
 
         // 避免重複包裝
         if (body instanceof ApiResponse) {
+            return body;
+        } else if (body instanceof ResponseEntity) {
             return body;
         }
 

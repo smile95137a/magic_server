@@ -2,9 +2,12 @@ package com.qiyuan.web.service;
 
 import com.qiyuan.security.exception.ApiException;
 import com.qiyuan.web.dao.*;
+import com.qiyuan.web.dto.PaymentAtmCallbackResult;
 import com.qiyuan.web.dto.request.PaymentSuccessRequest;
+import com.qiyuan.web.entity.Orders;
 import com.qiyuan.web.entity.PaymentTransaction;
 import com.qiyuan.web.entity.PaymentTransactionExample;
+import com.qiyuan.web.entity.example.OrdersExample;
 import com.qiyuan.web.enums.OrderStatus;
 import com.qiyuan.web.enums.PayMethodEnum;
 import com.qiyuan.web.enums.SourceTypeEnum;
@@ -45,6 +48,10 @@ public class PaymentService {
     @Value("${gomypay.customerNo}")
     private String customerNo;
 
+    /**
+     * 虛擬商品的信用卡付款(不含實體商品)
+     * @param request
+     */
     @Transactional
     public void markVirtualPaymentSuccess(PaymentSuccessRequest request) {
         String externalOrderNo = request.getExternalOrderNo();
@@ -82,101 +89,33 @@ public class PaymentService {
         }
     }
 
-//    public PaymentCreateResult createPayment(User user, String externalOrderNo, BigDecimal amount,
-//                                             PayMethodEnum payMethod, SourceTypeEnum sourceType, String sourceId) {
-//        GomypayRequest req = GomypayRequest.builder()
-//                .sendType(payMethod.getApiValue())         // 如 0, 7, ... 依金流API文件
-//                .orderNo(externalOrderNo)
-//                .amount(amount)
-//                .userName(user.getNickname())
-//                .phone(user.getPhone())
-//                .email(user.getEmail())
-//                .memo("線上訂單")                          // 可自訂備註
-//                .transMode("1")             // 一般交易 1，分期 2
-//                .installment("0")     // 無分期填0
-//                .build();
-//
-//        // === 2. 呼叫金流API，取得回應
-//        GomypayResponse resp = gomypayClient.createPayment(req);
-//
-//        // === 3. 寫入 payment_transaction
-//        Date now = DateUtil.getCurrentDate();
-//        PaymentTransaction trx = new PaymentTransaction();
-//        trx.setId(RandomGenerator.getUUID());
-//        trx.setUserId(user.getId());
-//        trx.setSourceType(sourceType.getCode());
-//        trx.setSourceId(sourceId);
-//        trx.setExternalOrderNo(externalOrderNo);
-//        trx.setPayMethod(payMethod.getCode());
-//        trx.setProvider("gomypay");
-//        trx.setAmount(amount);
-//        trx.setStatus("pending");
-//        trx.setMerchantTradeNo(resp.getTradeNo());
-//        trx.setRawData(JsonUtil.toJson(resp));
-//        trx.setCreateTime(now);
-//        trx.setUpdateTime(now);
-//        paymentTransactionMapper.insertSelective(trx);
-//
-//        // === 4. 回傳付款資訊給前端
-//        return PaymentCreateResult.builder()
-//                .paymentUrl(resp.getPaymentUrl())
-//                .build();
-//    }
+    /**
+     * ATM轉帳的付款(目前僅有實體)
+     * @param result
+     */
+    @Transactional
+    public void markAtmPaymentResult(PaymentAtmCallbackResult result) {
+        String paymentId = result.getEOrderno();
+        PaymentTransaction tx = paymentTransactionMapper.selectByPrimaryKey(paymentId);
+        tx.setProviderOrderNo(result.getOrderID());
+        tx.setRawData(result.toString());
+        tx.setUpdateTime(new Date());
 
+        if ("1".equals(result.getResult())) {
+            tx.setStatus(OrderStatus.PAID.getValue());
 
-
-//    public void handleCallback(PaymentNotifyRequest notify) {
-//        // 1. 簽章驗證
-//        if (!gomypayClient.verifySign(notify.getStrCheck())) throw new ApiException("驗證失敗");
-//
-//        // 2. 查找金流紀錄
-//        PaymentTransactionExample e = new PaymentTransactionExample();
-//        e.createCriteria().andExternalOrderNoEqualTo(notify.getOrderNo());
-//        List<PaymentTransaction> trxList = paymentTransactionMapper.selectByExample(e);
-//        if (trxList == null || trxList.isEmpty()) throw new ApiException("交易不存在");
-//
-//        PaymentTransaction trx = trxList.get(0);
-//
-//        // 3. 狀態判斷與更新
-//        String currentStatus = trx.getStatus();
-//        String callbackStatus = notify.getStatus();
-//
-//        // 若已付款成功，再次通知則略過
-//        if ("paid".equals(currentStatus)) {
-//            return;
-//        }
-//
-//        // 處理付款成功
-//        if ("1".equals(callbackStatus)) {
-//            trx.setStatus("paid");
-//            trx.setMerchantTradeNo(notify.getTradeNo());
-//            trx.setRawData(notify.toJson());
-//            trx.setUpdateTime(new Date());
-//            paymentTransactionMapper.updateByPrimaryKeySelective(trx);
-//
-//            markSourceAsPaid(trx.getSourceType(), trx.getSourceId());
-//            return;
-//        }
-//
-//        // 處理付款失敗
-//        if ("0".equals(callbackStatus)) {
-//            trx.setStatus("failed");
-//            trx.setMerchantTradeNo(notify.getTradeNo());
-//            trx.setRawData(notify.toJson());
-//            trx.setUpdateTime(new Date());
-//            paymentTransactionMapper.updateByPrimaryKeySelective(trx);
-//            return;
-//        }
-//
-//        // 其他情境（如果未來金流增加新狀態）
-//        trx.setStatus("unknown");
-//        trx.setMerchantTradeNo(notify.getTradeNo());
-//        trx.setRawData(notify.toJson());
-//        trx.setUpdateTime(new Date());
-//        paymentTransactionMapper.updateByPrimaryKeySelective(trx);
-//    }
-
-
+            if (tx.getSourceType().equals(SourceTypeEnum.REAL.getCode())) {
+                OrdersExample e = new OrdersExample();
+                e.createCriteria().andExternalOrderNoEqualTo(paymentId);
+                List<Orders> orders = ordersMapper.selectByExample(e);
+                Orders target = orders.get(0);
+                target.setStatus(OrderStatus.PAID.getValue());
+                target.setPaid(true);
+                ordersMapper.updateByPrimaryKey(target);
+            }
+        }
+        paymentTransactionMapper.updateByPrimaryKey(tx);
+    }
 
 
 
