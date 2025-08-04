@@ -125,6 +125,10 @@ gomypay:
     baseUrl: http://testeinvoice.gomypay.asia/api/
     pwd: jk5rjwzmk2f16h3t1n6qgx87tqhdy3ky
     customerNo: 60755266
+  logistics:
+    customer-id: 003M
+    customer-password: 9F82E3DFB2056161
+    baseUrl: https://logistics.gomypay.asia/
 ap:
   backend: https://api.ingodwetrust.tw:8443
 
