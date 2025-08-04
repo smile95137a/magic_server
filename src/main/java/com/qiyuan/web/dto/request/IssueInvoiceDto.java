@@ -26,24 +26,20 @@ public class IssueInvoiceDto {
     private String InvoiceType; // 07:一般電子發票, 08:特種稅額，預設 07
 
     private String BuyerIdentifier; // 統編，有統編才填
-    @NonNull
+
     private String BuyerName;
     private String BuyerAddress;
     private String BuyerTelephoneNumber;
     private String BuyerEmailAddress;
 
-    @NonNull
+
     private Integer SalesAmount;
-    @NonNull
     private Integer FreeTaxSalesAmount;
-    @NonNull
     private Integer ZeroTaxSalesAmount;
 
-    @NonNull
+
     private String TaxType; // 1~4 or 9
-    @NonNull
     private BigDecimal TaxRate; // 例如 0.05
-    @NonNull
     private Integer TaxAmount;
     @NonNull
     private Integer TotalAmount;
@@ -63,7 +59,6 @@ public class IssueInvoiceDto {
 
     private String MainRemark;
 
-    @NonNull
     private List<InvoiceItemDto> ITEM; // 消費明細
 
     @Builder
