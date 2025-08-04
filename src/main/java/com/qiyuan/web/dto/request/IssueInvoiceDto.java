@@ -9,18 +9,17 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class IssueInvoiceDto {
-    @NonNull
+    
     private String user_id; // 特店代號，必填，通常為統一編號
-
-    @NonNull
+    
     private String check_pwd; // 特店驗證密碼，必填
 
     private String eInvoiceMessage; // 傳輸型態，F0401 / A0101，可空
 
     private String InvoiceNumber; // 發票號碼，10碼，未填由系統取號
-    @NonNull
+    
     private String InvoiceDate; // 格式: YYYY/MM/DD
-    @NonNull
+    
     private String InvoiceTime; // 格式: HH:mm:ss
 
     private String InvoiceType; // 07:一般電子發票, 08:特種稅額，預設 07
@@ -41,10 +40,10 @@ public class IssueInvoiceDto {
     private String TaxType; // 1~4 or 9
     private BigDecimal TaxRate; // 例如 0.05
     private Integer TaxAmount;
-    @NonNull
+    
     private Integer TotalAmount;
 
-    @NonNull
+    
     private String PrintMark; // Y or N
 
     private String CustomsClearanceMark; // 零稅率時必填 (1 or 2)
@@ -65,18 +64,18 @@ public class IssueInvoiceDto {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class InvoiceItemDto {
-        @NonNull
+        
         private String Description; // 商品名稱
 
-        @NonNull
+        
         private Integer Quantity; // 數量
 
-        @NonNull
+        
         private BigDecimal UnitPrice; // 單價
 
         private String TaxType; // 只有當主發票 TaxType 為 9 時必填
 
-        @NonNull
+        
         private Integer Amount; // 小計金額
 
         private String Remark; // 備註（如健康捐等）
