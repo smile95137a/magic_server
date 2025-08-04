@@ -1,5 +1,6 @@
 package com.qiyuan.web.controller.front;
 
+import com.qiyuan.security.exception.ApiException;
 import com.qiyuan.web.dto.request.*;
 import com.qiyuan.web.dto.response.*;
 import com.qiyuan.web.security.RoleExpressions;
@@ -37,7 +38,11 @@ public class UserFrontController {
     @PostMapping("/login")
     @Operation(summary = "會員登入",description = "帳號密碼登入。成功後回傳 accessToken 及 refreshToken。")
     public LoginResponse login(@RequestBody UserLoginRequest req) {
-        return authService.login(req);
+        try {
+            return authService.login(req);
+        } catch (Exception e) {
+            throw new ApiException("登入失敗，帳號或密碼錯誤");
+        }
     }
 
     @PostMapping("/modify")

@@ -454,12 +454,23 @@ public class GodService {
             offeringInfoList = IntStream.range(0, 2)
                             .mapToObj(i -> OfferingStateVO.builder().build())
                             .collect(Collectors.toList());
+        } else {
+            offeringInfoList = JsonUtil.fromJsonList(offeringList, OfferingStateVO.class);
         }
 
         for (OfferingReplacementDto dto: replacementDtos) {
-            OfferingStateVO vo = offeringInfoList.get(dto.getIndex());
-            vo.setId(dto.getNewOfferingId());
-            vo.setBuyTime(DateFormatUtils.format(DateUtil.getCurrentDate(), "yyyy/MM/dd HH:mm"));
+            // 置換
+            if (offeringInfoList.size() - 1 >= dto.getIndex()) {
+                OfferingStateVO vo = offeringInfoList.get(dto.getIndex());
+                vo.setId(dto.getNewOfferingId());
+                vo.setBuyTime(DateFormatUtils.format(DateUtil.getCurrentDate(), "yyyy/MM/dd HH:mm"));
+            } else {
+                // 新增
+                offeringInfoList.add(OfferingStateVO.builder()
+                        .id(dto.getNewOfferingId())
+                        .buyTime(DateFormatUtils.format(DateUtil.getCurrentDate(), "yyyy/MM/dd HH:mm"))
+                        .build());
+            }
         }
         return offeringInfoList;
     }
