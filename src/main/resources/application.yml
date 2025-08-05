@@ -128,7 +128,8 @@ gomypay:
   logistics:
     customer-id: 003M
     customer-password: 9F82E3DFB2056161
-    baseUrl: https://logistics.gomypay.asia/
+#    baseUrl: https://logistics.gomypay.asia
+    baseUrl: http://127.0.0.1
 ap:
   backend: https://api.ingodwetrust.tw:8443
 
