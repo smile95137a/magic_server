@@ -13,10 +13,10 @@ public class GomypayLogisticsProperties {
     private String customerPassword;
 
     public String getStoreCreateUri() {
-        return baseUrl + "LogisticsAPI.aspx";
+        return baseUrl + "/LogisticsAPI.aspx";
     }
 
     public String getExpressCreateUri() {
-        return baseUrl + "Api/SF/SFCreateAPI.aspx";
+        return baseUrl + "/Api/SF/SFCreateAPI.aspx";
     }
 }

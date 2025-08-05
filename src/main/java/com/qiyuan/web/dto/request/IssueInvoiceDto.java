@@ -32,16 +32,16 @@ public class IssueInvoiceDto {
     private String BuyerEmailAddress;
 
 
-    private Integer SalesAmount;
-    private Integer FreeTaxSalesAmount;
-    private Integer ZeroTaxSalesAmount;
+    private String SalesAmount;
+    private String FreeTaxSalesAmount;
+    private String ZeroTaxSalesAmount;
 
 
     private String TaxType; // 1~4 or 9
-    private BigDecimal TaxRate; // 例如 0.05
-    private Integer TaxAmount;
+    private String TaxRate; // 例如 0.05
+    private String TaxAmount;
     
-    private Integer TotalAmount;
+    private String TotalAmount;
 
     
     private String PrintMark; // Y or N
@@ -68,15 +68,15 @@ public class IssueInvoiceDto {
         private String Description; // 商品名稱
 
         
-        private Integer Quantity; // 數量
+        private String Quantity; // 數量
 
         
-        private BigDecimal UnitPrice; // 單價
+        private String UnitPrice; // 單價
 
         private String TaxType; // 只有當主發票 TaxType 為 9 時必填
 
         
-        private Integer Amount; // 小計金額
+        private String Amount; // 小計金額
 
         private String Remark; // 備註（如健康捐等）
 
@@ -88,19 +88,19 @@ public class IssueInvoiceDto {
             Description = description;
         }
 
-        public Integer getQuantity() {
+        public String getQuantity() {
             return Quantity;
         }
 
-        public void setQuantity(Integer quantity) {
+        public void setQuantity(String quantity) {
             Quantity = quantity;
         }
 
-        public BigDecimal getUnitPrice() {
+        public String getUnitPrice() {
             return UnitPrice;
         }
 
-        public void setUnitPrice(BigDecimal unitPrice) {
+        public void setUnitPrice(String unitPrice) {
             UnitPrice = unitPrice;
         }
 
@@ -112,11 +112,11 @@ public class IssueInvoiceDto {
             TaxType = taxType;
         }
 
-        public Integer getAmount() {
+        public String getAmount() {
             return Amount;
         }
 
-        public void setAmount(Integer amount) {
+        public void setAmount(String amount) {
             Amount = amount;
         }
 
@@ -225,27 +225,27 @@ public class IssueInvoiceDto {
         BuyerEmailAddress = buyerEmailAddress;
     }
 
-    public Integer getSalesAmount() {
+    public String getSalesAmount() {
         return SalesAmount;
     }
 
-    public void setSalesAmount(Integer salesAmount) {
+    public void setSalesAmount(String salesAmount) {
         SalesAmount = salesAmount;
     }
 
-    public Integer getFreeTaxSalesAmount() {
+    public String getFreeTaxSalesAmount() {
         return FreeTaxSalesAmount;
     }
 
-    public void setFreeTaxSalesAmount(Integer freeTaxSalesAmount) {
+    public void setFreeTaxSalesAmount(String freeTaxSalesAmount) {
         FreeTaxSalesAmount = freeTaxSalesAmount;
     }
 
-    public Integer getZeroTaxSalesAmount() {
+    public String getZeroTaxSalesAmount() {
         return ZeroTaxSalesAmount;
     }
 
-    public void setZeroTaxSalesAmount(Integer zeroTaxSalesAmount) {
+    public void setZeroTaxSalesAmount(String zeroTaxSalesAmount) {
         ZeroTaxSalesAmount = zeroTaxSalesAmount;
     }
 
@@ -257,27 +257,27 @@ public class IssueInvoiceDto {
         TaxType = taxType;
     }
 
-    public BigDecimal getTaxRate() {
+    public String getTaxRate() {
         return TaxRate;
     }
 
-    public void setTaxRate(BigDecimal taxRate) {
+    public void setTaxRate(String taxRate) {
         TaxRate = taxRate;
     }
 
-    public Integer getTaxAmount() {
+    public String getTaxAmount() {
         return TaxAmount;
     }
 
-    public void setTaxAmount(Integer taxAmount) {
+    public void setTaxAmount(String taxAmount) {
         TaxAmount = taxAmount;
     }
 
-    public Integer getTotalAmount() {
+    public String getTotalAmount() {
         return TotalAmount;
     }
 
-    public void setTotalAmount(Integer totalAmount) {
+    public void setTotalAmount(String totalAmount) {
         TotalAmount = totalAmount;
     }
 
