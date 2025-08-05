@@ -42,6 +42,7 @@ public class InvoiceServiceImpl implements InvoiceService {
     private static final Logger logger = LoggerFactory.getLogger(InvoiceServiceImpl.class);
 
     private final InvoiceMapper invoiceMapper;
+    private final UserMapper userMapper;
     private final OrdersMapper ordersMapper;
     private final OrderItemMapper orderItemMapper;
     private final VirtualOrdersMapper virtualOrdersMapper;
@@ -129,8 +130,14 @@ public class InvoiceServiceImpl implements InvoiceService {
         }
 
         try {
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            headers.setAccept(List.of(MediaType.APPLICATION_JSON));
+
+            HttpEntity<IssueInvoiceDto> request = new HttpEntity<>(invoiceDto, headers);
+
             ResponseEntity<IssueInvoiceResponse> response =
-                    restTemplate.postForEntity(addUrl, invoiceDto, IssueInvoiceResponse.class);
+                    restTemplate.postForEntity(addUrl, request, IssueInvoiceResponse.class);
 
             IssueInvoiceResponse result = response.getBody();
 
@@ -181,7 +188,8 @@ public class InvoiceServiceImpl implements InvoiceService {
 
     private IssueInvoiceDto getRealProductOrderInvoice(Orders target) {
         InvoiceType invoiceType = InvoiceType.fromValue(target.getInvoiceType());
-        if (invoiceType.equals(InvoiceType.DONATION) || invoiceType.equals(InvoiceType.MOBILE)) {
+        // 第三方測試環境有問題，只能檢核手機條碼
+        if (invoiceType.equals(InvoiceType.MOBILE)) {
             validateInfo(invoiceType, target.getInvoiceTarget());
         }
 
@@ -195,14 +203,20 @@ public class InvoiceServiceImpl implements InvoiceService {
                 .PrintMark("N")
                 .build();
 
+        String userId = target.getUserId();
+        User user = userMapper.selectByPrimaryKey(userId);
+        invoice.setBuyerEmailAddress(user.getEmail());
+
         if (invoiceType.equals(InvoiceType.COMPANY)) {
             invoice.setBuyerIdentifier(target.getInvoiceTarget()); // 統編
-            invoice.setBuyerName("");  // 買方名稱
+            invoice.setTaxRate("0.05");
+
         } else if (invoiceType.equals(InvoiceType.DONATION)) {
             invoice.setNPOBAN(target.getInvoiceTarget());
         } else if  (invoiceType.equals(InvoiceType.MOBILE)) {
             invoice.setCarrierType("3J0002");
             invoice.setCarrierId1(target.getInvoiceTarget());
+            invoice.setCarrierId2(target.getInvoiceTarget());
         }
 
         OrderItemExample oie = new OrderItemExample();
@@ -211,25 +225,32 @@ public class InvoiceServiceImpl implements InvoiceService {
 
         if (orderItems == null || orderItems.size() == 0) throw new ApiException("發票開立失敗，查無訂單");
         List<IssueInvoiceDto.InvoiceItemDto> items = orderItems.stream().map(item -> IssueInvoiceDto.InvoiceItemDto.builder()
-                    .Amount(item.getSubtotal().intValue())
-                    .Quantity(item.getQuantity())
+                    .Amount(String.valueOf(item.getSubtotal().intValue()))
+                    .Quantity(String.valueOf(item.getQuantity()))
                     .Description(item.getProductName())
-                    .UnitPrice(item.getSpecialPrice())
+                    .UnitPrice(String.valueOf(item.getSpecialPrice().intValue()))
                     .build()
         ).collect(Collectors.toList());
 
         invoice.setITEM(items);
         int total = items.stream()
-                .mapToInt(IssueInvoiceDto.InvoiceItemDto::getAmount)
+                .map(IssueInvoiceDto.InvoiceItemDto::getAmount)
+                .mapToInt(Integer::parseInt)
                 .sum();
 
-        invoice.setFreeTaxSalesAmount(0);
-        invoice.setZeroTaxSalesAmount(0);
-        invoice.setSalesAmount(0);
+        if (invoiceType.equals(InvoiceType.COMPANY)) {
+            int tax = (int) (Double.valueOf(total) * 0.05);
+            invoice.setTaxAmount(String.valueOf(tax));
+            invoice.setSalesAmount(String.valueOf(total - tax));
+        } else {
+            invoice.setTaxAmount("0");
+            invoice.setSalesAmount(String.valueOf(total));
+        }
+
+        invoice.setFreeTaxSalesAmount("0");
+        invoice.setZeroTaxSalesAmount("0");
         invoice.setTaxType("1");
-        invoice.setTaxRate(BigDecimal.valueOf(0.05));
-        invoice.setTaxAmount(0);
-        invoice.setTotalAmount(total);
+        invoice.setTotalAmount(String.valueOf(total));
 
         return invoice;
     }
@@ -240,6 +261,7 @@ public class InvoiceServiceImpl implements InvoiceService {
             validateInfo(invoiceType, target.getInvoiceTarget());
         }
 
+
         Date currentDate = DateUtil.getCurrentDate();
 
         IssueInvoiceDto invoice = IssueInvoiceDto.builder()
@@ -250,14 +272,19 @@ public class InvoiceServiceImpl implements InvoiceService {
                 .PrintMark("N")
                 .build();
 
+        String userId = target.getUserId();
+        User user = userMapper.selectByPrimaryKey(userId);
+        invoice.setBuyerEmailAddress(user.getEmail());
+
         if (invoiceType.equals(InvoiceType.COMPANY)) {
             invoice.setBuyerIdentifier(target.getInvoiceTarget()); // 統編
-            invoice.setBuyerName("");  // 買方名稱
+            invoice.setTaxRate("0.05");
         } else if (invoiceType.equals(InvoiceType.DONATION)) {
             invoice.setNPOBAN(target.getInvoiceTarget());
         } else if  (invoiceType.equals(InvoiceType.MOBILE)) {
             invoice.setCarrierType("3J0002");
             invoice.setCarrierId1(target.getInvoiceTarget());
+            invoice.setCarrierId2(target.getInvoiceTarget());
         }
 
         VirtualOrderItemExample vie = new VirtualOrderItemExample();
@@ -266,26 +293,33 @@ public class InvoiceServiceImpl implements InvoiceService {
 
         if (virtualOrderItems == null || virtualOrderItems.size() == 0) throw new ApiException("發票開立失敗，查無訂單");
         List<IssueInvoiceDto.InvoiceItemDto> items = virtualOrderItems.stream().map(item -> IssueInvoiceDto.InvoiceItemDto.builder()
-                .Amount(item.getAmount().intValue())
-                .Quantity(item.getQuantity())
+                .Amount(String.valueOf(item.getAmount().intValue()))
+                .Quantity(String.valueOf(item.getQuantity()))
                 .Description(item.getDescription())
-                .UnitPrice(item.getUnitPrice())
+                .UnitPrice(String.valueOf(item.getUnitPrice().intValue()))
                 .build()
         ).collect(Collectors.toList());
 
         invoice.setITEM(items);
 
         int total = items.stream()
-                .mapToInt(IssueInvoiceDto.InvoiceItemDto::getAmount)
+                .map(IssueInvoiceDto.InvoiceItemDto::getAmount)
+                .mapToInt(Integer::parseInt)
                 .sum();
 
-        invoice.setFreeTaxSalesAmount(0);
-        invoice.setZeroTaxSalesAmount(0);
-        invoice.setSalesAmount(0);
+        if (invoiceType.equals(InvoiceType.COMPANY)) {
+            int tax = (int) (Double.valueOf(total) * 0.05);
+            invoice.setTaxAmount(String.valueOf(tax));
+            invoice.setSalesAmount(String.valueOf(total - tax));
+        } else {
+            invoice.setTaxAmount("0");
+            invoice.setSalesAmount(String.valueOf(total));
+        }
+
+        invoice.setFreeTaxSalesAmount("0");
+        invoice.setZeroTaxSalesAmount("0");
         invoice.setTaxType("1");
-        invoice.setTaxRate(BigDecimal.valueOf(0.05));
-        invoice.setTaxAmount(0);
-        invoice.setTotalAmount(total);
+        invoice.setTotalAmount(String.valueOf(total));
 
         return invoice;
     }

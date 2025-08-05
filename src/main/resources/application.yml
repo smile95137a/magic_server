@@ -122,7 +122,7 @@ gomypay:
   pwd: jk5rjwzmk2f16h3t1n6qgx87tqhdy3ky
   api: https://n.gomypay.asia/TestShuntClass.aspx
   einvoice:
-    baseUrl: http://testeinvoice.gomypay.asia/api/
+    baseUrl: http://testeinvoice.gomypay.asia/api
     pwd: jk5rjwzmk2f16h3t1n6qgx87tqhdy3ky
     customerNo: 60755266
   logistics:
