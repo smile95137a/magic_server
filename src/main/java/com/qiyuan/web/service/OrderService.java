@@ -105,9 +105,9 @@ public class OrderService {
         }
 
         // 3. 決定收件人資訊
-        // TODO: 不確定，待確定
-        String recipientName = null, recipientPhone = null, recipientAddress = null;
+        String recipientName = null, recipientPhone = null, recipientAddress = null, storeId = null, storeName = null;
         ShippingMethod shippingMethod = shippingMethodMapper.selectByPrimaryKey(request.getShippingMethodId());
+        // 宅配
         if (StringUtils.equals("SF_EXPRESS", shippingMethod.getCode())) {
             HomeDeliveryRecipientInfo r = request.getHomeDeliveryRecipient();
             if (r == null) throw new ApiException("宅配需填寫收件人資訊");
@@ -115,11 +115,14 @@ public class OrderService {
             recipientPhone = r.getPhone();
             recipientAddress = r.getAddress();
         } else {
+            // 超商
             StorePickupRecipientInfo r = request.getStorePickupRecipient();
             if (r == null) throw new ApiException("超商取貨需填寫收件人資訊");
             recipientName = r.getRecipientName();
             recipientPhone = r.getPhone();
             recipientAddress = r.getStoreAddress();
+            storeId = r.getStoreId();
+            storeName = r.getStoreName();
         }
         total = total.add(BigDecimal.valueOf(shippingMethod.getFee()));
 
@@ -141,6 +144,8 @@ public class OrderService {
                 .remark(request.getRemark())
                 .createTime(currentDate)
                 .updateTime(currentDate)
+                .storeId(storeId)
+                .storeName(storeName)
                 .build();
         ordersMapper.insertSelective(order);
 
@@ -156,7 +161,7 @@ public class OrderService {
                 .build();
 
         paymentTransactionMapper.insertSelective(tx);
-
+        
         return CreateOrderResponse.builder()
                 .orderId(orderId)
                 .externalOrderNo(paymentId)

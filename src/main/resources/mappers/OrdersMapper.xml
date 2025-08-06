@@ -18,6 +18,8 @@
     <result column="tracking_no" jdbcType="VARCHAR" property="trackingNo" />
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
     <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="store_id" jdbcType="VARCHAR" property="storeId" />
+    <result column="store_name" jdbcType="NVARCHAR" property="storeName" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -80,7 +82,7 @@
   <sql id="Base_Column_List">
     id, external_order_no, user_id, total_amount, paid, status, shipping_method_id, invoice_type,
     invoice_target, recipient_name, recipient_phone, recipient_address, remark, tracking_no,
-    create_time, update_time
+    create_time, update_time, store_id, store_name
   </sql>
   <select id="selectByExample" parameterType="com.qiyuan.web.entity.example.OrdersExample" resultMap="BaseResultMap">
     select
@@ -118,13 +120,13 @@
                         shipping_method_id, invoice_type, invoice_target,
                         recipient_name, recipient_phone, recipient_address,
                         remark, tracking_no, create_time,
-                        update_time)
+                        update_time, store_id, store_name)
     values (#{id,jdbcType=CHAR}, #{externalOrderNo,jdbcType=VARCHAR}, #{userId,jdbcType=CHAR},
             #{totalAmount,jdbcType=DECIMAL}, #{paid,jdbcType=BIT}, #{status,jdbcType=VARCHAR},
             #{shippingMethodId,jdbcType=CHAR}, #{invoiceType,jdbcType=VARCHAR}, #{invoiceTarget,jdbcType=NVARCHAR},
             #{recipientName,jdbcType=NVARCHAR}, #{recipientPhone,jdbcType=VARCHAR}, #{recipientAddress,jdbcType=NVARCHAR},
             #{remark,jdbcType=NVARCHAR}, #{trackingNo,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP},
-            #{updateTime,jdbcType=TIMESTAMP})
+            #{updateTime,jdbcType=TIMESTAMP}, #{storeId,jdbcType=VARCHAR}, #{storeName,jdbcType=NVARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.qiyuan.web.entity.Orders">
     insert into orders
@@ -177,6 +179,12 @@
       <if test="updateTime != null">
         update_time,
       </if>
+      <if test="storeId != null">
+        store_id,
+      </if>
+      <if test="storeName != null">
+        store_name,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -226,6 +234,12 @@
       </if>
       <if test="updateTime != null">
         #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="storeId != null">
+        #{storeId,jdbcType=VARCHAR},
+      </if>
+      <if test="storeName != null">
+        #{storeName,jdbcType=NVARCHAR},
       </if>
     </trim>
   </insert>
@@ -290,6 +304,12 @@
       <if test="row.updateTime != null">
         update_time = #{row.updateTime,jdbcType=TIMESTAMP},
       </if>
+      <if test="row.storeId != null">
+        store_id = #{row.storeId,jdbcType=VARCHAR},
+      </if>
+      <if test="row.storeName != null">
+        store_name = #{row.storeName,jdbcType=NVARCHAR},
+      </if>
     </set>
     <if test="example != null">
       <include refid="Update_By_Example_Where_Clause" />
@@ -312,7 +332,9 @@
     remark = #{row.remark,jdbcType=NVARCHAR},
     tracking_no = #{row.trackingNo,jdbcType=VARCHAR},
     create_time = #{row.createTime,jdbcType=TIMESTAMP},
-    update_time = #{row.updateTime,jdbcType=TIMESTAMP}
+    update_time = #{row.updateTime,jdbcType=TIMESTAMP},
+    store_id = #{row.storeId,jdbcType=VARCHAR},
+    store_name = #{row.storeName,jdbcType=NVARCHAR}
     <if test="example != null">
       <include refid="Update_By_Example_Where_Clause" />
     </if>
@@ -365,6 +387,12 @@
       <if test="updateTime != null">
         update_time = #{updateTime,jdbcType=TIMESTAMP},
       </if>
+      <if test="storeId != null">
+        store_id = #{storeId,jdbcType=VARCHAR},
+      </if>
+      <if test="storeName != null">
+        store_name = #{storeName,jdbcType=NVARCHAR},
+      </if>
     </set>
     where id = #{id,jdbcType=CHAR}
   </update>
@@ -384,7 +412,9 @@
         remark = #{remark,jdbcType=NVARCHAR},
         tracking_no = #{trackingNo,jdbcType=VARCHAR},
         create_time = #{createTime,jdbcType=TIMESTAMP},
-        update_time = #{updateTime,jdbcType=TIMESTAMP}
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+        store_id = #{storeId,jdbcType=VARCHAR},
+        store_name = #{storeName,jdbcType=NVARCHAR}
     where id = #{id,jdbcType=CHAR}
   </update>
 
