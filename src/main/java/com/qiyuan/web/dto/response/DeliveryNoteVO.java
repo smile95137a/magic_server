@@ -1,5 +1,7 @@
 package com.qiyuan.web.dto.response;
 
+import com.qiyuan.web.dto.request.HomeDeliveryRecipientInfo;
+import com.qiyuan.web.dto.request.StorePickupRecipientInfo;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,7 +11,6 @@ import lombok.NoArgsConstructor;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -21,12 +22,15 @@ public class DeliveryNoteVO {
     private String memberEmail;
 
     // 收件人資訊
-    @Schema(description = "收件人姓名")
-    private String recipientName;
-    @Schema(description = "收件人電話")
-    private String recipientPhone;
-    @Schema(description = "物流收件資訊，依物流方式格式變動")
-    private Map<String, String> recipientInfo;
+    @Schema(description = "物流方式")
+    private String shippingMethodCode;
+    @Schema(description = "物流方式名稱")
+    private String shippingMethodName;
+    @Schema(description = "收件人宅配收件資訊 (當物流方式為宅配時帶此欄)")
+    private HomeDeliveryRecipientInfo homeDeliveryRecipient;
+    @Schema(description = "收件人超商取貨收件資訊 (當物流方式為超商時帶此欄)")
+    private StorePickupRecipientInfo storePickupRecipient;
+
     @Schema(description = "物流單號")
     private String trackingNo;
 
