@@ -43,6 +43,10 @@ public class Orders {
 
     private Date updateTime;
 
+    private String storeId;
+
+    private String storeName;
+
     public String getId() {
         return id;
     }
@@ -169,5 +173,21 @@ public class Orders {
 
     public void setUpdateTime(Date updateTime) {
         this.updateTime = updateTime;
+    }
+
+    public String getStoreId() {
+        return storeId;
+    }
+
+    public void setStoreId(String storeId) {
+        this.storeId = storeId;
+    }
+
+    public String getStoreName() {
+        return storeName;
+    }
+
+    public void setStoreName(String storeName) {
+        this.storeName = storeName;
     }
 }

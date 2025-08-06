@@ -12,11 +12,10 @@ import java.util.Date;
 @Data
 @Builder
 public class QueryOrderAdminRequest {
-    private String userId;
+    private String orderId;
+    private String username;
     private String status;
-    private String paymentStatus;
+    private Boolean isPaid;
     private Date startTime;
     private Date endTime;
-    private Integer page;
-    private Integer size;
 }

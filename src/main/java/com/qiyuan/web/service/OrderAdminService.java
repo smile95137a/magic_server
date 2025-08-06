@@ -1,25 +1,19 @@
 package com.qiyuan.web.service;
 
+import com.qiyuan.security.config.ImagePathMappingConfig;
 import com.qiyuan.security.exception.ApiException;
-import com.qiyuan.web.dao.OrderItemMapper;
-import com.qiyuan.web.dao.OrdersMapper;
-import com.qiyuan.web.dao.ShippingMethodMapper;
-import com.qiyuan.web.dao.UserMapper;
+import com.qiyuan.web.dao.*;
 import com.qiyuan.web.dto.OrderItemVO;
 import com.qiyuan.web.dto.OrderStatusUpdateItem;
-import com.qiyuan.web.dto.request.QueryOrderAdminRequest;
-import com.qiyuan.web.dto.request.ShippingMethodRequest;
-import com.qiyuan.web.dto.request.UpdateOrderStatusBatchRequest;
+import com.qiyuan.web.dto.request.*;
 import com.qiyuan.web.dto.response.*;
-import com.qiyuan.web.entity.OrderItem;
-import com.qiyuan.web.entity.Orders;
-import com.qiyuan.web.entity.ShippingMethod;
-import com.qiyuan.web.entity.User;
+import com.qiyuan.web.entity.*;
 import com.qiyuan.web.entity.example.OrderItemExample;
 import com.qiyuan.web.entity.example.OrdersExample;
 import com.qiyuan.web.entity.example.ShippingMethodExample;
 import com.qiyuan.web.enums.OrderStatus;
 import com.qiyuan.web.enums.PaymentEnum;
+import com.qiyuan.web.enums.ProductImageType;
 import com.qiyuan.web.util.DateUtil;
 import com.qiyuan.web.util.RandomGenerator;
 import lombok.RequiredArgsConstructor;
@@ -39,35 +33,11 @@ public class OrderAdminService {
     private final ShippingMethodMapper shippingMethodMapper;
     private final UserMapper userMapper;
     private final StockService stockService;
+    private final ImagePathMappingConfig mappingConfig;
+    private final ProductMapper productMapper;
 
-    public List<OrderVO> getOrderList(QueryOrderAdminRequest request) {
-        OrdersExample example = new OrdersExample();
-        OrdersExample.Criteria criteria = example.createCriteria();
-
-        if (request.getUserId() != null && !request.getUserId().isBlank()) {
-            criteria.andUserIdEqualTo(request.getUserId());
-        }
-        if (request.getStatus() != null) {
-            criteria.andStatusEqualTo(request.getStatus());
-        }
-        if (request.getPaymentStatus() != null) {
-            criteria.andPaidEqualTo("paid".equalsIgnoreCase(request.getPaymentStatus()));
-        }
-        if (request.getStartTime() != null) {
-            criteria.andCreateTimeGreaterThanOrEqualTo(request.getStartTime());
-        }
-        if (request.getEndTime() != null) {
-            criteria.andCreateTimeLessThanOrEqualTo(DateUtil.getEndOfDate(request.getEndTime()));
-        }
-
-        example.setOrderByClause("create_time desc");
-        List<Orders> orderList = ordersMapper.selectByExample(example);
-
-        List<OrderVO> voList = new ArrayList<>();
-        for (Orders o : orderList) {
-            voList.add(toOrderVO(o));
-        }
-        return voList;
+    public List<OrderQueryResultVO> getOrderList(QueryOrderAdminRequest request) {
+        return ordersMapper.listOrderDetailsAdmin(request);
     }
 
     // 查詢訂單詳情
@@ -204,6 +174,12 @@ public class OrderAdminService {
         return vo;
     }
 
+    private String buildMainImageUrl(Product p) {
+        if (p.getMainImage() == null) return null;
+        String prefix = mappingConfig.getUrlPrefix("product") + p.getId() + "/" + ProductImageType.MAIN.getFolder() + "/";
+        return prefix + p.getMainImage();
+    }
+
     @Transactional
     public DeliveryNoteVO getDeliveryNote(String orderId) {
         Orders order = ordersMapper.selectByPrimaryKey(orderId);
@@ -215,40 +191,55 @@ public class OrderAdminService {
 
 
         ShippingMethod shippingMethod = shippingMethodMapper.selectByPrimaryKey(order.getShippingMethodId());
-        Map<String, String> recipientInfo = new HashMap<>();
 
-        //TODO
-//        if ("FAMILY".equalsIgnoreCase(shippingMethod)) {
-//            // 假設有這些欄位，請視你的欄位設計填寫
-//            recipientInfo.put("storeId", order.getStoreId());
-//            recipientInfo.put("storeName", order.getStoreName());
-//            recipientInfo.put("storeAddress", order.getStoreAddress());
-//            recipientInfo.put("recipientName", order.getRecipientName());
-//            recipientInfo.put("recipientPhone", order.getRecipientPhone());
-//        } else if ("HOME".equalsIgnoreCase(shippingMethod)) {
-//            recipientInfo.put("recipientName", order.getRecipientName());
-//            recipientInfo.put("recipientPhone", order.getRecipientPhone());
-//            recipientInfo.put("recipientAddress", order.getRecipientAddress());
-//        }
-
-
+        HomeDeliveryRecipientInfo homeDeliveryRecipientInfo = null;
+        StorePickupRecipientInfo storePickupRecipientInfo = null;
+        if ("SF_EXPRESS".equals(shippingMethod.getCode())) {
+            homeDeliveryRecipientInfo = HomeDeliveryRecipientInfo
+                    .builder()
+                    .name(order.getRecipientName())
+                    .phone(order.getRecipientPhone())
+                    .address(order.getRecipientAddress())
+                    .build();
+        } else {
+            storePickupRecipientInfo = StorePickupRecipientInfo
+                    .builder()
+                    .recipientName(order.getRecipientName())
+                    .phone(order.getRecipientPhone())
+                    .storeId(order.getStoreId())
+                    .storeName(order.getStoreName())
+                    .storeAddress(order.getRecipientAddress())
+                    .build();
+        }
         // 取得訂單明細
+        Map<Integer, Product> productMap = new HashMap<>();
         List<OrderItem> orderItems = getOrderItemsByOrderId(orderId);
-        List<DeliveryNoteItemVO> itemVOList = orderItems.stream().map(item ->
-                DeliveryNoteItemVO.builder()
-                        .productId(item.getProductId())
-                        .productName(item.getProductName())
-                        .unitPrice(item.getUnitPrice())
-                        .quantity(item.getQuantity())
-                        .subtotal(item.getSubtotal())
-                        .build()
-        ).collect(Collectors.toList());
+        List<DeliveryNoteItemVO> itemVOList = orderItems.stream().map(item -> {
+            Integer productId = item.getProductId();
+            Product p = null;
+            if (productMap.containsKey(productId)) {
+                p = productMap.get(productId);
+            } else {
+                p = productMapper.selectByPrimaryKey(productId);
+                productMap.put(productId, p);
+            }
+
+            return DeliveryNoteItemVO.builder()
+                    .productId(productId)
+                    .productName(item.getProductName())
+                    .productImage(buildMainImageUrl(p))
+                    .unitPrice(item.getUnitPrice())
+                    .quantity(item.getQuantity())
+                    .subtotal(item.getSubtotal())
+                    .build();
+            }).collect(Collectors.toList());
 
         return DeliveryNoteVO.builder()
                 .memberEmail(user.getEmail())
-                .recipientName(order.getRecipientName())
-                .recipientPhone(order.getRecipientPhone())
-                .recipientInfo(recipientInfo)
+                .shippingMethodCode(shippingMethod.getCode())
+                .shippingMethodName(shippingMethod.getName())
+                .homeDeliveryRecipient(homeDeliveryRecipientInfo)
+                .storePickupRecipient(storePickupRecipientInfo)
                 .trackingNo(order.getTrackingNo())
                 .orderId(order.getId())
                 .orderDate(order.getCreateTime())

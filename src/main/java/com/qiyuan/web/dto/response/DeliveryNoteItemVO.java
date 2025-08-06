@@ -16,6 +16,8 @@ import java.math.BigDecimal;
 public class DeliveryNoteItemVO {
     @Schema(description = "商品ID")
     private Integer productId;
+    @Schema(description = "商品主圖")
+    private String productImage;
     @Schema(description = "商品名稱")
     private String productName;
     @Schema(description = "單價")

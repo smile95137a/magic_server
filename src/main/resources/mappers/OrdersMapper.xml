@@ -18,6 +18,21 @@
     <result column="tracking_no" jdbcType="VARCHAR" property="trackingNo" />
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
     <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="store_id" jdbcType="VARCHAR" property="storeId" />
+    <result column="store_name" jdbcType="NVARCHAR" property="storeName" />
+  </resultMap>
+  <resultMap id="OrderQueryResultMap" type="com.qiyuan.web.dto.response.OrderQueryResultVO">
+    <id column="id" property="id" />
+    <result column="username" property="username" />
+    <result column="total_amount" property="totalAmount" />
+    <result column="status" property="status" />
+    <result column="provider_order_no" property="providerOrderNo" />
+    <result column="paid" property="paymentStatus" />
+    <result column="shipping_method_name" property="shippingMethodName" />
+    <result column="tracking_no" property="trackingNo" />
+    <result column="invoice_type" property="invoiceType" />
+    <result column="invoice_status" property="invoiceStatus" />
+    <result column="create_time" property="createTime" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -80,7 +95,7 @@
   <sql id="Base_Column_List">
     id, external_order_no, user_id, total_amount, paid, status, shipping_method_id, invoice_type,
     invoice_target, recipient_name, recipient_phone, recipient_address, remark, tracking_no,
-    create_time, update_time
+    create_time, update_time, store_id, store_name
   </sql>
   <select id="selectByExample" parameterType="com.qiyuan.web.entity.example.OrdersExample" resultMap="BaseResultMap">
     select
@@ -118,13 +133,13 @@
                         shipping_method_id, invoice_type, invoice_target,
                         recipient_name, recipient_phone, recipient_address,
                         remark, tracking_no, create_time,
-                        update_time)
+                        update_time, store_id, store_name)
     values (#{id,jdbcType=CHAR}, #{externalOrderNo,jdbcType=VARCHAR}, #{userId,jdbcType=CHAR},
             #{totalAmount,jdbcType=DECIMAL}, #{paid,jdbcType=BIT}, #{status,jdbcType=VARCHAR},
             #{shippingMethodId,jdbcType=CHAR}, #{invoiceType,jdbcType=VARCHAR}, #{invoiceTarget,jdbcType=NVARCHAR},
             #{recipientName,jdbcType=NVARCHAR}, #{recipientPhone,jdbcType=VARCHAR}, #{recipientAddress,jdbcType=NVARCHAR},
             #{remark,jdbcType=NVARCHAR}, #{trackingNo,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP},
-            #{updateTime,jdbcType=TIMESTAMP})
+            #{updateTime,jdbcType=TIMESTAMP}, #{storeId,jdbcType=VARCHAR}, #{storeName,jdbcType=NVARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.qiyuan.web.entity.Orders">
     insert into orders
@@ -177,6 +192,12 @@
       <if test="updateTime != null">
         update_time,
       </if>
+      <if test="storeId != null">
+        store_id,
+      </if>
+      <if test="storeName != null">
+        store_name,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -226,6 +247,12 @@
       </if>
       <if test="updateTime != null">
         #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="storeId != null">
+        #{storeId,jdbcType=VARCHAR},
+      </if>
+      <if test="storeName != null">
+        #{storeName,jdbcType=NVARCHAR},
       </if>
     </trim>
   </insert>
@@ -290,6 +317,12 @@
       <if test="row.updateTime != null">
         update_time = #{row.updateTime,jdbcType=TIMESTAMP},
       </if>
+      <if test="row.storeId != null">
+        store_id = #{row.storeId,jdbcType=VARCHAR},
+      </if>
+      <if test="row.storeName != null">
+        store_name = #{row.storeName,jdbcType=NVARCHAR},
+      </if>
     </set>
     <if test="example != null">
       <include refid="Update_By_Example_Where_Clause" />
@@ -312,7 +345,9 @@
     remark = #{row.remark,jdbcType=NVARCHAR},
     tracking_no = #{row.trackingNo,jdbcType=VARCHAR},
     create_time = #{row.createTime,jdbcType=TIMESTAMP},
-    update_time = #{row.updateTime,jdbcType=TIMESTAMP}
+    update_time = #{row.updateTime,jdbcType=TIMESTAMP},
+    store_id = #{row.storeId,jdbcType=VARCHAR},
+    store_name = #{row.storeName,jdbcType=NVARCHAR}
     <if test="example != null">
       <include refid="Update_By_Example_Where_Clause" />
     </if>
@@ -365,6 +400,12 @@
       <if test="updateTime != null">
         update_time = #{updateTime,jdbcType=TIMESTAMP},
       </if>
+      <if test="storeId != null">
+        store_id = #{storeId,jdbcType=VARCHAR},
+      </if>
+      <if test="storeName != null">
+        store_name = #{storeName,jdbcType=NVARCHAR},
+      </if>
     </set>
     where id = #{id,jdbcType=CHAR}
   </update>
@@ -384,7 +425,9 @@
         remark = #{remark,jdbcType=NVARCHAR},
         tracking_no = #{trackingNo,jdbcType=VARCHAR},
         create_time = #{createTime,jdbcType=TIMESTAMP},
-        update_time = #{updateTime,jdbcType=TIMESTAMP}
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+        store_id = #{storeId,jdbcType=VARCHAR},
+        store_name = #{storeName,jdbcType=NVARCHAR}
     where id = #{id,jdbcType=CHAR}
   </update>
 
@@ -407,6 +450,52 @@
 	  from orders
 	  where external_order_no = #{externalOrderNo, jdbcType=VARCHAR}
 	</select>
+
+
+    <select id="listOrderDetailsAdmin" resultMap="OrderQueryResultMap">
+      SELECT
+      o.id,
+      u.username,
+      o.total_amount,
+      p.provider_order_no,
+      CASE WHEN o.paid = 1 THEN N'已付款' ELSE N'未付款' END AS payment_status,
+      p.status,
+      s.name AS shipping_method_name,
+      o.invoice_type,
+      CASE WHEN i.invoice_number IS NOT NULL THEN N'已開立' ELSE N'未開立' END AS invoice_status,
+      o.recipient_name,
+      o.recipient_phone,
+      o.create_time
+      FROM orders o
+      LEFT JOIN payment_transaction p ON p.id = o.external_order_no
+      LEFT JOIN invoice i ON i.external_order_no = o.external_order_no
+      LEFT JOIN shipping_method s ON o.shipping_method_id = s.id
+      LEFT JOIN users u ON u.id = o.user_id
+      <where>
+        <if test="orderId != null and orderId != ''">
+          AND o.id = #{orderId}
+        </if>
+        <if test="username != null and username != ''">
+          AND u.username LIKE CONCAT('%', #{username}, '%')
+        </if>
+        <if test="status != null and status != ''">
+          AND o.status = #{status}
+        </if>
+        <if test="isPaid != null and isPaid == true">
+          AND o.paid = 1
+        </if>
+        <if test="isPaid != null and isPaid == false">
+          AND o.paid = 0
+        </if>
+        <if test="startTime != null">
+          AND o.create_time &gt;= #{startTime}
+        </if>
+        <if test="endTime != null">
+          AND o.create_time &lt;= #{endTime}
+        </if>
+      </where>
+      ORDER BY o.create_time DESC
+  </select>
 
 
 </mapper>
