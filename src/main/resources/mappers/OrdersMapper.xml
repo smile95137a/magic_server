@@ -21,6 +21,19 @@
     <result column="store_id" jdbcType="VARCHAR" property="storeId" />
     <result column="store_name" jdbcType="NVARCHAR" property="storeName" />
   </resultMap>
+  <resultMap id="OrderQueryResultMap" type="com.qiyuan.web.dto.response.OrderQueryResultVO">
+    <id column="id" property="id" />
+    <result column="username" property="username" />
+    <result column="total_amount" property="totalAmount" />
+    <result column="status" property="status" />
+    <result column="provider_order_no" property="providerOrderNo" />
+    <result column="paid" property="paymentStatus" />
+    <result column="shipping_method_name" property="shippingMethodName" />
+    <result column="tracking_no" property="trackingNo" />
+    <result column="invoice_type" property="invoiceType" />
+    <result column="invoice_status" property="invoiceStatus" />
+    <result column="create_time" property="createTime" />
+  </resultMap>
   <sql id="Example_Where_Clause">
     <where>
       <foreach collection="oredCriteria" item="criteria" separator="or">
@@ -437,6 +450,52 @@
 	  from orders
 	  where external_order_no = #{externalOrderNo, jdbcType=VARCHAR}
 	</select>
+
+
+    <select id="listOrderDetailsAdmin" resultMap="OrderQueryResultMap">
+      SELECT
+      o.id,
+      u.username,
+      o.total_amount,
+      p.provider_order_no,
+      CASE WHEN o.paid = 1 THEN N'已付款' ELSE N'未付款' END AS payment_status,
+      p.status,
+      s.name AS shipping_method_name,
+      o.invoice_type,
+      CASE WHEN i.invoice_number IS NOT NULL THEN N'已開立' ELSE N'未開立' END AS invoice_status,
+      o.recipient_name,
+      o.recipient_phone,
+      o.create_time
+      FROM orders o
+      LEFT JOIN payment_transaction p ON p.id = o.external_order_no
+      LEFT JOIN invoice i ON i.external_order_no = o.external_order_no
+      LEFT JOIN shipping_method s ON o.shipping_method_id = s.id
+      LEFT JOIN users u ON u.id = o.user_id
+      <where>
+        <if test="orderId != null and orderId != ''">
+          AND o.id = #{orderId}
+        </if>
+        <if test="username != null and username != ''">
+          AND u.username LIKE CONCAT('%', #{username}, '%')
+        </if>
+        <if test="status != null and status != ''">
+          AND o.status = #{status}
+        </if>
+        <if test="isPaid != null and isPaid == true">
+          AND o.paid = 1
+        </if>
+        <if test="isPaid != null and isPaid == false">
+          AND o.paid = 0
+        </if>
+        <if test="startTime != null">
+          AND o.create_time &gt;= #{startTime}
+        </if>
+        <if test="endTime != null">
+          AND o.create_time &lt;= #{endTime}
+        </if>
+      </where>
+      ORDER BY o.create_time DESC
+  </select>
 
 
 </mapper>

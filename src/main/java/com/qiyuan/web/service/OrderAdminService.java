@@ -40,34 +40,8 @@ public class OrderAdminService {
     private final UserMapper userMapper;
     private final StockService stockService;
 
-    public List<OrderVO> getOrderList(QueryOrderAdminRequest request) {
-        OrdersExample example = new OrdersExample();
-        OrdersExample.Criteria criteria = example.createCriteria();
-
-        if (request.getUserId() != null && !request.getUserId().isBlank()) {
-            criteria.andUserIdEqualTo(request.getUserId());
-        }
-        if (request.getStatus() != null) {
-            criteria.andStatusEqualTo(request.getStatus());
-        }
-        if (request.getPaymentStatus() != null) {
-            criteria.andPaidEqualTo("paid".equalsIgnoreCase(request.getPaymentStatus()));
-        }
-        if (request.getStartTime() != null) {
-            criteria.andCreateTimeGreaterThanOrEqualTo(request.getStartTime());
-        }
-        if (request.getEndTime() != null) {
-            criteria.andCreateTimeLessThanOrEqualTo(DateUtil.getEndOfDate(request.getEndTime()));
-        }
-
-        example.setOrderByClause("create_time desc");
-        List<Orders> orderList = ordersMapper.selectByExample(example);
-
-        List<OrderVO> voList = new ArrayList<>();
-        for (Orders o : orderList) {
-            voList.add(toOrderVO(o));
-        }
-        return voList;
+    public List<OrderQueryResultVO> getOrderList(QueryOrderAdminRequest request) {
+        return ordersMapper.listOrderDetailsAdmin(request);
     }
 
     // 查詢訂單詳情

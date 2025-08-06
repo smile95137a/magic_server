@@ -1,7 +1,12 @@
 package com.qiyuan.web.dao;
 
+import com.qiyuan.web.dto.request.QueryOrderAdminRequest;
+import com.qiyuan.web.dto.response.OrderQueryResultVO;
+import com.qiyuan.web.dto.response.OrderVO;
 import com.qiyuan.web.entity.Orders;
 import com.qiyuan.web.entity.example.OrdersExample;
+
+import java.util.Date;
 import java.util.List;
 import org.apache.ibatis.annotations.Param;
 
@@ -21,6 +26,9 @@ public interface OrdersMapper {
     List<Orders> selectByExampleWithPage(@Param("example") OrdersExample example,
                                          @Param("offset") int offset,
                                          @Param("size") int size);
+
+    List<OrderQueryResultVO> listOrderDetailsAdmin(QueryOrderAdminRequest request);
+
 
     void updateStatusToPaid(String orderId);
 

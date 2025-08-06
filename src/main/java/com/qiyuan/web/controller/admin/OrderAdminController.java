@@ -31,7 +31,7 @@ public class OrderAdminController {
 
     @Operation(summary = "查詢訂單列表", description = "多條件查詢訂單")
     @PostMapping("/list")
-    public List<OrderVO> getOrderList(@RequestBody QueryOrderAdminRequest request) {
+    public List<OrderQueryResultVO> getOrderList(@RequestBody QueryOrderAdminRequest request) {
         return orderAdminService.getOrderList(request);
     }
 
