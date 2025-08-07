@@ -112,6 +112,7 @@ public class AuthService {
         user.setAddressName(req.getAddressName());
         user.setLineId(req.getLineId());
         user.setPhone(req.getPhone());
+        user.setZipCode(req.getZipCode());
         user.setCity(req.getCity());
         user.setDistrict(req.getArea());
         user.setAddress(req.getAddress());
@@ -131,6 +132,7 @@ public class AuthService {
         resp.setAddressName(user.getAddressName());
         resp.setLineId(user.getLineId());
         resp.setPhone(user.getPhone());
+        resp.setZipCode(user.getZipCode());
         resp.setCity(user.getCity());
         resp.setArea(user.getDistrict());
         resp.setAddress(user.getAddress());

@@ -1,6 +1,7 @@
 package com.qiyuan.web.controller.admin;
 
 import com.qiyuan.security.exception.ApiException;
+import com.qiyuan.web.dto.SenderInfoDto;
 import com.qiyuan.web.dto.request.CountRequest;
 import com.qiyuan.web.entity.SystemConfig;
 import com.qiyuan.web.security.RoleExpressions;
@@ -9,6 +10,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
@@ -65,5 +67,16 @@ public class SystemConfigController {
             return systemConfigService.updateSystemConfig(config);
         }
     }
+
+    @GetMapping("/sender-info")
+    public SenderInfoDto getSenderInfo() {
+        return systemConfigService.getSenderInfo();
+    }
+
+    @PostMapping("/sender-info")
+    public boolean updateSenderInfo(@Validated @RequestBody SenderInfoDto req) {
+        return systemConfigService.updateSenderInfo(req);
+    }
+
 }
 

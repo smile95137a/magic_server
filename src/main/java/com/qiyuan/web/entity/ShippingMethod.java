@@ -21,6 +21,10 @@ public class ShippingMethod {
 
     private Date updateTime;
 
+    private Integer minSize;
+
+    private Integer maxSize;
+
     public String getId() {
         return id;
     }
@@ -91,5 +95,21 @@ public class ShippingMethod {
 
     public void setUpdateTime(Date updateTime) {
         this.updateTime = updateTime;
+    }
+
+    public Integer getMinSize() {
+        return minSize;
+    }
+
+    public void setMinSize(Integer minSize) {
+        this.minSize = minSize;
+    }
+
+    public Integer getMaxSize() {
+        return maxSize;
+    }
+
+    public void setMaxSize(Integer maxSize) {
+        this.maxSize = maxSize;
     }
 }

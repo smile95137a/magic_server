@@ -21,6 +21,7 @@ public class UserProfileModifyRequest {
     @NotBlank
     private String phone;
 
+    private String zipCode;
     private String city;
     private String area;
     private String address;

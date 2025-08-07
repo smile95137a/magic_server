@@ -1,0 +1,306 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.qiyuan.web.dao.ShippingTrackingMapper">
+  <resultMap id="BaseResultMap" type="com.qiyuan.web.entity.ShippingTracking">
+    <id column="id" jdbcType="CHAR" property="id" />
+    <result column="order_id" jdbcType="VARCHAR" property="orderId" />
+    <result column="logistics_type" jdbcType="VARCHAR" property="logisticsType" />
+    <result column="logistics_vendor" jdbcType="VARCHAR" property="logisticsVendor" />
+    <result column="waybill_no" jdbcType="VARCHAR" property="waybillNo" />
+    <result column="vendororder" jdbcType="VARCHAR" property="vendororder" />
+    <result column="status" jdbcType="VARCHAR" property="status" />
+    <result column="request_payload" jdbcType="NVARCHAR" property="requestPayload" />
+    <result column="response_payload" jdbcType="NVARCHAR" property="responsePayload" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause">
+    <where>
+      <foreach collection="example.oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    id, order_id, logistics_type, logistics_vendor, waybill_no, vendororder, status, 
+    request_payload, response_payload, create_time, update_time
+  </sql>
+  <select id="selectByExample" parameterType="com.qiyuan.web.entity.example.ShippingTrackingExample" resultMap="BaseResultMap">
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from shipping_tracking
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from shipping_tracking
+    where id = #{id,jdbcType=CHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+    delete from shipping_tracking
+    where id = #{id,jdbcType=CHAR}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.qiyuan.web.entity.example.ShippingTrackingExample">
+    delete from shipping_tracking
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.qiyuan.web.entity.ShippingTracking">
+    insert into shipping_tracking (id, order_id, logistics_type, 
+      logistics_vendor, waybill_no, vendororder, 
+      status, request_payload, response_payload, 
+      create_time, update_time)
+    values (#{id,jdbcType=CHAR}, #{orderId,jdbcType=VARCHAR}, #{logisticsType,jdbcType=VARCHAR}, 
+      #{logisticsVendor,jdbcType=VARCHAR}, #{waybillNo,jdbcType=VARCHAR}, #{vendororder,jdbcType=VARCHAR}, 
+      #{status,jdbcType=VARCHAR}, #{requestPayload,jdbcType=NVARCHAR}, #{responsePayload,jdbcType=NVARCHAR}, 
+      #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="com.qiyuan.web.entity.ShippingTracking">
+    insert into shipping_tracking
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="orderId != null">
+        order_id,
+      </if>
+      <if test="logisticsType != null">
+        logistics_type,
+      </if>
+      <if test="logisticsVendor != null">
+        logistics_vendor,
+      </if>
+      <if test="waybillNo != null">
+        waybill_no,
+      </if>
+      <if test="vendororder != null">
+        vendororder,
+      </if>
+      <if test="status != null">
+        status,
+      </if>
+      <if test="requestPayload != null">
+        request_payload,
+      </if>
+      <if test="responsePayload != null">
+        response_payload,
+      </if>
+      <if test="createTime != null">
+        create_time,
+      </if>
+      <if test="updateTime != null">
+        update_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=CHAR},
+      </if>
+      <if test="orderId != null">
+        #{orderId,jdbcType=VARCHAR},
+      </if>
+      <if test="logisticsType != null">
+        #{logisticsType,jdbcType=VARCHAR},
+      </if>
+      <if test="logisticsVendor != null">
+        #{logisticsVendor,jdbcType=VARCHAR},
+      </if>
+      <if test="waybillNo != null">
+        #{waybillNo,jdbcType=VARCHAR},
+      </if>
+      <if test="vendororder != null">
+        #{vendororder,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null">
+        #{status,jdbcType=VARCHAR},
+      </if>
+      <if test="requestPayload != null">
+        #{requestPayload,jdbcType=NVARCHAR},
+      </if>
+      <if test="responsePayload != null">
+        #{responsePayload,jdbcType=NVARCHAR},
+      </if>
+      <if test="createTime != null">
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.qiyuan.web.entity.example.ShippingTrackingExample" resultType="java.lang.Long">
+    select count(*) from shipping_tracking
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map">
+    update shipping_tracking
+    <set>
+      <if test="row.id != null">
+        id = #{row.id,jdbcType=CHAR},
+      </if>
+      <if test="row.orderId != null">
+        order_id = #{row.orderId,jdbcType=VARCHAR},
+      </if>
+      <if test="row.logisticsType != null">
+        logistics_type = #{row.logisticsType,jdbcType=VARCHAR},
+      </if>
+      <if test="row.logisticsVendor != null">
+        logistics_vendor = #{row.logisticsVendor,jdbcType=VARCHAR},
+      </if>
+      <if test="row.waybillNo != null">
+        waybill_no = #{row.waybillNo,jdbcType=VARCHAR},
+      </if>
+      <if test="row.vendororder != null">
+        vendororder = #{row.vendororder,jdbcType=VARCHAR},
+      </if>
+      <if test="row.status != null">
+        status = #{row.status,jdbcType=VARCHAR},
+      </if>
+      <if test="row.requestPayload != null">
+        request_payload = #{row.requestPayload,jdbcType=NVARCHAR},
+      </if>
+      <if test="row.responsePayload != null">
+        response_payload = #{row.responsePayload,jdbcType=NVARCHAR},
+      </if>
+      <if test="row.createTime != null">
+        create_time = #{row.createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="row.updateTime != null">
+        update_time = #{row.updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    <if test="example != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map">
+    update shipping_tracking
+    set id = #{row.id,jdbcType=CHAR},
+      order_id = #{row.orderId,jdbcType=VARCHAR},
+      logistics_type = #{row.logisticsType,jdbcType=VARCHAR},
+      logistics_vendor = #{row.logisticsVendor,jdbcType=VARCHAR},
+      waybill_no = #{row.waybillNo,jdbcType=VARCHAR},
+      vendororder = #{row.vendororder,jdbcType=VARCHAR},
+      status = #{row.status,jdbcType=VARCHAR},
+      request_payload = #{row.requestPayload,jdbcType=NVARCHAR},
+      response_payload = #{row.responsePayload,jdbcType=NVARCHAR},
+      create_time = #{row.createTime,jdbcType=TIMESTAMP},
+      update_time = #{row.updateTime,jdbcType=TIMESTAMP}
+    <if test="example != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.qiyuan.web.entity.ShippingTracking">
+    update shipping_tracking
+    <set>
+      <if test="orderId != null">
+        order_id = #{orderId,jdbcType=VARCHAR},
+      </if>
+      <if test="logisticsType != null">
+        logistics_type = #{logisticsType,jdbcType=VARCHAR},
+      </if>
+      <if test="logisticsVendor != null">
+        logistics_vendor = #{logisticsVendor,jdbcType=VARCHAR},
+      </if>
+      <if test="waybillNo != null">
+        waybill_no = #{waybillNo,jdbcType=VARCHAR},
+      </if>
+      <if test="vendororder != null">
+        vendororder = #{vendororder,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null">
+        status = #{status,jdbcType=VARCHAR},
+      </if>
+      <if test="requestPayload != null">
+        request_payload = #{requestPayload,jdbcType=NVARCHAR},
+      </if>
+      <if test="responsePayload != null">
+        response_payload = #{responsePayload,jdbcType=NVARCHAR},
+      </if>
+      <if test="createTime != null">
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=CHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.qiyuan.web.entity.ShippingTracking">
+    update shipping_tracking
+    set order_id = #{orderId,jdbcType=VARCHAR},
+      logistics_type = #{logisticsType,jdbcType=VARCHAR},
+      logistics_vendor = #{logisticsVendor,jdbcType=VARCHAR},
+      waybill_no = #{waybillNo,jdbcType=VARCHAR},
+      vendororder = #{vendororder,jdbcType=VARCHAR},
+      status = #{status,jdbcType=VARCHAR},
+      request_payload = #{requestPayload,jdbcType=NVARCHAR},
+      response_payload = #{responsePayload,jdbcType=NVARCHAR},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=CHAR}
+  </update>
+</mapper>

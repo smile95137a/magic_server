@@ -104,6 +104,76 @@ public class UserExample {
             criteria.add(new Criterion(condition, value1, value2));
         }
 
+        public Criteria andZipCodeIsNull() {
+            addCriterion("zip_code is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andZipCodeIsNotNull() {
+            addCriterion("zip_code is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andZipCodeEqualTo(String value) {
+            addCriterion("zip_code =", value, "zipCode");
+            return (Criteria) this;
+        }
+
+        public Criteria andZipCodeNotEqualTo(String value) {
+            addCriterion("zip_code <>", value, "zipCode");
+            return (Criteria) this;
+        }
+
+        public Criteria andZipCodeGreaterThan(String value) {
+            addCriterion("zip_code >", value, "zipCode");
+            return (Criteria) this;
+        }
+
+        public Criteria andZipCodeGreaterThanOrEqualTo(String value) {
+            addCriterion("zip_code >=", value, "zipCode");
+            return (Criteria) this;
+        }
+
+        public Criteria andZipCodeLessThan(String value) {
+            addCriterion("zip_code <", value, "zipCode");
+            return (Criteria) this;
+        }
+
+        public Criteria andZipCodeLessThanOrEqualTo(String value) {
+            addCriterion("zip_code <=", value, "zipCode");
+            return (Criteria) this;
+        }
+
+        public Criteria andZipCodeLike(String value) {
+            addCriterion("zip_code like", value, "zipCode");
+            return (Criteria) this;
+        }
+
+        public Criteria andZipCodeNotLike(String value) {
+            addCriterion("zip_code not like", value, "zipCode");
+            return (Criteria) this;
+        }
+
+        public Criteria andZipCodeIn(List<String> values) {
+            addCriterion("zip_code in", values, "zipCode");
+            return (Criteria) this;
+        }
+
+        public Criteria andZipCodeNotIn(List<String> values) {
+            addCriterion("zip_code not in", values, "zipCode");
+            return (Criteria) this;
+        }
+
+        public Criteria andZipCodeBetween(String value1, String value2) {
+            addCriterion("zip_code between", value1, value2, "zipCode");
+            return (Criteria) this;
+        }
+
+        public Criteria andZipCodeNotBetween(String value1, String value2) {
+            addCriterion("zip_code not between", value1, value2, "zipCode");
+            return (Criteria) this;
+        }
+
         public Criteria andIdIsNull() {
             addCriterion("id is null");
             return (Criteria) this;

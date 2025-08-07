@@ -1,8 +1,11 @@
 package com.qiyuan.web.service;
 
 import com.qiyuan.web.dao.SystemConfigMapper;
+import com.qiyuan.web.dto.SenderInfoDto;
 import com.qiyuan.web.entity.SystemConfig;
 import com.qiyuan.web.entity.SystemConfigExample;
+import com.qiyuan.web.util.JsonUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -50,6 +53,26 @@ public class SystemConfigService {
 
     public boolean updateSystemConfig(SystemConfig config) {
         return systemConfigMapper.updateByPrimaryKeySelective(config) > 0;
+    }
+
+    public SenderInfoDto getSenderInfo() {
+        try {
+            SystemConfig systemConfig = this.getSystemConfig("sender_info");
+            if (StringUtils.isNotBlank(systemConfig.getConfigValue())) {
+                return JsonUtil.fromJson(systemConfig.getConfigValue(), SenderInfoDto.class);
+            }
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+        return SenderInfoDto.builder().build();
+    }
+
+    public boolean updateSenderInfo(SenderInfoDto dto) {
+        SystemConfig systemConfig = this.getSystemConfig("sender_info");
+        String value = JsonUtil.toJson(dto);
+        systemConfig.setConfigValue(value);
+        updateSystemConfig(systemConfig);
+        return true;
     }
 
 }

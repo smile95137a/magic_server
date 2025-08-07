@@ -105,6 +105,96 @@ public class OrdersExample {
             }
             criteria.add(new Criterion(condition, value1, value2));
         }
+        public Criteria andZipCodeIsNull() {
+            addCriterion("zip_code is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andZipCodeIsNotNull() {
+            addCriterion("zip_code is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andZipCodeEqualTo(String value) {
+            addCriterion("zip_code =", value, "zipCode");
+            return (Criteria) this;
+        }
+
+        public Criteria andZipCodeNotEqualTo(String value) {
+            addCriterion("zip_code <>", value, "zipCode");
+            return (Criteria) this;
+        }
+
+        public Criteria andZipCodeLike(String value) {
+            addCriterion("zip_code like", value, "zipCode");
+            return (Criteria) this;
+        }
+
+        public Criteria andZipCodeIn(List<String> values) {
+            addCriterion("zip_code in", values, "zipCode");
+            return (Criteria) this;
+        }
+
+        public Criteria andZipCodeNotIn(List<String> values) {
+            addCriterion("zip_code not in", values, "zipCode");
+            return (Criteria) this;
+        }
+
+        public Criteria andZipCodeBetween(String value1, String value2) {
+            addCriterion("zip_code between", value1, value2, "zipCode");
+            return (Criteria) this;
+        }
+
+        public Criteria andZipCodeNotBetween(String value1, String value2) {
+            addCriterion("zip_code not between", value1, value2, "zipCode");
+            return (Criteria) this;
+        }
+
+        public Criteria andRecipientCityIsNull() {
+            addCriterion("recipient_city is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andRecipientCityIsNotNull() {
+            addCriterion("recipient_city is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andRecipientCityEqualTo(String value) {
+            addCriterion("recipient_city =", value, "recipientCity");
+            return (Criteria) this;
+        }
+
+        public Criteria andRecipientCityNotEqualTo(String value) {
+            addCriterion("recipient_city <>", value, "recipientCity");
+            return (Criteria) this;
+        }
+
+        public Criteria andRecipientCityLike(String value) {
+            addCriterion("recipient_city like", value, "recipientCity");
+            return (Criteria) this;
+        }
+
+        public Criteria andRecipientCityIn(List<String> values) {
+            addCriterion("recipient_city in", values, "recipientCity");
+            return (Criteria) this;
+        }
+
+        public Criteria andRecipientCityNotIn(List<String> values) {
+            addCriterion("recipient_city not in", values, "recipientCity");
+            return (Criteria) this;
+        }
+
+        public Criteria andRecipientCityBetween(String value1, String value2) {
+            addCriterion("recipient_city between", value1, value2, "recipientCity");
+            return (Criteria) this;
+        }
+
+        public Criteria andRecipientCityNotBetween(String value1, String value2) {
+            addCriterion("recipient_city not between", value1, value2, "recipientCity");
+            return (Criteria) this;
+        }
+
 
         public Criteria andIdIsNull() {
             addCriterion("id is null");

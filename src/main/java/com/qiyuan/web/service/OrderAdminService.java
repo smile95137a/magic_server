@@ -3,8 +3,10 @@ package com.qiyuan.web.service;
 import com.qiyuan.security.config.ImagePathMappingConfig;
 import com.qiyuan.security.exception.ApiException;
 import com.qiyuan.web.dao.*;
+import com.qiyuan.web.dto.ExpressCreateResult;
 import com.qiyuan.web.dto.OrderItemVO;
 import com.qiyuan.web.dto.OrderStatusUpdateItem;
+import com.qiyuan.web.dto.SenderInfoDto;
 import com.qiyuan.web.dto.request.*;
 import com.qiyuan.web.dto.response.*;
 import com.qiyuan.web.entity.*;
@@ -17,6 +19,7 @@ import com.qiyuan.web.enums.ProductImageType;
 import com.qiyuan.web.util.DateUtil;
 import com.qiyuan.web.util.RandomGenerator;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,6 +38,8 @@ public class OrderAdminService {
     private final StockService stockService;
     private final ImagePathMappingConfig mappingConfig;
     private final ProductMapper productMapper;
+    private final GomypayLogisticsService logisticsService;
+    private final SystemConfigService systemConfigService;
 
     public List<OrderQueryResultVO> getOrderList(QueryOrderAdminRequest request) {
         return ordersMapper.listOrderDetailsAdmin(request);
@@ -55,6 +60,7 @@ public class OrderAdminService {
     public void updateOrderStatusBatch(UpdateOrderStatusBatchRequest request) {
         OrderStatus targetStatus = request.getStatus();
 
+        Map<String, ShippingMethod> shippingMap = new HashMap<>();
         for (OrderStatusUpdateItem update : request.getUpdates()) {
             Orders order = ordersMapper.selectByPrimaryKey(update.getOrderId());
             if (order == null) continue;
@@ -66,11 +72,12 @@ public class OrderAdminService {
 
             // 處理庫存異動
             if (targetStatus == OrderStatus.SHIPPED) {
-                // 出貨：將 reservedStock 扣除（shipReservedStock）
+            // 出貨：將 reservedStock 扣除（shipReservedStock）
                 for (OrderItem item : items) {
                     stockService.shipReservedStock(item.getProductId(), item.getQuantity(), null);
                 }
             } else if (targetStatus == OrderStatus.RETURNED) {
+            // 退貨
                 for (OrderItem item : items) {
                     stockService.releaseReservedStock(item.getProductId(), item.getQuantity(), null);
                 }
@@ -79,12 +86,93 @@ public class OrderAdminService {
             Orders record = new Orders();
             record.setId(order.getId());
             record.setStatus(targetStatus.getValue());
-            if (update.getTrackingNo() != null) {
-                record.setTrackingNo(update.getTrackingNo());
-            }
+
             if (update.getRemark() != null) {
                 record.setRemark(update.getRemark());
             }
+            record.setUpdateTime(DateUtil.getCurrentDate());
+            ordersMapper.updateByPrimaryKeySelective(record);
+        }
+    }
+
+    /**
+     * 批次更新訂單 訂單準備中 => 準備出貨中
+     * @param request
+     */
+    @Transactional
+    public void markReadyToShip(List<MarkReadyToShipRequest> request) {
+        Map<String, ShippingMethod> shippingMap = new HashMap<>();
+        SenderInfoDto senderInfo = systemConfigService.getSenderInfo();
+
+        for (MarkReadyToShipRequest item : request) {
+            Orders order = ordersMapper.selectByPrimaryKey(item.getOrderId());
+            if (order == null) continue;
+
+            // 查詢訂單明細
+            OrderItemExample e = new OrderItemExample();
+            e.createCriteria().andOrderIdEqualTo(order.getId());
+            List<OrderItem> items = orderItemMapper.selectByExample(e);
+
+            // 準備出貨，建立物流單
+            String shippingMethodId = order.getShippingMethodId();
+            ShippingMethod shippingMethod = null;
+            if (shippingMap.containsKey(shippingMethodId)) {
+                shippingMethod = shippingMap.get(shippingMethodId);
+            } else {
+                shippingMethod = shippingMethodMapper.selectByPrimaryKey(shippingMethodId);
+                shippingMap.put(shippingMethodId, shippingMethod);
+            }
+
+            // 宅配
+            String trackingId = null;
+            if (StringUtils.equals("SF_EXPRESS",shippingMethod.getCode())) {
+                ExpressDeliveryRequest target = ExpressDeliveryRequest.builder()
+                        .orderId(item.getOrderId())
+                        .declaredValue(order.getTotalAmount())
+                        .totalWeight(BigDecimal.valueOf(5)) // 寫死
+                        .pickupType(0)
+                        .pickupAppointTime(null)
+                        .productName("商品")
+                        .quantity(items.size())
+                        .recipientName(order.getRecipientName())
+                        .recipientMobile(order.getRecipientPhone())
+                        .recipientAddress(order.getRecipientAddress())
+                        .recipientRegion(order.getRecipientCity())
+                        .recipientAddress(order.getRecipientAddress())
+                        .recipientZipCode(order.getZipCode())
+                        .senderAddress(senderInfo.getAddress())
+                        .senderName(senderInfo.getName())
+                        .senderMobile(senderInfo.getPhone())
+                        .senderRegion(senderInfo.getCity())
+                        .senderAddress(senderInfo.getAddress())
+                        .senderZipCode(senderInfo.getZipcode())
+                        .remark(item.getRemark())
+                        .build();
+                trackingId = logisticsService.createExpressDeliveryOrder(target);
+            } else {
+                // 超商取貨
+                StorePickupRequest target = StorePickupRequest.builder()
+                        .orderId(order.getId())
+                        .storeId(order.getStoreId())
+                        .amount(order.getTotalAmount())
+                        .orderAmount(order.getTotalAmount())
+                        .senderName(senderInfo.getName())
+                        .sendMobilePhone(senderInfo.getPhone())
+                        .receiverName(order.getRecipientName())
+                        .receiverMobilePhone(order.getRecipientPhone())
+                        .StoreCode(shippingMethod.getCode())
+                        .shipDate(item.getShippingDate())
+                        .build();
+                trackingId = logisticsService.createStorePickupOrder(target);
+            }
+
+            Orders record = new Orders();
+            record.setId(order.getId());
+            record.setStatus(OrderStatus.READY_TO_SHIP.getValue());
+            if (item.getRemark() != null) {
+                record.setRemark(item.getRemark());
+            }
+            record.setTrackingNo(trackingId);
             record.setUpdateTime(DateUtil.getCurrentDate());
             ordersMapper.updateByPrimaryKeySelective(record);
         }
@@ -197,6 +285,8 @@ public class OrderAdminService {
         if ("SF_EXPRESS".equals(shippingMethod.getCode())) {
             homeDeliveryRecipientInfo = HomeDeliveryRecipientInfo
                     .builder()
+                    .city(order.getRecipientCity())
+                    .zipCode(order.getZipCode())
                     .name(order.getRecipientName())
                     .phone(order.getRecipientPhone())
                     .address(order.getRecipientAddress())

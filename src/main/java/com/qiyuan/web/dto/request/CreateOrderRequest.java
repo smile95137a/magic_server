@@ -1,6 +1,7 @@
 package com.qiyuan.web.dto.request;
 
 import com.qiyuan.web.dto.CreateOrderItem;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -50,8 +51,10 @@ public class CreateOrderRequest {
     private String remark;
 
     @Schema(description = "宅配收件資訊 (當物流方式為宅配時帶此欄)", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+    @Valid
     private HomeDeliveryRecipientInfo homeDeliveryRecipient;
 
     @Schema(description = "超商取貨收件資訊 (當物流方式為超商時帶此欄)", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+    @Valid
     private StorePickupRecipientInfo storePickupRecipient;
 }

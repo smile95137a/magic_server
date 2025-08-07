@@ -11,6 +11,8 @@
     <result column="sort" jdbcType="SMALLINT" property="sort" />
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
     <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="min_size" jdbcType="INTEGER" property="minSize" />
+    <result column="max_size" jdbcType="INTEGER" property="maxSize" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -71,7 +73,8 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    id, code, name, description, fee, status, sort, create_time, update_time
+    id, code, name, description, fee, status, sort, create_time, update_time, min_size,
+    max_size
   </sql>
   <select id="selectByExample" parameterType="com.qiyuan.web.entity.example.ShippingMethodExample" resultMap="BaseResultMap">
     select
@@ -106,11 +109,12 @@
   <insert id="insert" parameterType="com.qiyuan.web.entity.ShippingMethod">
     insert into shipping_method (id, code, name, 
       description, fee, status, 
-      sort, create_time, update_time
+      sort, create_time, update_time,min_size, max_size
       )
     values (#{id,jdbcType=CHAR}, #{code,jdbcType=VARCHAR}, #{name,jdbcType=NVARCHAR}, 
       #{description,jdbcType=NVARCHAR}, #{fee,jdbcType=INTEGER}, #{status,jdbcType=BIT}, 
-      #{sort,jdbcType=SMALLINT}, #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}
+      #{sort,jdbcType=SMALLINT}, #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP},
+      #{minSize,jdbcType=INTEGER}, #{maxSize,jdbcType=INTEGER}
       )
   </insert>
   <insert id="insertSelective" parameterType="com.qiyuan.web.entity.ShippingMethod">
@@ -143,6 +147,12 @@
       <if test="updateTime != null">
         update_time,
       </if>
+      <if test="minSize != null">
+        min_size,
+      </if>
+      <if test="maxSize != null">
+        max_size,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -171,6 +181,12 @@
       </if>
       <if test="updateTime != null">
         #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="minSize != null">
+        #{minSize,jdbcType=INTEGER},
+      </if>
+      <if test="maxSize != null">
+        #{maxSize,jdbcType=INTEGER},
       </if>
     </trim>
   </insert>
@@ -210,6 +226,12 @@
       <if test="record.updateTime != null">
         update_time = #{record.updateTime,jdbcType=TIMESTAMP},
       </if>
+      <if test="row.minSize != null">
+        min_size = #{row.minSize,jdbcType=INTEGER},
+      </if>
+      <if test="row.maxSize != null">
+        max_size = #{row.maxSize,jdbcType=INTEGER},
+      </if>
     </set>
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
@@ -225,7 +247,9 @@
       status = #{record.status,jdbcType=BIT},
       sort = #{record.sort,jdbcType=SMALLINT},
       create_time = #{record.createTime,jdbcType=TIMESTAMP},
-      update_time = #{record.updateTime,jdbcType=TIMESTAMP}
+      update_time = #{record.updateTime,jdbcType=TIMESTAMP},
+    min_size = #{row.minSize,jdbcType=INTEGER},
+    max_size = #{row.maxSize,jdbcType=INTEGER}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
     </if>
@@ -257,6 +281,12 @@
       <if test="updateTime != null">
         update_time = #{updateTime,jdbcType=TIMESTAMP},
       </if>
+      <if test="minSize != null">
+        min_size = #{minSize,jdbcType=INTEGER},
+      </if>
+      <if test="maxSize != null">
+        max_size = #{maxSize,jdbcType=INTEGER},
+      </if>
     </set>
     where id = #{id,jdbcType=CHAR}
   </update>
@@ -269,7 +299,9 @@
       status = #{status,jdbcType=BIT},
       sort = #{sort,jdbcType=SMALLINT},
       create_time = #{createTime,jdbcType=TIMESTAMP},
-      update_time = #{updateTime,jdbcType=TIMESTAMP}
+      update_time = #{updateTime,jdbcType=TIMESTAMP},
+        min_size = #{minSize,jdbcType=INTEGER},
+        max_size = #{maxSize,jdbcType=INTEGER}
     where id = #{id,jdbcType=CHAR}
   </update>
 </mapper>

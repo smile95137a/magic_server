@@ -105,12 +105,16 @@ public class OrderService {
         }
 
         // 3. 決定收件人資訊
-        String recipientName = null, recipientPhone = null, recipientAddress = null, storeId = null, storeName = null;
+        String recipientName = null, recipientPhone = null, recipientAddress = null,
+                recipientCity = null, zipCode = null,
+                storeId = null, storeName = null;
         ShippingMethod shippingMethod = shippingMethodMapper.selectByPrimaryKey(request.getShippingMethodId());
         // 宅配
         if (StringUtils.equals("SF_EXPRESS", shippingMethod.getCode())) {
             HomeDeliveryRecipientInfo r = request.getHomeDeliveryRecipient();
             if (r == null) throw new ApiException("宅配需填寫收件人資訊");
+            zipCode = r.getZipCode();
+            recipientCity = r.getCity();
             recipientName = r.getName();
             recipientPhone = r.getPhone();
             recipientAddress = r.getAddress();
@@ -141,6 +145,8 @@ public class OrderService {
                 .recipientName(recipientName)
                 .recipientPhone(recipientPhone)
                 .recipientAddress(recipientAddress)
+                .recipientCity(recipientCity)
+                .zipCode(zipCode)
                 .remark(request.getRemark())
                 .createTime(currentDate)
                 .updateTime(currentDate)
@@ -349,8 +355,6 @@ public class OrderService {
             return;
         }
 
-
-
         // 2. 更新付款狀態為成功
         tx.setStatus(OrderStatus.PAID.getValue());
         tx.setProviderOrderNo(providerOrderNo);
@@ -362,12 +366,16 @@ public class OrderService {
         Orders update = new Orders();
         update.setId(order.getId());
         update.setPaid(true);
-        update.setStatus(OrderStatus.PAID.getValue());
+        update.setStatus(OrderStatus.PROCESSING.getValue());
         update.setUpdateTime(new Date());
         ordersMapper.updateByPrimaryKeySelective(update);
 
-        // 成立發票
-        invoiceService.issueInvoice(paymentId);
+        try {
+            // 成立發票
+            invoiceService.issueInvoice(paymentId);
+        } catch (Exception e) {
+            logger.error("商城訂單 {} 金流單號 {} 付款完成，但發票開立失敗!!", order.getId(), paymentId);
+        }
     }
 
 

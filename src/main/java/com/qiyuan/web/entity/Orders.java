@@ -46,6 +46,12 @@ public class Orders {
     private String storeId;
 
     private String storeName;
+    // 收件人郵遞區號
+    private String zipCode;
+
+    // 收件人城市／縣市
+    private String recipientCity;
+
 
     public String getId() {
         return id;
@@ -190,4 +196,20 @@ public class Orders {
     public void setStoreName(String storeName) {
         this.storeName = storeName;
     }
+    public String getZipCode() {
+        return zipCode;
+    }
+
+    public void setZipCode(String zipCode) {
+        this.zipCode = zipCode;
+    }
+
+    public String getRecipientCity() {
+        return recipientCity;
+    }
+
+    public void setRecipientCity(String recipientCity) {
+        this.recipientCity = recipientCity;
+    }
+
 }
