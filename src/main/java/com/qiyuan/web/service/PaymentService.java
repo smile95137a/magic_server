@@ -112,6 +112,7 @@ public class PaymentService {
      */
     @Transactional
     public void markAtmPaymentResult(PaymentAtmCallbackResult result) {
+        logger.info("成功接收到ATM轉帳通知: ", result);
         String paymentId = result.getEOrderno();
         PaymentTransaction tx = paymentTransactionMapper.selectByPrimaryKey(paymentId);
         tx.setProviderOrderNo(result.getOrderID());

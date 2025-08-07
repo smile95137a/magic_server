@@ -87,6 +87,8 @@ security:
     - /product/**
     - /test/mail/**
     - /images/**
+    - /payment/atmCallback
+    - /logistics/callback
   response:
     exclude-paths:
       - /v3/api-docs

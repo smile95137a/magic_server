@@ -19,13 +19,13 @@ import java.util.List;
 public class ShippingMethodController {
     private final ShippingMethodService shippingMethodService;
 
-    @Operation(summary = "查詢物流方式列表")
+    @Operation(summary = "查詢物流方式列表", description = "取得目前所有可用的物流方式")
     @GetMapping("/list")
     public List<ShippingMethod> listShippingMethods() {
         return shippingMethodService.list();
     }
 
-    @Operation(summary = "編輯物流方式")
+    @Operation(summary = "編輯物流方式", description = "更新物流方式資訊")
     @PutMapping("/modify")
     public boolean updateShippingMethod(@RequestBody @Validated ShippingMethodUpdateRequest req) {
         return shippingMethodService.update(req);

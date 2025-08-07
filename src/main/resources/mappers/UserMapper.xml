@@ -17,6 +17,7 @@
     <result column="city" jdbcType="NVARCHAR" property="city" />
     <result column="district" jdbcType="NVARCHAR" property="district" />
     <result column="provider" jdbcType="VARCHAR" property="provider" />
+    <result column="zip_code" jdbcType="VARCHAR" property="zipCode" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -79,7 +80,7 @@
   
   <sql id="Base_Column_List">
     id, password, email, phone, nickname, line_id, address_name, address, receipt,
-    username, oauth_type, oauth_id, city, district, provider
+    username, oauth_type, oauth_id, city, district, provider, zip_code
   </sql>
   
   <select id="selectByUsername" parameterType="java.lang.String" resultMap="BaseResultMap">
@@ -124,12 +125,12 @@
                        phone, nickname, line_id,
                        address_name, address, receipt,
                        username, oauth_type, oauth_id, provider,
-                       city, district)
+                       city, district, zip_code)
     values (#{id,jdbcType=CHAR}, #{password,jdbcType=VARCHAR}, #{email,jdbcType=VARCHAR},
             #{phone,jdbcType=VARCHAR}, #{nickname,jdbcType=NVARCHAR}, #{lineId,jdbcType=VARCHAR},
             #{addressName,jdbcType=NVARCHAR}, #{address,jdbcType=NVARCHAR}, #{receipt,jdbcType=VARCHAR},
             #{username,jdbcType=VARCHAR}, #{oauthType,jdbcType=VARCHAR}, #{oauthId,jdbcType=VARCHAR}, #{provider,jdbcType=VARCHAR},
-            #{city,jdbcType=NVARCHAR}, #{district,jdbcType=NVARCHAR})
+            #{city,jdbcType=NVARCHAR}, #{district,jdbcType=NVARCHAR}, #{zipCode,jdbcType=VARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.qiyuan.web.entity.User">
     insert into users
@@ -226,6 +227,10 @@
       <if test="district != null">
         #{district,jdbcType=NVARCHAR},
       </if>
+      <if test="zipCode != null">
+        zip_code,
+      </if>
+
     </trim>
   </insert>
   <select id="countByExample" parameterType="com.qiyuan.web.entity.example.UserExample" resultType="java.lang.Long">
@@ -279,6 +284,10 @@
       <if test="row.district != null">
         district = #{row.district,jdbcType=NVARCHAR},
       </if>
+      <if test="zipCode != null">
+        #{zipCode,jdbcType=VARCHAR},
+      </if>
+
     </set>
     <if test="example != null">
       <include refid="Update_By_Example_Where_Clause" />
@@ -299,7 +308,9 @@
     oauth_type = #{row.oauthType,jdbcType=VARCHAR},
     oauth_id = #{row.oauthId,jdbcType=VARCHAR},
     city = #{row.city,jdbcType=NVARCHAR},
-    district = #{row.district,jdbcType=NVARCHAR}
+    district = #{row.district,jdbcType=NVARCHAR},
+    zip_code = #{zipCode,jdbcType=VARCHAR}
+
     <if test="example != null">
       <include refid="Update_By_Example_Where_Clause" />
     </if>
@@ -350,6 +361,9 @@
       <if test="district != null">
         district = #{district,jdbcType=NVARCHAR},
       </if>
+      <if test="zipCode != null">
+        zip_code = #{zipCode,jdbcType=VARCHAR},
+      </if>
     </set>
     where id = #{id,jdbcType=CHAR}
   </update>
@@ -368,7 +382,8 @@
         oauth_id = #{oauthId,jdbcType=VARCHAR},
         provider = #{provider,jdbcType=VARCHAR},
         city = #{city,jdbcType=NVARCHAR},
-        district = #{district,jdbcType=NVARCHAR}
-    where id = #{id,jdbcType=CHAR}
+        district = #{district,jdbcType=NVARCHAR},
+        zip_code = #{zipCode,jdbcType=VARCHAR}
+        where id = #{id,jdbcType=CHAR}
   </update>
 </mapper>

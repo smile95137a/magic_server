@@ -15,6 +15,7 @@ public class UserProfileResponse {
     private String addressName;
     private String lineId;
     private String phone;
+    private String zipCode;
     private String city;
     private String area;
     private String address;
