@@ -684,6 +684,126 @@ public class ShippingMethodExample {
             addCriterion("update_time not between", value1, value2, "updateTime");
             return (Criteria) this;
         }
+
+        public Criteria andMinSizeIsNull() {
+            addCriterion("min_size is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andMinSizeIsNotNull() {
+            addCriterion("min_size is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andMinSizeEqualTo(Integer value) {
+            addCriterion("min_size =", value, "minSize");
+            return (Criteria) this;
+        }
+
+        public Criteria andMinSizeNotEqualTo(Integer value) {
+            addCriterion("min_size <>", value, "minSize");
+            return (Criteria) this;
+        }
+
+        public Criteria andMinSizeGreaterThan(Integer value) {
+            addCriterion("min_size >", value, "minSize");
+            return (Criteria) this;
+        }
+
+        public Criteria andMinSizeGreaterThanOrEqualTo(Integer value) {
+            addCriterion("min_size >=", value, "minSize");
+            return (Criteria) this;
+        }
+
+        public Criteria andMinSizeLessThan(Integer value) {
+            addCriterion("min_size <", value, "minSize");
+            return (Criteria) this;
+        }
+
+        public Criteria andMinSizeLessThanOrEqualTo(Integer value) {
+            addCriterion("min_size <=", value, "minSize");
+            return (Criteria) this;
+        }
+
+        public Criteria andMinSizeIn(List<Integer> values) {
+            addCriterion("min_size in", values, "minSize");
+            return (Criteria) this;
+        }
+
+        public Criteria andMinSizeNotIn(List<Integer> values) {
+            addCriterion("min_size not in", values, "minSize");
+            return (Criteria) this;
+        }
+
+        public Criteria andMinSizeBetween(Integer value1, Integer value2) {
+            addCriterion("min_size between", value1, value2, "minSize");
+            return (Criteria) this;
+        }
+
+        public Criteria andMinSizeNotBetween(Integer value1, Integer value2) {
+            addCriterion("min_size not between", value1, value2, "minSize");
+            return (Criteria) this;
+        }
+
+        public Criteria andMaxSizeIsNull() {
+            addCriterion("max_size is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andMaxSizeIsNotNull() {
+            addCriterion("max_size is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andMaxSizeEqualTo(Integer value) {
+            addCriterion("max_size =", value, "maxSize");
+            return (Criteria) this;
+        }
+
+        public Criteria andMaxSizeNotEqualTo(Integer value) {
+            addCriterion("max_size <>", value, "maxSize");
+            return (Criteria) this;
+        }
+
+        public Criteria andMaxSizeGreaterThan(Integer value) {
+            addCriterion("max_size >", value, "maxSize");
+            return (Criteria) this;
+        }
+
+        public Criteria andMaxSizeGreaterThanOrEqualTo(Integer value) {
+            addCriterion("max_size >=", value, "maxSize");
+            return (Criteria) this;
+        }
+
+        public Criteria andMaxSizeLessThan(Integer value) {
+            addCriterion("max_size <", value, "maxSize");
+            return (Criteria) this;
+        }
+
+        public Criteria andMaxSizeLessThanOrEqualTo(Integer value) {
+            addCriterion("max_size <=", value, "maxSize");
+            return (Criteria) this;
+        }
+
+        public Criteria andMaxSizeIn(List<Integer> values) {
+            addCriterion("max_size in", values, "maxSize");
+            return (Criteria) this;
+        }
+
+        public Criteria andMaxSizeNotIn(List<Integer> values) {
+            addCriterion("max_size not in", values, "maxSize");
+            return (Criteria) this;
+        }
+
+        public Criteria andMaxSizeBetween(Integer value1, Integer value2) {
+            addCriterion("max_size between", value1, value2, "maxSize");
+            return (Criteria) this;
+        }
+
+        public Criteria andMaxSizeNotBetween(Integer value1, Integer value2) {
+            addCriterion("max_size not between", value1, value2, "maxSize");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {
