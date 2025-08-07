@@ -91,8 +91,13 @@ public class PaymentService {
         virtualOrders.get(0).setStatus(OrderStatus.PAID.getValue());
         virtualOrdersMapper.updateByPrimaryKeySelective(virtualOrders.get(0));
 
-        // 發票開立
-        invoiceService.issueInvoice(externalOrderNo);
+
+        try {
+            // 發票開立
+            invoiceService.issueInvoice(externalOrderNo);
+        } catch (Exception e) {
+            logger.error("虛擬商品訂單 {} 金流單號 {} 付款完成，但發票開立失敗!!", virtualOrders.get(0).getId(), externalOrderNo);
+        }
 
         if (StringUtils.equalsIgnoreCase(tx.getSourceType(), SourceTypeEnum.OFFERING.getCode())) {
             godService.processOfferingAfterPayment(tx.getId());
@@ -112,6 +117,7 @@ public class PaymentService {
         tx.setProviderOrderNo(result.getOrderID());
         tx.setRawData(result.toString());
         tx.setUpdateTime(new Date());
+        String orderId = null;
 
         if ("1".equals(result.getResult())) {
             tx.setStatus(OrderStatus.PAID.getValue());
@@ -121,14 +127,22 @@ public class PaymentService {
                 e.createCriteria().andExternalOrderNoEqualTo(paymentId);
                 List<Orders> orders = ordersMapper.selectByExample(e);
                 Orders target = orders.get(0);
+                orderId = target.getId();
                 target.setStatus(OrderStatus.PAID.getValue());
                 target.setPaid(true);
                 ordersMapper.updateByPrimaryKey(target);
             }
         }
-        // 發票開立
-        invoiceService.issueInvoice(paymentId);
+
         paymentTransactionMapper.updateByPrimaryKey(tx);
+
+
+        try {
+            // 發票開立
+            invoiceService.issueInvoice(paymentId);
+        } catch (Exception e) {
+            logger.error("商城訂單 {} 金流單號 {} 付款完成，但發票開立失敗!!", StringUtils.defaultString(orderId), paymentId);
+        }
     }
 
 

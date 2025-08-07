@@ -366,8 +366,12 @@ public class OrderService {
         update.setUpdateTime(new Date());
         ordersMapper.updateByPrimaryKeySelective(update);
 
-        // 成立發票
-        invoiceService.issueInvoice(paymentId);
+        try {
+            // 成立發票
+            invoiceService.issueInvoice(paymentId);
+        } catch (Exception e) {
+            logger.error("商城訂單 {} 金流單號 {} 付款完成，但發票開立失敗!!", order.getId(), paymentId);
+        }
     }
 
 
