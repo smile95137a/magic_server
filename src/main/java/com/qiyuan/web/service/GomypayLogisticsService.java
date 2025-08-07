@@ -1,23 +1,33 @@
 package com.qiyuan.web.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.qiyuan.security.exception.ApiException;
 import com.qiyuan.web.config.GomypayLogisticsProperties;
+import com.qiyuan.web.dao.ShippingTrackingMapper;
 import com.qiyuan.web.dto.C2CLogisticsCreateRawResponseDto;
+import com.qiyuan.web.dto.ExpressCreateResult;
 import com.qiyuan.web.dto.request.ExpressDeliveryRequest;
 import com.qiyuan.web.dto.request.StorePickupRequest;
+import com.qiyuan.web.entity.ShippingTracking;
+import com.qiyuan.web.entity.example.ShippingTrackingExample;
+import com.qiyuan.web.enums.OrderStatus;
 import com.qiyuan.web.util.JsonUtil;
 import com.qiyuan.web.util.Md5Util;
+import com.qiyuan.web.util.RandomGenerator;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.Date;
 import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -28,6 +38,10 @@ public class GomypayLogisticsService {
 
     private final RestTemplate restTemplate;
     private final GomypayLogisticsProperties props;
+    private final ShippingTrackingMapper shippingTrackingMapper;
+
+    @Value("${ap.backend}")
+    private String backendBaseUrl;
 
     private static final Logger logger = LoggerFactory.getLogger(GomypayLogisticsService.class);
 
@@ -36,7 +50,7 @@ public class GomypayLogisticsService {
      */
     public String createStorePickupOrder(StorePickupRequest req) {
         String storeCreateUri = props.getStoreCreateUri();
-        String callbackUrl = "https://api.onemorelottery.tw:8081/logistics/callback";
+        String callbackUrl = backendBaseUrl + "/logistics/callback";
 
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         params.add("Vendororder", req.getOrderId()); // 客戶訂單編號
@@ -50,7 +64,7 @@ public class GomypayLogisticsService {
         params.add("SendMobilePhone", req.getSendMobilePhone()); // 寄件人手機電話
         params.add("ReceiverName", req.getReceiverName()); // 取貨人姓名
         params.add("ReceiverMobilePhone", req.getReceiverMobilePhone()); // 取貨人手機電話
-        params.add("OPMode", req.getOpMode()); // 通路代號
+        params.add("OPMode", this.opModeMap(req.getStoreCode())); // 通路代號
         params.add("Internetsite", callbackUrl); // 接收狀態的網址
         params.add("ShipDate", DateFormatUtils.format(req.getShipDate(), "yyyy/MM/dd")); // 出貨日期
         // 檢查碼
@@ -66,7 +80,6 @@ public class GomypayLogisticsService {
         String jsonResponse = response.getBody();
         C2CLogisticsCreateRawResponseDto dto = parseStoreC2CResponse(jsonResponse);
 
-
         if (!"000".equals(dto.getErrorCode())) {
             logger.error("物流訂單創建失敗，錯誤代碼: {}, 錯誤說明: {}",
                     StringUtils.defaultString(dto.getErrorCode()),
@@ -74,28 +87,30 @@ public class GomypayLogisticsService {
             throw new ApiException("物流訂單創建失敗" + dto.getErrorMessage());
         }
 
-        // TODO: 補上DB操作
+        String id = RandomGenerator.getUUID();
+        ShippingTracking t = ShippingTracking.builder()
+                .id(id)
+                .logisticsType("C2C")
+                .logisticsVendor(req.getStoreCode())
+                .orderId(req.getOrderId())
+                .waybillNo(dto.getOrderNo())
+                .vendororder(dto.getVendororder())
+                .status(OrderStatus.CREATED.getValue())
+                .requestPayload(params.toString())
+                .responsePayload(dto.toString())
+                .createTime(new Date())
+                .updateTime(new Date())
+                .build();
 
-        // TODO: 字串作法
-//        if ("000".equals(errorCode)) {
-//            VendorOrderEntity vendorOrderEntity = new VendorOrderEntity();
-//            vendorOrderEntity.setVendorOrder(vendorOrder);
-//            vendorOrderEntity.setOrderNo(orderNo);
-//            vendorOrderEntity.setErrorCode(errorCode);
-//            vendorOrderEntity.setErrorMessage(errorMessage);
-//            vendorOrderEntity.setExpress("1".equals(logisticsRequest.getOpMode()) ? "全家" : "711");
-//            vendorOrderEntity.setStatus("未寄出");
-//
-//            // 插入資料庫
-//            vendorOrderRepository.insert(vendorOrderEntity);
-//            System.out.println("已插入資料庫");
-//        } else {
-//            System.out.println("訂單失敗，錯誤代碼：" + errorCode);
-//        }
-        // TODO: JSON作法
-        //vendorOrderEntity.setExpress("1".equals(logisticsRequest.getOpMode()) ? "全家" : "711");
-        //            vendorOrderRepository.insert(vendorOrderEntity);
+        shippingTrackingMapper.insertSelective(t);
+        return id;
+    }
 
+    private String opModeMap(String code) {
+        switch (code) {
+            case "7_ELEVEN": return "3";
+            case "FAMILY": return "1";
+        }
         return null;
     }
 
@@ -126,8 +141,6 @@ public class GomypayLogisticsService {
                         .ErrorCode(errorCode)
                         .build();
             } else {
-                // TODO
-                // 寫入物流回應(DB)
                 logger.error("物流訂單解析失敗");
                 throw new ApiException("物流訂單解析失敗");
             }
@@ -163,48 +176,61 @@ public class GomypayLogisticsService {
         params.add("SenderPodtcode", req.getSenderZipCode()); //寄件人郵遞區號
         params.add("Remark", StringUtils.defaultString(req.getRemark())); //訂單備註
 
-
         String check = this.props.getCustomerPassword() + req.getOrderId();
         String md5 = Md5Util.md5(check.toLowerCase());
         params.add("CHKMAC", md5.toUpperCase(Locale.ROOT)); //檢查碼
 
-
-
-        // references
-//        params.add("Spec", String.valueOf(homeReq.getSpec())); // 規格(代碼)
-//        params.add("ServiceType", "3"); // 服務型態代碼
-//        params.add("InternetSite", ""); // 接收狀態的網址
-//        params.add("Amount", String.valueOf(homeReq.getAmount())); // 交易金額
-//        params.add("OrderAmount", homeReq.getOrderAmount()); // 商品價值
-//        params.add("RecipientName", homeReq.getRecipientName()); // 取貨人姓名
-//        params.add("RecipientMobile", homeReq.getRecipientMobile()); // 取貨人手機電話
-//        params.add("RecipientAddress", homeReq.getRecipientAddress()); // 取貨人地址
-//        params.add("SenderName", homeReq.getSenderName()); // 寄件人姓名
-//        params.add("SenderMobile", homeReq.getSenderMobile()); // 寄件人手機電話
-//        params.add("SenderZipCode", homeReq.getSenderZipCode()); // 寄件人郵碼
-//        params.add("SenderAddress", homeReq.getSenderAddress()); // 寄件人地址
-//        params.add("ShipmentDate", homeReq.getShipmentDate()); // 出貨日期
-//        params.add("DeliveryDate", homeReq.getDeliveryDate()); // 希望配達日期
-//        params.add("DeliveryTime" , homeReq.getDeliveryTime());
-//        params.add("ProductTypeId", "0015"); // 商品類別(代碼)
-//        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-//        params.add("PrintDateTime", sdf.format(new Date()));
-//        params.add("ProductName", "景品"); // 商品名稱
-//        params.add("CHKMAC", s); // 檢查碼
-
-
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED); // 設定為表單格式
+        HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>(params, headers);
+        ResponseEntity<String> response = null;
+        try {
+            response = restTemplate.postForEntity(expressCreateUri, requestEntity, String.class);
 
-        // 處理回傳
-        // 塞入DB
-        // 封裝請求
-//        HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(params, headers);
-//        for (Map.Entry<String, List<String>> entry : params.entrySet()) {
-//            String key = entry.getKey();
-//            List<String> values = entry.getValue();
-//            System.out.println(key + ": " + values);
-//        }
-        return null;
+            if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
+                String body = response.getBody();
+
+                // 將 JSON 字串轉換成物件
+                ExpressCreateResult result = JsonUtil.fromJson(body, ExpressCreateResult.class);
+
+                if (StringUtils.isBlank(result.getErrorMessage()) && StringUtils.contains(result.getMsg(), "成功")) {
+                    logger.info("順豐物流建立成功：{}", result.getSfWaybillNo());
+                    String id = RandomGenerator.getUUID();
+                    ShippingTracking t = ShippingTracking.builder()
+                            .id(id)
+                            .logisticsType("EXPRESS")
+                            .logisticsVendor("EXPRESS")
+                            .orderId(req.getOrderId())
+                            .waybillNo(result.getSfWaybillNo())
+                            .status(OrderStatus.CREATED.getValue())
+                            .requestPayload(params.toString())
+                            .responsePayload(result.toString())
+                            .createTime(new Date())
+                            .updateTime(new Date())
+                            .build();
+
+                    shippingTrackingMapper.insertSelective(t);
+                    return id;
+                } else {
+                    logger.warn("順豐物流建立失敗：{}", result.getErrorMessage());
+                    throw new ApiException("訂單: "+ req.getOrderId() + " ,物流建立失敗：" + result.getErrorMessage());
+                }
+            } else {
+                throw new ApiException("物流 API 回傳非 200 或無內容");
+            }
+        } catch (Exception ex) {
+            if (ex instanceof JsonProcessingException) {
+                logger.error("順豐物流回傳 JSON 解析失敗：{}", response.getBody(), ex);
+                throw new ApiException("物流回傳資料格式異常");
+            }
+            logger.error("呼叫順豐物流 API 發生錯誤", ex);
+            throw new ApiException("呼叫物流 API 失敗：" + ex.getMessage());
+        }
+    }
+
+    public boolean updateLogisticsStatus(String eshopId, String orderNo, String status) {
+        // TODO
+        return true;
+
     }
 }

@@ -1,40 +1,44 @@
 package com.qiyuan.web.entity;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.Date;
 
+@Builder
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class ShippingTracking {
-    private Integer id;
+    private String id;
 
     private String orderId;
 
-    private String externalOrderNo;
+    private String logisticsType;
 
-    private String shippingOrderNo;
+    private String logisticsVendor;
 
-    private String shippingProvider;
+    private String waybillNo;
 
-    private String mode;
-
-    private String storeId;
-
-    private String opmode;
+    private String vendororder;
 
     private String status;
 
-    private Date shipDate;
+    private String requestPayload;
 
-    private Date deliveredDate;
+    private String responsePayload;
 
-    private String rawData;
+    private Date createTime;
 
     private Date updateTime;
 
-    public Integer getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -46,52 +50,36 @@ public class ShippingTracking {
         this.orderId = orderId;
     }
 
-    public String getExternalOrderNo() {
-        return externalOrderNo;
+    public String getLogisticsType() {
+        return logisticsType;
     }
 
-    public void setExternalOrderNo(String externalOrderNo) {
-        this.externalOrderNo = externalOrderNo;
+    public void setLogisticsType(String logisticsType) {
+        this.logisticsType = logisticsType;
     }
 
-    public String getShippingOrderNo() {
-        return shippingOrderNo;
+    public String getLogisticsVendor() {
+        return logisticsVendor;
     }
 
-    public void setShippingOrderNo(String shippingOrderNo) {
-        this.shippingOrderNo = shippingOrderNo;
+    public void setLogisticsVendor(String logisticsVendor) {
+        this.logisticsVendor = logisticsVendor;
     }
 
-    public String getShippingProvider() {
-        return shippingProvider;
+    public String getWaybillNo() {
+        return waybillNo;
     }
 
-    public void setShippingProvider(String shippingProvider) {
-        this.shippingProvider = shippingProvider;
+    public void setWaybillNo(String waybillNo) {
+        this.waybillNo = waybillNo;
     }
 
-    public String getMode() {
-        return mode;
+    public String getVendororder() {
+        return vendororder;
     }
 
-    public void setMode(String mode) {
-        this.mode = mode;
-    }
-
-    public String getStoreId() {
-        return storeId;
-    }
-
-    public void setStoreId(String storeId) {
-        this.storeId = storeId;
-    }
-
-    public String getOpmode() {
-        return opmode;
-    }
-
-    public void setOpmode(String opmode) {
-        this.opmode = opmode;
+    public void setVendororder(String vendororder) {
+        this.vendororder = vendororder;
     }
 
     public String getStatus() {
@@ -102,28 +90,28 @@ public class ShippingTracking {
         this.status = status;
     }
 
-    public Date getShipDate() {
-        return shipDate;
+    public String getRequestPayload() {
+        return requestPayload;
     }
 
-    public void setShipDate(Date shipDate) {
-        this.shipDate = shipDate;
+    public void setRequestPayload(String requestPayload) {
+        this.requestPayload = requestPayload;
     }
 
-    public Date getDeliveredDate() {
-        return deliveredDate;
+    public String getResponsePayload() {
+        return responsePayload;
     }
 
-    public void setDeliveredDate(Date deliveredDate) {
-        this.deliveredDate = deliveredDate;
+    public void setResponsePayload(String responsePayload) {
+        this.responsePayload = responsePayload;
     }
 
-    public String getRawData() {
-        return rawData;
+    public Date getCreateTime() {
+        return createTime;
     }
 
-    public void setRawData(String rawData) {
-        this.rawData = rawData;
+    public void setCreateTime(Date createTime) {
+        this.createTime = createTime;
     }
 
     public Date getUpdateTime() {

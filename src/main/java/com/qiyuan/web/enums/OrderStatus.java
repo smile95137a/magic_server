@@ -9,6 +9,7 @@ public enum OrderStatus {
     CREATED("created", "已建立"),
     PAID("paid", "已付款"),
     PROCESSING("processing", "訂單準備中"),
+    READY_TO_SHIP("ready_to_ship", "準備出貨"),
     SHIPPED("shipped", "已出貨"),
     DELIVERED("delivered", "已完成"),
     CANCELLED("cancelled", "已取消"),
@@ -36,6 +37,7 @@ public enum OrderStatus {
 
     public static final Set<OrderStatus> BACKEND_SET = Set.of(
             OrderStatus.PROCESSING,
+            OrderStatus.READY_TO_SHIP,
             OrderStatus.SHIPPED,
             OrderStatus.DELIVERED,
             OrderStatus.CANCELLED,

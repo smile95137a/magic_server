@@ -1,18 +1,17 @@
 package com.qiyuan.web.dao;
 
-
 import com.qiyuan.web.entity.ShippingTracking;
-import java.util.List;
-
 import com.qiyuan.web.entity.example.ShippingTrackingExample;
 import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 public interface ShippingTrackingMapper {
     long countByExample(ShippingTrackingExample example);
 
     int deleteByExample(ShippingTrackingExample example);
 
-    int deleteByPrimaryKey(Integer id);
+    int deleteByPrimaryKey(String id);
 
     int insert(ShippingTracking row);
 
@@ -20,7 +19,7 @@ public interface ShippingTrackingMapper {
 
     List<ShippingTracking> selectByExample(ShippingTrackingExample example);
 
-    ShippingTracking selectByPrimaryKey(Integer id);
+    ShippingTracking selectByPrimaryKey(String id);
 
     int updateByExampleSelective(@Param("row") ShippingTracking row, @Param("example") ShippingTrackingExample example);
 

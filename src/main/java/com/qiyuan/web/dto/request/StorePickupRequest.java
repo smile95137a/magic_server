@@ -38,8 +38,7 @@ public class StorePickupRequest {
     /** 收件人手機 */
     private String receiverMobilePhone;
 
-    /** 通路代碼 (如：1=全家、2=萊爾富、3=統一超商...) */
-    private String opMode;
+    private String StoreCode;
 
     /** 出貨日期 (yyyy/MM/dd 格式) */
     private Date shipDate;

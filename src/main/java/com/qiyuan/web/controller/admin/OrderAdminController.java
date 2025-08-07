@@ -1,5 +1,6 @@
 package com.qiyuan.web.controller.admin;
 
+import com.qiyuan.web.dto.request.MarkReadyToShipRequest;
 import com.qiyuan.web.dto.request.QueryOrderAdminRequest;
 import com.qiyuan.web.dto.request.ShippingMethodRequest;
 import com.qiyuan.web.dto.request.UpdateOrderStatusBatchRequest;
@@ -48,22 +49,16 @@ public class OrderAdminController {
         return true;
     }
 
-    @Operation(summary = "變更物流內容", description = "更新物流方式資訊")
-    @PostMapping("/shipping-method/save")
-    public boolean saveShippingMethod(@RequestBody @Validated ShippingMethodRequest request) {
-        orderAdminService.saveShippingMethod(request);
+    @Operation(summary = "訂單備貨完成，準備出貨", description = "將訂單從準備中變更為準備出貨，並建立物流單號")
+    @PostMapping("/status/mark-ready-to-ship")
+    public boolean markOrderReadyToShip(@RequestBody @Validated List<MarkReadyToShipRequest> request) {
+        orderAdminService.markReadyToShip(request);
         return true;
-    }
-
-    @Operation(summary = "查詢物流方式列表", description = "取得目前所有可用的物流方式")
-    @GetMapping("/shipping-method/list")
-    public List<ShippingMethodVO> getShippingMethodList() {
-        return orderAdminService.getShippingMethodList();
     }
 
     @Operation(
             summary = "查詢可更改的訂單狀態列表",
-            description = "取得後台可用於訂單狀態異動的狀態列表（僅限: 訂單準備中、已出貨、已完成、已取消、已退款）"
+            description = "取得後台可用於訂單狀態異動的狀態列表（僅限: 訂單準備中、已出貨、準備出貨、已完成、已取消、已退款）"
     )
     @ApiResponse(responseCode = "200", description = "查詢成功，回傳可更改狀態")
     @GetMapping("/status/updatable-list")
