@@ -13,6 +13,8 @@
     <result column="response_payload" jdbcType="NVARCHAR" property="responsePayload" />
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
     <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="create_status" jdbcType="VARCHAR" property="createStatus" />
+    <result column="last_callback_payload" jdbcType="NVARCHAR" property="lastCallbackPayload" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -74,7 +76,7 @@
   </sql>
   <sql id="Base_Column_List">
     id, order_id, logistics_type, logistics_vendor, waybill_no, vendororder, status, 
-    request_payload, response_payload, create_time, update_time
+    request_payload, response_payload, create_time, update_time, create_status, last_callback_payload
   </sql>
   <select id="selectByExample" parameterType="com.qiyuan.web.entity.example.ShippingTrackingExample" resultMap="BaseResultMap">
     select
@@ -91,7 +93,7 @@
     </if>
   </select>
   <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
-    select 
+    select
     <include refid="Base_Column_List" />
     from shipping_tracking
     where id = #{id,jdbcType=CHAR}
@@ -107,14 +109,16 @@
     </if>
   </delete>
   <insert id="insert" parameterType="com.qiyuan.web.entity.ShippingTracking">
-    insert into shipping_tracking (id, order_id, logistics_type, 
-      logistics_vendor, waybill_no, vendororder, 
-      status, request_payload, response_payload, 
-      create_time, update_time)
-    values (#{id,jdbcType=CHAR}, #{orderId,jdbcType=VARCHAR}, #{logisticsType,jdbcType=VARCHAR}, 
-      #{logisticsVendor,jdbcType=VARCHAR}, #{waybillNo,jdbcType=VARCHAR}, #{vendororder,jdbcType=VARCHAR}, 
-      #{status,jdbcType=VARCHAR}, #{requestPayload,jdbcType=NVARCHAR}, #{responsePayload,jdbcType=NVARCHAR}, 
-      #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP})
+    insert into shipping_tracking (id, order_id, logistics_type,
+                                   logistics_vendor, waybill_no, vendororder,
+                                   status, request_payload, response_payload,
+                                   create_time, update_time, create_status,
+                                   last_callback_payload)
+    values (#{id,jdbcType=CHAR}, #{orderId,jdbcType=VARCHAR}, #{logisticsType,jdbcType=VARCHAR},
+            #{logisticsVendor,jdbcType=VARCHAR}, #{waybillNo,jdbcType=VARCHAR}, #{vendororder,jdbcType=VARCHAR},
+            #{status,jdbcType=VARCHAR}, #{requestPayload,jdbcType=NVARCHAR}, #{responsePayload,jdbcType=NVARCHAR},
+            #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, #{createStatus,jdbcType=VARCHAR},
+            #{lastCallbackPayload,jdbcType=NVARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.qiyuan.web.entity.ShippingTracking">
     insert into shipping_tracking
@@ -152,6 +156,12 @@
       <if test="updateTime != null">
         update_time,
       </if>
+      <if test="createStatus != null">
+        create_status,
+      </if>
+      <if test="lastCallbackPayload != null">
+        last_callback_payload,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -186,6 +196,12 @@
       </if>
       <if test="updateTime != null">
         #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createStatus != null">
+        #{createStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="lastCallbackPayload != null">
+        #{lastCallbackPayload,jdbcType=NVARCHAR},
       </if>
     </trim>
   </insert>
@@ -231,6 +247,12 @@
       <if test="row.updateTime != null">
         update_time = #{row.updateTime,jdbcType=TIMESTAMP},
       </if>
+      <if test="row.createStatus != null">
+        create_status = #{row.createStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="row.lastCallbackPayload != null">
+        last_callback_payload = #{row.lastCallbackPayload,jdbcType=NVARCHAR},
+      </if>
     </set>
     <if test="example != null">
       <include refid="Update_By_Example_Where_Clause" />
@@ -239,16 +261,18 @@
   <update id="updateByExample" parameterType="map">
     update shipping_tracking
     set id = #{row.id,jdbcType=CHAR},
-      order_id = #{row.orderId,jdbcType=VARCHAR},
-      logistics_type = #{row.logisticsType,jdbcType=VARCHAR},
-      logistics_vendor = #{row.logisticsVendor,jdbcType=VARCHAR},
-      waybill_no = #{row.waybillNo,jdbcType=VARCHAR},
-      vendororder = #{row.vendororder,jdbcType=VARCHAR},
-      status = #{row.status,jdbcType=VARCHAR},
-      request_payload = #{row.requestPayload,jdbcType=NVARCHAR},
-      response_payload = #{row.responsePayload,jdbcType=NVARCHAR},
-      create_time = #{row.createTime,jdbcType=TIMESTAMP},
-      update_time = #{row.updateTime,jdbcType=TIMESTAMP}
+    order_id = #{row.orderId,jdbcType=VARCHAR},
+    logistics_type = #{row.logisticsType,jdbcType=VARCHAR},
+    logistics_vendor = #{row.logisticsVendor,jdbcType=VARCHAR},
+    waybill_no = #{row.waybillNo,jdbcType=VARCHAR},
+    vendororder = #{row.vendororder,jdbcType=VARCHAR},
+    status = #{row.status,jdbcType=VARCHAR},
+    request_payload = #{row.requestPayload,jdbcType=NVARCHAR},
+    response_payload = #{row.responsePayload,jdbcType=NVARCHAR},
+    create_time = #{row.createTime,jdbcType=TIMESTAMP},
+    update_time = #{row.updateTime,jdbcType=TIMESTAMP},
+    create_status = #{row.createStatus,jdbcType=VARCHAR},
+    last_callback_payload = #{row.lastCallbackPayload,jdbcType=NVARCHAR}
     <if test="example != null">
       <include refid="Update_By_Example_Where_Clause" />
     </if>
@@ -286,21 +310,29 @@
       <if test="updateTime != null">
         update_time = #{updateTime,jdbcType=TIMESTAMP},
       </if>
+      <if test="createStatus != null">
+        create_status = #{createStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="lastCallbackPayload != null">
+        last_callback_payload = #{lastCallbackPayload,jdbcType=NVARCHAR},
+      </if>
     </set>
     where id = #{id,jdbcType=CHAR}
   </update>
   <update id="updateByPrimaryKey" parameterType="com.qiyuan.web.entity.ShippingTracking">
     update shipping_tracking
     set order_id = #{orderId,jdbcType=VARCHAR},
-      logistics_type = #{logisticsType,jdbcType=VARCHAR},
-      logistics_vendor = #{logisticsVendor,jdbcType=VARCHAR},
-      waybill_no = #{waybillNo,jdbcType=VARCHAR},
-      vendororder = #{vendororder,jdbcType=VARCHAR},
-      status = #{status,jdbcType=VARCHAR},
-      request_payload = #{requestPayload,jdbcType=NVARCHAR},
-      response_payload = #{responsePayload,jdbcType=NVARCHAR},
-      create_time = #{createTime,jdbcType=TIMESTAMP},
-      update_time = #{updateTime,jdbcType=TIMESTAMP}
+        logistics_type = #{logisticsType,jdbcType=VARCHAR},
+        logistics_vendor = #{logisticsVendor,jdbcType=VARCHAR},
+        waybill_no = #{waybillNo,jdbcType=VARCHAR},
+        vendororder = #{vendororder,jdbcType=VARCHAR},
+        status = #{status,jdbcType=VARCHAR},
+        request_payload = #{requestPayload,jdbcType=NVARCHAR},
+        response_payload = #{responsePayload,jdbcType=NVARCHAR},
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+        create_status = #{createStatus,jdbcType=VARCHAR},
+        last_callback_payload = #{lastCallbackPayload,jdbcType=NVARCHAR}
     where id = #{id,jdbcType=CHAR}
   </update>
 </mapper>

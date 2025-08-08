@@ -2,6 +2,7 @@ package com.qiyuan.web.service;
 
 import com.qiyuan.security.config.ImagePathMappingConfig;
 import com.qiyuan.security.exception.ApiException;
+import com.qiyuan.web.controller.front.LogisticsFrontController;
 import com.qiyuan.web.dao.*;
 import com.qiyuan.web.dto.ExpressCreateResult;
 import com.qiyuan.web.dto.OrderItemVO;
@@ -13,6 +14,7 @@ import com.qiyuan.web.entity.*;
 import com.qiyuan.web.entity.example.OrderItemExample;
 import com.qiyuan.web.entity.example.OrdersExample;
 import com.qiyuan.web.entity.example.ShippingMethodExample;
+import com.qiyuan.web.entity.example.ShippingTrackingExample;
 import com.qiyuan.web.enums.OrderStatus;
 import com.qiyuan.web.enums.PaymentEnum;
 import com.qiyuan.web.enums.ProductImageType;
@@ -34,6 +36,7 @@ public class OrderAdminService {
     private final OrdersMapper ordersMapper;
     private final OrderItemMapper orderItemMapper;
     private final ShippingMethodMapper shippingMethodMapper;
+    private final ShippingTrackingMapper shippingTrackingMapper;
     private final UserMapper userMapper;
     private final StockService stockService;
     private final ImagePathMappingConfig mappingConfig;
@@ -52,7 +55,9 @@ public class OrderAdminService {
             throw new ApiException("訂單不存在");
         }
         List<OrderItem> items = getOrderItemsByOrderId(orderId);
-        return toOrderDetailVO(order, items);
+        OrderDetailVO orderDetailVO = toOrderDetailVO(order, items);
+        orderDetailVO.setTrackingNo(getTrackingNoByOrder(orderId));
+        return orderDetailVO;
     }
 
     // 批次變更訂單狀態
@@ -324,13 +329,14 @@ public class OrderAdminService {
                     .build();
             }).collect(Collectors.toList());
 
+
         return DeliveryNoteVO.builder()
                 .memberEmail(user.getEmail())
                 .shippingMethodCode(shippingMethod.getCode())
                 .shippingMethodName(shippingMethod.getName())
                 .homeDeliveryRecipient(homeDeliveryRecipientInfo)
                 .storePickupRecipient(storePickupRecipientInfo)
-                .trackingNo(order.getTrackingNo())
+                .trackingNo(getTrackingNoByOrder(orderId))
                 .orderId(order.getId())
                 .orderDate(order.getCreateTime())
                 .totalAmount(order.getTotalAmount())
@@ -338,6 +344,17 @@ public class OrderAdminService {
                 .remark(order.getRemark())
                 .items(itemVOList)
                 .build();
+    }
+
+    private String getTrackingNoByOrder(String orderId) {
+        ShippingTrackingExample ste = new ShippingTrackingExample();
+        ste.createCriteria().andOrderIdEqualTo(orderId);
+        List<ShippingTracking> shippingTrackings = shippingTrackingMapper.selectByExample(ste);
+        ShippingTracking target = shippingTrackings != null && shippingTrackings.size() > 0 ?
+                shippingTrackings.get(0) : null;
+        String trackingNo = target != null ?
+                StringUtils.defaultIfBlank(target.getWaybillNo(), target.getVendororder()) : null;
+        return trackingNo;
     }
 }
 

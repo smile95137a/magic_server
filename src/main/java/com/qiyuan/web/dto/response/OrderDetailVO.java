@@ -19,9 +19,9 @@ public class OrderDetailVO {
     private BigDecimal totalAmount;
     private String status;
     private String paymentStatus;
-    private String shippingMethod;
     private String invoiceType;
     private String invoiceTarget;
+    private String shippingMethod;
     private String recipientName;
     private String recipientPhone;
     private String recipientAddress;
