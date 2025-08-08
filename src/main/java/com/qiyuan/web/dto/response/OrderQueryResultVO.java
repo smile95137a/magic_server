@@ -20,7 +20,9 @@ public class OrderQueryResultVO {
     private String providerOrderNo; // 金流訂單
     private String paymentStatus; // 付款狀態
     private String shippingMethodName; // 物流方式
-    private String trackingNo; // 物流編號
+    private String trackingNo;
+    private String logisticsStatus; // 物流訂單狀態
+    private String logisticsRecordStatus; // 萬事達物流回傳的狀態碼
     private String invoiceType; // 發票類型
     private String invoiceStatus; // 發票狀態
     private Date createTime;

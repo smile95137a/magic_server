@@ -11,6 +11,7 @@ import java.util.Date;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+
 public class ShippingTracking {
     private String id;
 
@@ -33,6 +34,10 @@ public class ShippingTracking {
     private Date createTime;
 
     private Date updateTime;
+
+    private String createStatus;
+
+    private String lastCallbackPayload;
 
     public String getId() {
         return id;
@@ -120,5 +125,21 @@ public class ShippingTracking {
 
     public void setUpdateTime(Date updateTime) {
         this.updateTime = updateTime;
+    }
+
+    public String getCreateStatus() {
+        return createStatus;
+    }
+
+    public void setCreateStatus(String createStatus) {
+        this.createStatus = createStatus;
+    }
+
+    public String getLastCallbackPayload() {
+        return lastCallbackPayload;
+    }
+
+    public void setLastCallbackPayload(String lastCallbackPayload) {
+        this.lastCallbackPayload = lastCallbackPayload;
     }
 }

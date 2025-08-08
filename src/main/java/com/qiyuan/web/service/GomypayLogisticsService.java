@@ -28,6 +28,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -95,7 +96,7 @@ public class GomypayLogisticsService {
                 .orderId(req.getOrderId())
                 .waybillNo(dto.getOrderNo())
                 .vendororder(dto.getVendororder())
-                .status(OrderStatus.CREATED.getValue())
+                .createStatus(OrderStatus.CREATED.getValue())
                 .requestPayload(params.toString())
                 .responsePayload(dto.toString())
                 .createTime(new Date())
@@ -201,8 +202,8 @@ public class GomypayLogisticsService {
                             .logisticsType("EXPRESS")
                             .logisticsVendor("EXPRESS")
                             .orderId(req.getOrderId())
-                            .waybillNo(result.getSfWaybillNo())
-                            .status(OrderStatus.CREATED.getValue())
+                            .vendororder(result.getSfWaybillNo())
+                            .createStatus(OrderStatus.CREATED.getValue())
                             .requestPayload(params.toString())
                             .responsePayload(result.toString())
                             .createTime(new Date())
@@ -229,8 +230,19 @@ public class GomypayLogisticsService {
     }
 
     public boolean updateLogisticsStatus(String eshopId, String orderNo, String status) {
-        // TODO
-        return true;
+        ShippingTrackingExample e = new ShippingTrackingExample();
+        e.createCriteria().andWaybillNoEqualTo(orderNo);
+        List<ShippingTracking> trackings = shippingTrackingMapper.selectByExample(e);
+        if (trackings == null || trackings.size() == 0) {
+            throw new ApiException("查無物流訂單");
+        }
 
+        ShippingTracking target = new ShippingTracking();
+        target.setId(trackings.get(0).getId());
+        target.setStatus(status);
+        target.setLastCallbackPayload(String.format("EshopId:%s,OrderNo:%s,status:%s", eshopId, orderNo, status));
+
+        shippingTrackingMapper.updateByPrimaryKeySelective(target);
+        return true;
     }
 }

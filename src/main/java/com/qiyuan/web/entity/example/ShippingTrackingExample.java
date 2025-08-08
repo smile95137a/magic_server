@@ -854,6 +854,146 @@ public class ShippingTrackingExample {
             addCriterion("update_time not between", value1, value2, "updateTime");
             return (Criteria) this;
         }
+
+        public Criteria andCreateStatusIsNull() {
+            addCriterion("create_status is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andCreateStatusIsNotNull() {
+            addCriterion("create_status is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andCreateStatusEqualTo(String value) {
+            addCriterion("create_status =", value, "createStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andCreateStatusNotEqualTo(String value) {
+            addCriterion("create_status <>", value, "createStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andCreateStatusGreaterThan(String value) {
+            addCriterion("create_status >", value, "createStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andCreateStatusGreaterThanOrEqualTo(String value) {
+            addCriterion("create_status >=", value, "createStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andCreateStatusLessThan(String value) {
+            addCriterion("create_status <", value, "createStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andCreateStatusLessThanOrEqualTo(String value) {
+            addCriterion("create_status <=", value, "createStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andCreateStatusLike(String value) {
+            addCriterion("create_status like", value, "createStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andCreateStatusNotLike(String value) {
+            addCriterion("create_status not like", value, "createStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andCreateStatusIn(List<String> values) {
+            addCriterion("create_status in", values, "createStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andCreateStatusNotIn(List<String> values) {
+            addCriterion("create_status not in", values, "createStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andCreateStatusBetween(String value1, String value2) {
+            addCriterion("create_status between", value1, value2, "createStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andCreateStatusNotBetween(String value1, String value2) {
+            addCriterion("create_status not between", value1, value2, "createStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andLastCallbackPayloadIsNull() {
+            addCriterion("last_callback_payload is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andLastCallbackPayloadIsNotNull() {
+            addCriterion("last_callback_payload is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andLastCallbackPayloadEqualTo(String value) {
+            addCriterion("last_callback_payload =", value, "lastCallbackPayload");
+            return (Criteria) this;
+        }
+
+        public Criteria andLastCallbackPayloadNotEqualTo(String value) {
+            addCriterion("last_callback_payload <>", value, "lastCallbackPayload");
+            return (Criteria) this;
+        }
+
+        public Criteria andLastCallbackPayloadGreaterThan(String value) {
+            addCriterion("last_callback_payload >", value, "lastCallbackPayload");
+            return (Criteria) this;
+        }
+
+        public Criteria andLastCallbackPayloadGreaterThanOrEqualTo(String value) {
+            addCriterion("last_callback_payload >=", value, "lastCallbackPayload");
+            return (Criteria) this;
+        }
+
+        public Criteria andLastCallbackPayloadLessThan(String value) {
+            addCriterion("last_callback_payload <", value, "lastCallbackPayload");
+            return (Criteria) this;
+        }
+
+        public Criteria andLastCallbackPayloadLessThanOrEqualTo(String value) {
+            addCriterion("last_callback_payload <=", value, "lastCallbackPayload");
+            return (Criteria) this;
+        }
+
+        public Criteria andLastCallbackPayloadLike(String value) {
+            addCriterion("last_callback_payload like", value, "lastCallbackPayload");
+            return (Criteria) this;
+        }
+
+        public Criteria andLastCallbackPayloadNotLike(String value) {
+            addCriterion("last_callback_payload not like", value, "lastCallbackPayload");
+            return (Criteria) this;
+        }
+
+        public Criteria andLastCallbackPayloadIn(List<String> values) {
+            addCriterion("last_callback_payload in", values, "lastCallbackPayload");
+            return (Criteria) this;
+        }
+
+        public Criteria andLastCallbackPayloadNotIn(List<String> values) {
+            addCriterion("last_callback_payload not in", values, "lastCallbackPayload");
+            return (Criteria) this;
+        }
+
+        public Criteria andLastCallbackPayloadBetween(String value1, String value2) {
+            addCriterion("last_callback_payload between", value1, value2, "lastCallbackPayload");
+            return (Criteria) this;
+        }
+
+        public Criteria andLastCallbackPayloadNotBetween(String value1, String value2) {
+            addCriterion("last_callback_payload not between", value1, value2, "lastCallbackPayload");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {
