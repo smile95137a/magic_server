@@ -4,7 +4,7 @@
   <resultMap id="BaseResultMap" type="com.qiyuan.web.entity.SystemConfig">
     <id column="id" jdbcType="INTEGER" property="id" />
     <result column="config_key" jdbcType="VARCHAR" property="configKey" />
-    <result column="config_value" jdbcType="VARCHAR" property="configValue" />
+    <result column="config_value" jdbcType="NVARCHAR" property="configValue" />
     <result column="description" jdbcType="NVARCHAR" property="description" />
     <result column="data_type" jdbcType="VARCHAR" property="dataType" />
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
@@ -105,7 +105,7 @@
     insert into system_config (id, config_key, config_value, 
       description, data_type, create_time, 
       update_time)
-    values (#{id,jdbcType=INTEGER}, #{configKey,jdbcType=VARCHAR}, #{configValue,jdbcType=VARCHAR}, 
+    values (#{id,jdbcType=INTEGER}, #{configKey,jdbcType=VARCHAR}, #{configValue,jdbcType=NVARCHAR},
       #{description,jdbcType=NVARCHAR}, #{dataType,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, 
       #{updateTime,jdbcType=TIMESTAMP})
   </insert>
@@ -142,7 +142,7 @@
         #{configKey,jdbcType=VARCHAR},
       </if>
       <if test="configValue != null">
-        #{configValue,jdbcType=VARCHAR},
+        #{configValue,jdbcType=NVARCHAR},
       </if>
       <if test="description != null">
         #{description,jdbcType=NVARCHAR},
@@ -174,7 +174,7 @@
         config_key = #{record.configKey,jdbcType=VARCHAR},
       </if>
       <if test="record.configValue != null">
-        config_value = #{record.configValue,jdbcType=VARCHAR},
+        config_value = #{record.configValue,jdbcType=NVARCHAR},
       </if>
       <if test="record.description != null">
         description = #{record.description,jdbcType=NVARCHAR},
@@ -197,7 +197,7 @@
     update system_config
     set id = #{record.id,jdbcType=INTEGER},
       config_key = #{record.configKey,jdbcType=VARCHAR},
-      config_value = #{record.configValue,jdbcType=VARCHAR},
+      config_value = #{record.configValue,jdbcType=NVARCHAR},
       description = #{record.description,jdbcType=NVARCHAR},
       data_type = #{record.dataType,jdbcType=VARCHAR},
       create_time = #{record.createTime,jdbcType=TIMESTAMP},
@@ -213,7 +213,7 @@
         config_key = #{configKey,jdbcType=VARCHAR},
       </if>
       <if test="configValue != null">
-        config_value = #{configValue,jdbcType=VARCHAR},
+        config_value = #{configValue,jdbcType=NVARCHAR},
       </if>
       <if test="description != null">
         description = #{description,jdbcType=NVARCHAR},
@@ -233,7 +233,7 @@
   <update id="updateByPrimaryKey" parameterType="com.qiyuan.web.entity.SystemConfig">
     update system_config
     set config_key = #{configKey,jdbcType=VARCHAR},
-      config_value = #{configValue,jdbcType=VARCHAR},
+      config_value = #{configValue,jdbcType=NVARCHAR},
       description = #{description,jdbcType=NVARCHAR},
       data_type = #{dataType,jdbcType=VARCHAR},
       create_time = #{createTime,jdbcType=TIMESTAMP},

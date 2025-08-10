@@ -493,7 +493,7 @@
       o.total_amount,
       p.provider_order_no,
       CASE WHEN o.paid = 1 THEN N'已付款' ELSE N'未付款' END AS payment_status,
-      p.status,
+      o.status,
       s.name AS shipping_method_name,
       o.invoice_type,
       CASE WHEN i.invoice_number IS NOT NULL THEN N'已開立' ELSE N'未開立' END AS invoice_status,
