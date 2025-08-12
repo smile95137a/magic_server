@@ -25,6 +25,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
@@ -94,7 +95,7 @@ public class InvoiceServiceImpl implements InvoiceService {
 
 
     @Override
-    @Transactional
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public InvoiceVo issueInvoice(String paymentId) {
         PaymentTransaction tx = paymentTransactionMapper.selectByPrimaryKey(paymentId);
         SourceTypeEnum typeEnum = SourceTypeEnum.fromCode(tx.getSourceType());
