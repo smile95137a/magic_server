@@ -1,13 +1,14 @@
 package com.qiyuan.web.dto.response;
 
-import lombok.Data;
-import lombok.ToString;
 import com.fasterxml.jackson.annotation.JsonProperty;
+
+import lombok.Builder;
 import lombok.Data;
 import lombok.ToString;
 
 @Data
 @ToString
+@Builder
 public class IssueInvoiceResponse {
 
     /**

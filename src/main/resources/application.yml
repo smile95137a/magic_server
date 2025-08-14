@@ -7,6 +7,9 @@ server:
     key-store-type: PKCS12
     key-alias: tomcat
 
+qiyuan:
+   mock-einvoice: true
+
 
 spring:
   application:

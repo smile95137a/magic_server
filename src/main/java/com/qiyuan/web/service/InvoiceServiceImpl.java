@@ -12,15 +12,13 @@ import org.apache.hc.client5.http.config.RequestConfig;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.apache.hc.client5.http.impl.classic.HttpClients;
 import org.apache.hc.core5.util.Timeout;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.springframework.core.env.Environment;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
@@ -74,6 +72,12 @@ public class InvoiceServiceImpl implements InvoiceService {
     private final PaymentTransactionMapper paymentTransactionMapper;
     private final GomypayEinvoiceProperties einvoiceProps;
     private final RestTemplate restTemplate;
+    private final Environment environment;
+    
+    private boolean isMockEinvoice() {
+        return Boolean.parseBoolean(environment.getProperty("qiyuan.mock-einvoice", "false"));
+    }
+
     
     private RestTemplate createNoMtlsRestTemplate() {
         RequestConfig config = RequestConfig.custom()
@@ -177,29 +181,45 @@ public class InvoiceServiceImpl implements InvoiceService {
 
             HttpEntity<IssueInvoiceDto> request = new HttpEntity<>(invoiceDto, headers);
 
-         // ===== 發送前 log =====
-            System.out.println("[EINV][Issue] URL=" + addUrl +
-                    ", headers=" + headers +
-                    ", payload=" + JsonUtil.toJson(invoiceDto));
+            IssueInvoiceResponse result;
 
-            long start = System.currentTimeMillis();
+            if (isMockEinvoice()) {
+            	  log.warn("[MOCK] 偵測到 mock-einvoice 環境，模擬回傳成功發票");
 
-            RestTemplate noMtlsRt = createNoMtlsRestTemplate();
-            ResponseEntity<IssueInvoiceResponse> response =
-                    noMtlsRt.postForEntity(addUrl, request, IssueInvoiceResponse.class);
+            	    result = IssueInvoiceResponse.builder()
+            	            .result("1")
+            	            .message("模擬成功")
+            	            .invoiceNumber("ZZ99999999")
+            	            .invoiceDate(DateFormatUtils.format(new Date(), "yyyy/MM/dd"))
+            	            .invoiceTime(DateFormatUtils.format(new Date(), "HH:mm:ss"))
+            	            .randomNumber("8888")
+            	            .taxAmount("5")
+            	            .totalAmount("100")
+            	            .description("模擬商品A,模擬商品B")
+            	            .quantity("1,2")
+            	            .unitPrice("50,25")
+            	            .amount("50,50")
+            	            .aes("MOCK_AES_KEY")
+            	            .additionalInformationType("API")
+            	            .build();
 
-            long cost = System.currentTimeMillis() - start;
+            } else {
+                RestTemplate noMtlsRt = createNoMtlsRestTemplate();
+                long start = System.currentTimeMillis();
 
-            // ===== 發送後 log =====
-            System.out.println("[EINV][Issue] status=" + response.getStatusCodeValue() +
-                    ", costMs=" + cost +
-                    ", body=" + JsonUtil.toJson(response.getBody()));
+                ResponseEntity<IssueInvoiceResponse> response =
+                        noMtlsRt.postForEntity(addUrl, request, IssueInvoiceResponse.class);
 
-            IssueInvoiceResponse result = response.getBody();
+                long cost = System.currentTimeMillis() - start;
 
-            if (!response.getStatusCode().is2xxSuccessful() || result == null) {
-            	log.error("發票開立失敗，HTTP狀態碼: {}, 回傳為空或格式錯誤", response.getStatusCode());
-                throw new ApiException("發票驗證失敗，無法取得有效回應");
+                log.info("[EINV][Issue] status={}, costMs={}, body={}",
+                        response.getStatusCodeValue(), cost, JsonUtil.toJson(response.getBody()));
+
+                result = response.getBody();
+
+                if (!response.getStatusCode().is2xxSuccessful() || result == null) {
+                    throw new ApiException("發票驗證失敗，無法取得有效回應");
+                }
             }
 
             if ("1".equals(result.getResult())) {
