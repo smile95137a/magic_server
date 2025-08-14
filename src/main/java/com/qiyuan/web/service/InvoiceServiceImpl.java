@@ -77,8 +77,14 @@ public class InvoiceServiceImpl implements InvoiceService {
     private final RestTemplate restTemplate;
     
     private RestTemplate createNoMtlsRestTemplate() {
-        return new RestTemplate();
+        HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory();
+        factory.setConnectTimeout(10000);          
+        factory.setReadTimeout(10000);              
+        factory.setConnectionRequestTimeout(10000); 
+
+        return new RestTemplate(factory);
     }
+
 
     @Override
     public boolean validateInfo(InvoiceType type, String code) {
