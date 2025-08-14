@@ -243,11 +243,9 @@ public class InvoiceServiceImpl implements InvoiceService {
         String userId = target.getUserId();
         User user = userMapper.selectByPrimaryKey(userId);
         invoice.setBuyerEmailAddress(user.getEmail());
-
+        invoice.setTaxRate("0.05");
         if (invoiceType.equals(InvoiceType.COMPANY)) {
             invoice.setBuyerIdentifier(target.getInvoiceTarget()); // 統編
-            invoice.setTaxRate("0.05");
-
         } else if (invoiceType.equals(InvoiceType.DONATION)) {
             invoice.setNPOBAN(target.getInvoiceTarget());
         } else if  (invoiceType.equals(InvoiceType.MOBILE)) {
@@ -312,10 +310,9 @@ public class InvoiceServiceImpl implements InvoiceService {
         String userId = target.getUserId();
         User user = userMapper.selectByPrimaryKey(userId);
         invoice.setBuyerEmailAddress(user.getEmail());
-
+        invoice.setTaxRate("0.05");
         if (invoiceType.equals(InvoiceType.COMPANY)) {
             invoice.setBuyerIdentifier(target.getInvoiceTarget()); // 統編
-            invoice.setTaxRate("0.05");
         } else if (invoiceType.equals(InvoiceType.DONATION)) {
             invoice.setNPOBAN(target.getInvoiceTarget());
         } else if  (invoiceType.equals(InvoiceType.MOBILE)) {
