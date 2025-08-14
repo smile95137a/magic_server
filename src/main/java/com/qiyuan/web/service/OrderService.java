@@ -1,20 +1,11 @@
 package com.qiyuan.web.service;
 
-import com.qiyuan.security.config.ImagePathMappingConfig;
-import com.qiyuan.security.exception.ApiException;
-import com.qiyuan.web.dao.*;
-import com.qiyuan.web.dto.CreateOrderItem;
-import com.qiyuan.web.dto.OrderItemVO;
-import com.qiyuan.web.dto.request.*;
-import com.qiyuan.web.dto.response.*;
-import com.qiyuan.web.entity.*;
-import com.qiyuan.web.entity.example.OrderItemExample;
-import com.qiyuan.web.entity.example.OrdersExample;
-import com.qiyuan.web.entity.example.ShippingMethodExample;
-import com.qiyuan.web.enums.*;
-import com.qiyuan.web.util.DateUtil;
-import com.qiyuan.web.util.RandomGenerator;
-import com.qiyuan.web.util.SecurityUtils;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.slf4j.Logger;
@@ -22,14 +13,49 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Locale;
+import com.qiyuan.security.config.ImagePathMappingConfig;
+import com.qiyuan.security.exception.ApiException;
+import com.qiyuan.web.dao.OrderItemMapper;
+import com.qiyuan.web.dao.OrdersMapper;
+import com.qiyuan.web.dao.PaymentTransactionMapper;
+import com.qiyuan.web.dao.ProductMapper;
+import com.qiyuan.web.dao.ShippingMethodMapper;
+import com.qiyuan.web.dao.UserMapper;
+import com.qiyuan.web.dto.CreateOrderItem;
+import com.qiyuan.web.dto.OrderItemVO;
+import com.qiyuan.web.dto.request.CancelOrderRequest;
+import com.qiyuan.web.dto.request.CreateOrderRequest;
+import com.qiyuan.web.dto.request.HomeDeliveryRecipientInfo;
+import com.qiyuan.web.dto.request.PaySuccessRequest;
+import com.qiyuan.web.dto.request.QueryOrderRequest;
+import com.qiyuan.web.dto.request.StorePickupRecipientInfo;
+import com.qiyuan.web.dto.response.CreateOrderResponse;
+import com.qiyuan.web.dto.response.OrderDetailVO;
+import com.qiyuan.web.dto.response.OrderVO;
+import com.qiyuan.web.dto.response.ShippingMethodVO;
+import com.qiyuan.web.entity.OrderItem;
+import com.qiyuan.web.entity.Orders;
+import com.qiyuan.web.entity.PaymentTransaction;
+import com.qiyuan.web.entity.Product;
+import com.qiyuan.web.entity.ShippingMethod;
+import com.qiyuan.web.entity.User;
+import com.qiyuan.web.entity.example.OrderItemExample;
+import com.qiyuan.web.entity.example.OrdersExample;
+import com.qiyuan.web.entity.example.ShippingMethodExample;
+import com.qiyuan.web.enums.OrderStatus;
+import com.qiyuan.web.enums.PayMethodEnum;
+import com.qiyuan.web.enums.PaymentEnum;
+import com.qiyuan.web.enums.ProductImageType;
+import com.qiyuan.web.enums.SourceTypeEnum;
+import com.qiyuan.web.util.DateUtil;
+import com.qiyuan.web.util.RandomGenerator;
+import com.qiyuan.web.util.SecurityUtils;
+
+import lombok.RequiredArgsConstructor;
 
 
 @Service
+@RequiredArgsConstructor
 public class OrderService {
 
     private static final Logger logger = LoggerFactory.getLogger(OrderService.class);
@@ -44,19 +70,6 @@ public class OrderService {
     private final StockService stockService;
     private final ImagePathMappingConfig mappingConfig;
     private final InvoiceService invoiceService;
-
-    public OrderService(OrdersMapper ordersMapper, OrderItemMapper orderItemMapper, ShippingMethodMapper shippingMethodMapper, UserMapper userMapper, ProductMapper productMapper, PaymentTransactionMapper paymentTransactionMapper, PaymentService paymentService, StockService stockService, ImagePathMappingConfig mappingConfig, InvoiceService invoiceService) {
-        this.ordersMapper = ordersMapper;
-        this.orderItemMapper = orderItemMapper;
-        this.shippingMethodMapper = shippingMethodMapper;
-        this.userMapper = userMapper;
-        this.productMapper = productMapper;
-        this.paymentTransactionMapper = paymentTransactionMapper;
-        this.paymentService = paymentService;
-        this.stockService = stockService;
-        this.mappingConfig = mappingConfig;
-        this.invoiceService = invoiceService;
-    }
 
     @Transactional
     public CreateOrderResponse createOrder(CreateOrderRequest request) {

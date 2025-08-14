@@ -135,7 +135,7 @@ public class InvoiceServiceImpl implements InvoiceService {
 
 
     @Override
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @Transactional
     public InvoiceVo issueInvoice(String paymentId) {
         PaymentTransaction tx = paymentTransactionMapper.selectByPrimaryKey(paymentId);
         SourceTypeEnum typeEnum = SourceTypeEnum.fromCode(tx.getSourceType());
