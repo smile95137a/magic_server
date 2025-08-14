@@ -197,8 +197,8 @@ public class InvoiceServiceImpl implements InvoiceService {
             	            .totalAmount("100")
             	            .description("模擬商品A,模擬商品B")
             	            .quantity("1,2")
-            	            .unitPrice("50,25")
-            	            .amount("50,50")
+            	            .unitPrice("50")
+            	            .amount("50")
             	            .aes("MOCK_AES_KEY")
             	            .additionalInformationType("API")
             	            .build();
