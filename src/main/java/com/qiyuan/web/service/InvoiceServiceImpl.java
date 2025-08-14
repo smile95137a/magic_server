@@ -234,7 +234,7 @@ public class InvoiceServiceImpl implements InvoiceService {
             }
 
         } catch (Exception e) {
-            logger.error("呼叫發票開立API 發生錯誤: {}", e.getMessage(), e);
+            log.error("呼叫發票開立API 發生錯誤: {}", e.getMessage(), e);
             throw new ApiException("發票驗證失敗：" + e.getMessage());
         }
     }
