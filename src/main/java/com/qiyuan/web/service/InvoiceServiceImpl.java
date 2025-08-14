@@ -53,15 +53,17 @@ import com.qiyuan.web.enums.InvoiceType;
 import com.qiyuan.web.enums.OrderStatus;
 import com.qiyuan.web.enums.SourceTypeEnum;
 import com.qiyuan.web.util.DateUtil;
+import com.qiyuan.web.util.JsonUtil;
 import com.qiyuan.web.util.RandomGenerator;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class InvoiceServiceImpl implements InvoiceService {
 
-    private static final Logger logger = LoggerFactory.getLogger(InvoiceServiceImpl.class);
 
     private final InvoiceMapper invoiceMapper;
     private final UserMapper userMapper;
@@ -114,19 +116,19 @@ public class InvoiceServiceImpl implements InvoiceService {
             InvoiceValidationResult result = response.getBody();
 
             if (!response.getStatusCode().is2xxSuccessful() || result == null) {
-                logger.error("發票驗證失敗，HTTP狀態碼: {}, 回傳為空或格式錯誤", response.getStatusCode());
+            	log.error("發票驗證失敗，HTTP狀態碼: {}, 回傳為空或格式錯誤", response.getStatusCode());
                 throw new ApiException("發票驗證失敗，無法取得有效回應");
             }
 
             if ("1".equals(result.getResult())) {
                 return true;
             } else {
-                logger.warn("發票驗證未通過，訊息: {}", result.getMessage());
+                log.warn("發票驗證未通過，訊息: {}", result.getMessage());
                 throw new ApiException(result.getMessage());
             }
 
         } catch (Exception e) {
-            logger.error("呼叫發票驗證 API 發生錯誤: {}", e.getMessage(), e);
+        	log.error("呼叫發票驗證 API 發生錯誤: {}", e.getMessage(), e);
             throw new ApiException("發票驗證失敗：" + e.getMessage());
         }
     }
@@ -176,14 +178,25 @@ public class InvoiceServiceImpl implements InvoiceService {
             HttpEntity<IssueInvoiceDto> request = new HttpEntity<>(invoiceDto, headers);
 
             
+            // ===== 發送前 log =====
+            log.info("[EINV][Issue] URL={}, headers={}, payload={}",
+                    addUrl, headers, JsonUtil.toJson(invoiceDto));
+            long start = System.currentTimeMillis();
+
             RestTemplate noMtlsRt = createNoMtlsRestTemplate();
             ResponseEntity<IssueInvoiceResponse> response =
                     noMtlsRt.postForEntity(addUrl, request, IssueInvoiceResponse.class);
 
+            long cost = System.currentTimeMillis() - start;
+
+            // ===== 發送後 log =====
+            log.info("[EINV][Issue] status={}, costMs={}, body={}",
+                    response.getStatusCodeValue(), cost, JsonUtil.toJson(response.getBody()));
+
             IssueInvoiceResponse result = response.getBody();
 
             if (!response.getStatusCode().is2xxSuccessful() || result == null) {
-                logger.error("發票開立失敗，HTTP狀態碼: {}, 回傳為空或格式錯誤", response.getStatusCode());
+            	log.error("發票開立失敗，HTTP狀態碼: {}, 回傳為空或格式錯誤", response.getStatusCode());
                 throw new ApiException("發票驗證失敗，無法取得有效回應");
             }
 
@@ -215,8 +228,8 @@ public class InvoiceServiceImpl implements InvoiceService {
                         .randomNumber(result.getRandomNumber())
                         .build();
             } else {
-                logger.error("發票開立失敗，訊息: {}", result.getMessage());
-                logger.error(result.toString());
+            	log.error("發票開立失敗，訊息: {}", result.getMessage());
+            	log.error(result.toString());
                 throw new ApiException(result.getMessage());
             }
 
