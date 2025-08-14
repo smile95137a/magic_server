@@ -98,6 +98,11 @@ public class InvoiceServiceImpl implements InvoiceService {
 
     @Override
     public boolean validateInfo(InvoiceType type, String code) {
+	   if (isMockEinvoice()) {
+	        log.warn("[MOCK] 偵測到 mock-einvoice 環境，跳過發票驗證邏輯");
+	        return true;
+	    }
+
         InvoiceValidationDto dto = InvoiceValidationDto.builder()
                 .Code(code)
                 .check_pwd(einvoiceProps.getPwd())
