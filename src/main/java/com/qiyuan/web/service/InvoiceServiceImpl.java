@@ -1,12 +1,53 @@
 package com.qiyuan.web.service;
 
+import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
+import java.util.stream.Collectors;
+
+import javax.net.ssl.SSLContext;
+
+import org.apache.commons.lang3.time.DateFormatUtils;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.HttpClients;
+import org.apache.hc.client5.http.ssl.DefaultHostnameVerifier;
+import org.apache.hc.client5.http.ssl.SSLConnectionSocketFactory;
+import org.apache.hc.core5.ssl.SSLContextBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
+
 import com.qiyuan.security.exception.ApiException;
 import com.qiyuan.web.config.GomypayEinvoiceProperties;
-import com.qiyuan.web.dao.*;
+import com.qiyuan.web.dao.InvoiceMapper;
+import com.qiyuan.web.dao.OrderItemMapper;
+import com.qiyuan.web.dao.OrdersMapper;
+import com.qiyuan.web.dao.PaymentTransactionMapper;
+import com.qiyuan.web.dao.UserMapper;
+import com.qiyuan.web.dao.VirtualOrderItemMapper;
+import com.qiyuan.web.dao.VirtualOrdersMapper;
 import com.qiyuan.web.dto.InvoiceValidationDto;
 import com.qiyuan.web.dto.request.IssueInvoiceDto;
-import com.qiyuan.web.dto.response.*;
-import com.qiyuan.web.entity.*;
+import com.qiyuan.web.dto.response.InvoiceValidationResult;
+import com.qiyuan.web.dto.response.InvoiceVo;
+import com.qiyuan.web.dto.response.IssueInvoiceResponse;
+import com.qiyuan.web.entity.Invoice;
+import com.qiyuan.web.entity.OrderItem;
+import com.qiyuan.web.entity.Orders;
+import com.qiyuan.web.entity.PaymentTransaction;
+import com.qiyuan.web.entity.User;
+import com.qiyuan.web.entity.VirtualOrderItem;
+import com.qiyuan.web.entity.VirtualOrders;
 import com.qiyuan.web.entity.example.OrderItemExample;
 import com.qiyuan.web.entity.example.OrdersExample;
 import com.qiyuan.web.entity.example.VirtualOrderItemExample;
@@ -16,25 +57,8 @@ import com.qiyuan.web.enums.OrderStatus;
 import com.qiyuan.web.enums.SourceTypeEnum;
 import com.qiyuan.web.util.DateUtil;
 import com.qiyuan.web.util.RandomGenerator;
-import lombok.RequiredArgsConstructor;
-import org.apache.commons.lang3.time.DateFormatUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.client.RestTemplate;
 
-import java.math.BigDecimal;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
-import java.util.Locale;
-import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
@@ -51,6 +75,10 @@ public class InvoiceServiceImpl implements InvoiceService {
     private final PaymentTransactionMapper paymentTransactionMapper;
     private final GomypayEinvoiceProperties einvoiceProps;
     private final RestTemplate restTemplate;
+    
+    private RestTemplate createNoMtlsRestTemplate() {
+        return new RestTemplate();
+    }
 
     @Override
     public boolean validateInfo(InvoiceType type, String code) {
@@ -137,8 +165,10 @@ public class InvoiceServiceImpl implements InvoiceService {
 
             HttpEntity<IssueInvoiceDto> request = new HttpEntity<>(invoiceDto, headers);
 
+            
+            RestTemplate noMtlsRt = createNoMtlsRestTemplate();
             ResponseEntity<IssueInvoiceResponse> response =
-                    restTemplate.postForEntity(addUrl, request, IssueInvoiceResponse.class);
+                    noMtlsRt.postForEntity(addUrl, request, IssueInvoiceResponse.class);
 
             IssueInvoiceResponse result = response.getBody();
 
