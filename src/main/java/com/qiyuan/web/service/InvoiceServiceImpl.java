@@ -7,14 +7,10 @@ import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
 
-import javax.net.ssl.SSLContext;
-
 import org.apache.commons.lang3.time.DateFormatUtils;
+import org.apache.hc.client5.http.config.RequestConfig;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.apache.hc.client5.http.impl.classic.HttpClients;
-import org.apache.hc.client5.http.ssl.DefaultHostnameVerifier;
-import org.apache.hc.client5.http.ssl.SSLConnectionSocketFactory;
-import org.apache.hc.core5.ssl.SSLContextBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpEntity;
@@ -75,12 +71,19 @@ public class InvoiceServiceImpl implements InvoiceService {
     private final PaymentTransactionMapper paymentTransactionMapper;
     private final GomypayEinvoiceProperties einvoiceProps;
     private final RestTemplate restTemplate;
-    
     private RestTemplate createNoMtlsRestTemplate() {
-        HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory();
-        factory.setConnectTimeout(10000);          
-        factory.setReadTimeout(10000);              
-        factory.setConnectionRequestTimeout(10000); 
+        RequestConfig config = RequestConfig.custom()
+                .setConnectTimeout(10000)             // TCP 連線建立超時
+                .setSocketTimeout(10000)              // 讀取資料超時
+                .setConnectionRequestTimeout(10000)   // 從連線池取連線超時
+                .build();
+
+        CloseableHttpClient httpClient = HttpClients.custom()
+                .setDefaultRequestConfig(config)
+                .build();
+
+        HttpComponentsClientHttpRequestFactory factory =
+                new HttpComponentsClientHttpRequestFactory(httpClient);
 
         return new RestTemplate(factory);
     }
