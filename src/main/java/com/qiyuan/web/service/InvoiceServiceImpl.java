@@ -177,10 +177,11 @@ public class InvoiceServiceImpl implements InvoiceService {
 
             HttpEntity<IssueInvoiceDto> request = new HttpEntity<>(invoiceDto, headers);
 
-            
-            // ===== 發送前 log =====
-            log.info("[EINV][Issue] URL={}, headers={}, payload={}",
-                    addUrl, headers, JsonUtil.toJson(invoiceDto));
+         // ===== 發送前 log =====
+            System.out.println("[EINV][Issue] URL=" + addUrl +
+                    ", headers=" + headers +
+                    ", payload=" + JsonUtil.toJson(invoiceDto));
+
             long start = System.currentTimeMillis();
 
             RestTemplate noMtlsRt = createNoMtlsRestTemplate();
@@ -190,8 +191,9 @@ public class InvoiceServiceImpl implements InvoiceService {
             long cost = System.currentTimeMillis() - start;
 
             // ===== 發送後 log =====
-            log.info("[EINV][Issue] status={}, costMs={}, body={}",
-                    response.getStatusCodeValue(), cost, JsonUtil.toJson(response.getBody()));
+            System.out.println("[EINV][Issue] status=" + response.getStatusCodeValue() +
+                    ", costMs=" + cost +
+                    ", body=" + JsonUtil.toJson(response.getBody()));
 
             IssueInvoiceResponse result = response.getBody();
 
