@@ -237,10 +237,31 @@ public class GodService {
         String offeringJson = godInfo.getOfferingList();
         if (StringUtils.isNotBlank(offeringJson)) {
             try {
-                List<OfferingStateVO> offerings = JsonUtil.fromJsonList(offeringJson, OfferingStateVO.class);
-                List<Offering> offeringList = offeringService.getOfferingByIds(offerings.stream().map(OfferingStateVO::getId).collect(Collectors.toList()));
-                List<OfferingVO> offeringVOList = offeringList.stream().map(offeringService::convertToVo).collect(Collectors.toList());
-                vo.setOfferings(offeringVOList);
+            	List<OfferingStateVO> states = JsonUtil.fromJsonList(offeringJson, OfferingStateVO.class);
+
+            	List<String> distinctIds = states.stream()
+            	        .map(OfferingStateVO::getId)
+            	        .filter(StringUtils::isNotBlank)
+            	        .distinct()
+            	        .collect(Collectors.toList());
+
+            	List<Offering> found = distinctIds.isEmpty()
+            	        ? Collections.emptyList()
+            	        : offeringService.getOfferingByIds(distinctIds);
+
+            	Map<String, OfferingVO> idToVO = found.stream()
+            	        .collect(Collectors.toMap(Offering::getId, o -> offeringService.convertToVo(o)));
+
+            	List<OfferingVO> offeringVOList = new ArrayList<>(states.size());
+            	for (OfferingStateVO s : states) {
+            	    String id = s.getId();
+            	    OfferingVO voItem = StringUtils.isBlank(id) ? null : idToVO.get(id);
+            	    offeringVOList.add(voItem);
+            	}
+
+            	// 4) 設回去，長度會跟 offeringJson 的陣列一樣（例如 3 個）
+            	vo.setOfferings(offeringVOList);
+
             } catch (Exception e) {
                 log.error(e.getMessage(), e);
                 throw new ApiException("發生未知錯誤");
@@ -469,73 +490,43 @@ public class GodService {
     }
 
 
-    private List<OfferingStateVO> addOffering(String offeringListJson, List<OfferingReplacementDto> replacementDtos) {
-        // 1) 先建出可保順序的資料結構
-        List<OfferingStateVO> offeringInfoList;
-        if (StringUtils.isBlank(offeringListJson)) {
-            // 初始兩格占位
-            offeringInfoList = new ArrayList<>();
-            for (int i = 0; i < 2; i++) {
-                offeringInfoList.add(OfferingStateVO.builder().build());
-            }
-        } else {
-            // 確保是 ArrayList（保序 & 可隨 index 設定）
-            offeringInfoList = new ArrayList<>(JsonUtil.fromJsonList(offeringListJson, OfferingStateVO.class));
-        }
-
-        // 2) 依 index 升冪套用，避免套用順序造成的位移／不一致
-        List<OfferingReplacementDto> sorted = replacementDtos.stream()
-                .sorted(Comparator.comparingInt(OfferingReplacementDto::getIndex))
-                .collect(Collectors.toList());
-
-        // 3) 先建立「供品ID -> 目前所在 index」的查找表，用來避免重複（可選）
-        Map<String, Integer> idToIndex = new HashMap<>();
-        for (int i = 0; i < offeringInfoList.size(); i++) {
-            OfferingStateVO vo = offeringInfoList.get(i);
-            if (vo != null && StringUtils.isNotBlank(vo.getId())) {
-                idToIndex.put(vo.getId(), i);
-            }
-        }
-
-        // 4) 逐筆置換
-        String now = DateFormatUtils.format(DateUtil.getCurrentDate(), "yyyy/MM/dd HH:mm");
-
-        for (OfferingReplacementDto dto : sorted) {
-            int idx = dto.getIndex();
-            String newId = dto.getNewOfferingId();
-
-            // 4-1) 若新 ID 已存在於別的 index，先清掉舊位置（避免同 ID 重複）
-            Integer oldPos = idToIndex.get(newId);
-            if (oldPos != null && oldPos != idx) {
-                // 清掉舊位置（保留槽位但清空 id / 時間）
-                OfferingStateVO oldVo = offeringInfoList.get(oldPos);
-                if (oldVo != null) {
-                    oldVo.setId(null);
-                    oldVo.setBuyTime(null);
-                }
-            }
-
-            // 4-2) 如果目標 index 超過 list 長度，補齊占位到該 index
-            while (offeringInfoList.size() <= idx) {
-                offeringInfoList.add(OfferingStateVO.builder().build());
-            }
-
-            // 4-3) 在目標 index 寫入新供品
-            OfferingStateVO target = offeringInfoList.get(idx);
-            if (target == null) {
-                target = OfferingStateVO.builder().build();
-                offeringInfoList.set(idx, target);
-            }
-            target.setId(newId);
-            target.setBuyTime(now);
-
-            // 4-4) 更新查找表：新 ID 現在在 idx
-            idToIndex.put(newId, idx);
-        }
-
-        return offeringInfoList;
-    }
-
+	private List<OfferingStateVO> addOffering(String offeringListJson, List<OfferingReplacementDto> replacementDtos) {
+	    // 1) 初始化 slots（至少 2 格）
+	    List<OfferingStateVO> slots;
+	    if (StringUtils.isBlank(offeringListJson)) {
+	        slots = new ArrayList<>(Arrays.asList(
+	                OfferingStateVO.builder().build(),
+	                OfferingStateVO.builder().build()
+	        ));
+	    } else {
+	        slots = new ArrayList<>(JsonUtil.fromJsonList(offeringListJson, OfferingStateVO.class));
+	        while (slots.size() < 2) slots.add(OfferingStateVO.builder().build());
+	    }
+	
+	    // 2) 依 index 排序，確保套用順序穩定
+	    replacementDtos.sort(Comparator.comparingInt(OfferingReplacementDto::getIndex));
+	
+	    // 3) 逐筆套用：補空位到目標 index，再 set(index, ...)
+	    String now = DateFormatUtils.format(DateUtil.getCurrentDate(), "yyyy/MM/dd HH:mm");
+	    for (OfferingReplacementDto dto : replacementDtos) {
+	        int idx = dto.getIndex();
+	
+	        // 若 index 超出目前長度，補空位直到可索引到 idx
+	        while (slots.size() <= idx) {
+	            slots.add(OfferingStateVO.builder().build());
+	        }
+	
+	        OfferingStateVO target = slots.get(idx);
+	        if (target == null) {
+	            target = OfferingStateVO.builder().build();
+	            slots.set(idx, target);
+	        }
+	        target.setId(dto.getNewOfferingId());
+	        target.setBuyTime(now);
+	    }
+	
+	    return slots;
+	}
 
     public God getGodByCode(String godCode) {
         GodExample e = new GodExample();
