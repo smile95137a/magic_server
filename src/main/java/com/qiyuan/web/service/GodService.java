@@ -458,12 +458,10 @@ public class GodService {
             // 進入金身
             godInfo.setLevel((byte) 1);
             godInfo.setGoldenExpiration(DateUtil.adjustDate(DateUtil.getCurrentDate(), 1, Date.class));
-            //（可選）進金身是否要把 exp 歸 0？大多數設計會清空
-            newExp = 0;
         } else {
             godInfo.setLevel((byte) newGodLevel);
-            newExp = newExp % 10;
         }
+        newExp = newExp % 10;
         godInfo.setExp((byte) newExp);
 
         godInfoService.updateGodInfo(godInfo);
