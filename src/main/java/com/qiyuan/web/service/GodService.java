@@ -468,33 +468,74 @@ public class GodService {
         return true;
     }
 
-    private List<OfferingStateVO> addOffering(String offeringList, List<OfferingReplacementDto> replacementDtos) {
-        List<OfferingStateVO> offeringInfoList = null;
-        // 開始新增/置換供品
-        if (StringUtils.isBlank(offeringList)) {
-            offeringInfoList = IntStream.range(0, 2)
-                            .mapToObj(i -> OfferingStateVO.builder().build())
-                            .collect(Collectors.toList());
+
+    private List<OfferingStateVO> addOffering(String offeringListJson, List<OfferingReplacementDto> replacementDtos) {
+        // 1) 先建出可保順序的資料結構
+        List<OfferingStateVO> offeringInfoList;
+        if (StringUtils.isBlank(offeringListJson)) {
+            // 初始兩格占位
+            offeringInfoList = new ArrayList<>();
+            for (int i = 0; i < 2; i++) {
+                offeringInfoList.add(OfferingStateVO.builder().build());
+            }
         } else {
-            offeringInfoList = JsonUtil.fromJsonList(offeringList, OfferingStateVO.class);
+            // 確保是 ArrayList（保序 & 可隨 index 設定）
+            offeringInfoList = new ArrayList<>(JsonUtil.fromJsonList(offeringListJson, OfferingStateVO.class));
         }
 
-        for (OfferingReplacementDto dto: replacementDtos) {
-            // 置換
-            if (offeringInfoList.size() - 1 >= dto.getIndex()) {
-                OfferingStateVO vo = offeringInfoList.get(dto.getIndex());
-                vo.setId(dto.getNewOfferingId());
-                vo.setBuyTime(DateFormatUtils.format(DateUtil.getCurrentDate(), "yyyy/MM/dd HH:mm"));
-            } else {
-                // 新增
-                offeringInfoList.add(OfferingStateVO.builder()
-                        .id(dto.getNewOfferingId())
-                        .buyTime(DateFormatUtils.format(DateUtil.getCurrentDate(), "yyyy/MM/dd HH:mm"))
-                        .build());
+        // 2) 依 index 升冪套用，避免套用順序造成的位移／不一致
+        List<OfferingReplacementDto> sorted = replacementDtos.stream()
+                .sorted(Comparator.comparingInt(OfferingReplacementDto::getIndex))
+                .collect(Collectors.toList());
+
+        // 3) 先建立「供品ID -> 目前所在 index」的查找表，用來避免重複（可選）
+        Map<String, Integer> idToIndex = new HashMap<>();
+        for (int i = 0; i < offeringInfoList.size(); i++) {
+            OfferingStateVO vo = offeringInfoList.get(i);
+            if (vo != null && StringUtils.isNotBlank(vo.getId())) {
+                idToIndex.put(vo.getId(), i);
             }
         }
+
+        // 4) 逐筆置換
+        String now = DateFormatUtils.format(DateUtil.getCurrentDate(), "yyyy/MM/dd HH:mm");
+
+        for (OfferingReplacementDto dto : sorted) {
+            int idx = dto.getIndex();
+            String newId = dto.getNewOfferingId();
+
+            // 4-1) 若新 ID 已存在於別的 index，先清掉舊位置（避免同 ID 重複）
+            Integer oldPos = idToIndex.get(newId);
+            if (oldPos != null && oldPos != idx) {
+                // 清掉舊位置（保留槽位但清空 id / 時間）
+                OfferingStateVO oldVo = offeringInfoList.get(oldPos);
+                if (oldVo != null) {
+                    oldVo.setId(null);
+                    oldVo.setBuyTime(null);
+                }
+            }
+
+            // 4-2) 如果目標 index 超過 list 長度，補齊占位到該 index
+            while (offeringInfoList.size() <= idx) {
+                offeringInfoList.add(OfferingStateVO.builder().build());
+            }
+
+            // 4-3) 在目標 index 寫入新供品
+            OfferingStateVO target = offeringInfoList.get(idx);
+            if (target == null) {
+                target = OfferingStateVO.builder().build();
+                offeringInfoList.set(idx, target);
+            }
+            target.setId(newId);
+            target.setBuyTime(now);
+
+            // 4-4) 更新查找表：新 ID 現在在 idx
+            idToIndex.put(newId, idx);
+        }
+
         return offeringInfoList;
     }
+
 
     public God getGodByCode(String godCode) {
         GodExample e = new GodExample();
