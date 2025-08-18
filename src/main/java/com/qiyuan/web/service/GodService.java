@@ -424,40 +424,48 @@ public class GodService {
 
         if (replacement == null || !replacement.contains(":")) throw new ApiException("查無供品購買紀錄，請聯繫客服。");
         List<String> replacements = Arrays.stream(replacement.split(",")).filter(StringUtils::isNotBlank).collect(Collectors.toList());
-        List<OfferingReplacementDto> dtoList = replacements.stream().map(r -> {
-            String[] tempSplit = r.split(":");
-            String newOfferingId = tempSplit[1];
-            String prevIndex = tempSplit[0];
-            return OfferingReplacementDto.builder()
-                    .newOfferingId(newOfferingId)
-                    .index(Integer.valueOf(prevIndex))
-                    .build();
-        }).collect(Collectors.toList());
+        
+        // 1) 解析本次更換清單（只含本次付費項目）
+        List<String> newIds = new ArrayList<>();
+        List<OfferingReplacementDto> dtoList = Arrays.stream(replacement.split(","))
+                .filter(StringUtils::isNotBlank)
+                .map(r -> {
+                    String[] tmp = r.split(":");
+                    String newOfferingId = tmp[1];
+                    Integer index = Integer.valueOf(tmp[0]);
+                    newIds.add(newOfferingId);
+                    return OfferingReplacementDto.builder()
+                            .newOfferingId(newOfferingId)
+                            .index(index)
+                            .build();
+                }).collect(Collectors.toList());
 
+        // 2) 實際把供品換進供桌（維持你原本的行為）
         List<OfferingStateVO> offeringInfoList = this.addOffering(godInfo.getOfferingList(), dtoList);
         godInfo.setOfferingList(JsonUtil.toJson(offeringInfoList));
         godInfo.setOfferingReplacement("");
 
-        // 升級計算
-        List<String> offeringIds = offeringInfoList.stream().map(OfferingStateVO::getId).collect(Collectors.toList());
-        List<Offering> offering = offeringService.getOfferingByIds(offeringIds);
-        int totolPoints = offering.stream().mapToInt(Offering::getPoints).sum();
+        // 3) 只計算「本次更換的新供品」的分數總和（delta）
+        List<Offering> newOfferings = offeringService.getOfferingByIds(newIds);
+        int deltaPoints = newOfferings.stream().mapToInt(Offering::getPoints).sum();
 
-        int newExp = godInfo.getExp() + totolPoints;
+        // 4) 用 deltaPoints 來升級
+        int newExp = godInfo.getExp() + deltaPoints;
         int nextLevel = newExp / 10;
         int newGodLevel = nextLevel > 0 ? godInfo.getLevel() + nextLevel : godInfo.getLevel();
-        boolean isGolden = false;
+
         if (newGodLevel >= 5) {
-            isGolden = true;
+            // 進入金身
             godInfo.setLevel((byte) 1);
             godInfo.setGoldenExpiration(DateUtil.adjustDate(DateUtil.getCurrentDate(), 1, Date.class));
+            //（可選）進金身是否要把 exp 歸 0？大多數設計會清空
+            newExp = 0;
         } else {
             godInfo.setLevel((byte) newGodLevel);
+            newExp = newExp % 10;
         }
-        newExp = newExp % 10;
         godInfo.setExp((byte) newExp);
 
-        // 更新請神資訊
         godInfoService.updateGodInfo(godInfo);
         return true;
     }
