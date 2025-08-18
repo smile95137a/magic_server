@@ -252,6 +252,7 @@ public class GodService {
 
     @Transactional
     public PaymentNoVO addOffering(PresentOfferingRequest param) {
+        // 1) 取使用者、神明、與現有供奉狀態
         String godCode = param.getGodCode();
         String username = SecurityUtils.getCurrentUsername();
         User user = userMapper.selectByUsername(username);
@@ -259,6 +260,7 @@ public class GodService {
         GodInfo godInfo = godInfoService.getGodInfo(user.getId(), god.getId());
         if (godInfo == null) throw new ApiException("請先請神成功!");
 
+        // 2) 發票資訊檢查
         InvoiceDTO invoiceDTO = null;
         try {
             invoiceDTO = JsonUtil.fromJson(user.getReceipt(), InvoiceDTO.class);
@@ -269,101 +271,157 @@ public class GodService {
             throw new ApiException("請先至會員中心填寫發票資訊");
         }
 
+        // 3) 取前端傳入的置換需求，並做 index 唯一性檢查
         List<OfferingPresentRequest> list = param.getList();
-        List<String> offeringIds = list.stream().map(OfferingPresentRequest::getNewOfferingId).collect(Collectors.toList());
-        List<Offering> offerings = offeringService.getOfferingByIds(offeringIds);
-        if (offerings == null || offerings.isEmpty() || offerings.size() != offeringIds.size()) throw new ApiException("包含不存在的供品，請重新選擇");
+        if (list == null || list.isEmpty()) {
+            // 沒有任何置換，直接回傳 0 元
+            return PaymentNoVO.builder()
+                    .externalPaymentNo(null)
+                    .price(BigDecimal.ZERO)
+                    .build();
+        }
+        Set<Integer> idxSet = new HashSet<>();
+        for (OfferingPresentRequest r : list) {
+            if (!idxSet.add(r.getIndex())) throw new ApiException("索引不可重複");
+        }
 
-        Map<String, Offering> offeringMap = offerings.stream().collect(Collectors.toMap(Offering::getId, o -> o));
-
+        // 4) 解析目前神像上的供品清單，建立 index -> 舊供品ID 對照
         final Map<Integer, String> indexToOldId = new HashMap<>();
         if (godInfo.getOfferingList() != null) {
-            List<OfferingStateVO>  currentOfferings = JsonUtil.fromJsonList(godInfo.getOfferingList(), OfferingStateVO.class);
+            List<OfferingStateVO> currentOfferings = JsonUtil.fromJsonList(godInfo.getOfferingList(), OfferingStateVO.class);
             for (int i = 0; i < currentOfferings.size(); i++) {
                 indexToOldId.put(i, currentOfferings.get(i).getId());
             }
         }
 
-        List<OfferingReplacementDto> replacements = list.stream().map(req -> {
-            Integer index = req.getIndex();
-            String newId = req.getNewOfferingId();
-            String oldId = indexToOldId.get(index);
-            Offering offering = offeringMap.get(newId);
-            return OfferingReplacementDto.builder()
-                    .index(index)
-                    .newOfferingId(newId)
-                    .oldOfferingId(oldId)
-                    .offering(offering)
-                    .build();
-        }).collect(Collectors.toList());
+        // 5) 依前端順序取得新供品ID清單、查詢供品，並按前端順序重排（DB 不保證 IN(...) 順序）
+        List<String> offeringIds = list.stream()
+                .map(OfferingPresentRequest::getNewOfferingId)
+                .collect(Collectors.toList());
 
+        List<Offering> offerings = offeringService.getOfferingByIds(offeringIds);
+        if (offerings == null || offerings.isEmpty() || offerings.size() != offeringIds.size()) {
+            throw new ApiException("包含不存在的供品，請重新選擇");
+        }
 
-        // ========== 免費供品直接更新 ==========
-        List<OfferingReplacementDto> freeOffering = replacements.stream().filter(dto -> dto.getOffering().getPrice() == 0).collect(Collectors.toList());
+        Map<String, Offering> byId = offerings.stream()
+                .collect(Collectors.toMap(Offering::getId, o -> o));
+        // 依前端 ID 順序重建（若 DB 回傳順序不同仍可校正）
+        List<Offering> offeringsSorted = offeringIds.stream()
+                .map(id -> {
+                    Offering o = byId.get(id);
+                    if (o == null) throw new ApiException("包含不存在的供品，請重新選擇");
+                    return o;
+                })
+                .collect(Collectors.toList());
+
+        // 6) 需要 Map 時，使用 LinkedHashMap 保序
+        Map<String, Offering> offeringMap = offeringsSorted.stream().collect(
+                Collectors.toMap(
+                        Offering::getId,
+                        o -> o,
+                        (a, b) -> a,
+                        LinkedHashMap::new
+                )
+        );
+
+        // 7) 以 index 建立 replacements，並明確用 index 排序（index 為唯一真實順序來源）
+        List<OfferingReplacementDto> replacements = list.stream()
+                .map(req -> {
+                    Integer index = req.getIndex();
+                    String newId = req.getNewOfferingId();
+                    String oldId = indexToOldId.get(index);
+                    Offering offering = offeringMap.get(newId);
+                    if (offering == null) throw new ApiException("包含不存在的供品，請重新選擇");
+                    return OfferingReplacementDto.builder()
+                            .index(index)
+                            .newOfferingId(newId)
+                            .oldOfferingId(oldId)
+                            .offering(offering)
+                            .build();
+                })
+                .sorted(Comparator.comparing(OfferingReplacementDto::getIndex)) // ★ 關鍵：以 index 穩定排序
+                .collect(Collectors.toList());
+
+        // 8) 先處理「免費供品」：直接更新 godInfo.offeringList
+        List<OfferingReplacementDto> freeOffering = replacements.stream()
+                .filter(dto -> dto.getOffering().getPrice() == 0)
+                .collect(Collectors.toList());
+
         List<OfferingStateVO> newOfferingState = null;
-
-        // 免費供品置換
-        if (freeOffering.size() > 0) {
+        if (!freeOffering.isEmpty()) {
             newOfferingState = this.addOffering(godInfo.getOfferingList(), freeOffering);
+            if (newOfferingState != null) {
+                godInfo.setOfferingList(JsonUtil.toJson(newOfferingState));
+            }
         }
 
-        if (newOfferingState != null) {
-            godInfo.setOfferingList(JsonUtil.toJson(newOfferingState));
-        }
+        // 9) 再處理「付費供品」：記錄置換字串 + 建立虛擬訂單與交易
+        List<OfferingReplacementDto> payOffering = replacements.stream()
+                .filter(dto -> dto.getOffering().getPrice() != 0)
+                .collect(Collectors.toList());
 
-        // ========== 收費供品紀錄 ==========
-        List<OfferingReplacementDto> payOffering = replacements.stream().filter(dto -> dto.getOffering().getPrice() != 0).collect(Collectors.toList());
-        if (payOffering.size() == 0) {
+        if (payOffering.isEmpty()) {
+            // 只有免費供品 → 更新後直接返回 0 元
             godInfoService.updateGodInfo(godInfo);
-
             return PaymentNoVO.builder()
                     .externalPaymentNo(null)
                     .price(BigDecimal.ZERO)
                     .build();
         }
 
-        String replacementStr = payOffering.stream().map(po -> String.format("%d:%s", po.getIndex(), po.getNewOfferingId())).collect(Collectors.joining(","));
+        // replacementStr 依 index 升冪組合，避免亂序
+        String replacementStr = payOffering.stream()
+                .map(po -> String.format("%d:%s", po.getIndex(), po.getNewOfferingId()))
+                .collect(Collectors.joining(","));
         godInfo.setOfferingReplacement(replacementStr);
         godInfoService.updateGodInfo(godInfo);
 
+        // 10) 準備虛擬訂單與交易
         String orderId = RandomGenerator.getUUID().toLowerCase(Locale.ROOT);
         String paymentId = orderId.substring(0, 25);
-        BigDecimal total = BigDecimal.ZERO;
 
-        Map<String, VirtualOrderItem> orderItemMap = new LinkedHashMap<>();
-        for (OfferingReplacementDto dto : payOffering) {
-            total = total.add(BigDecimal.valueOf(dto.getOffering().getPrice()));
-            // 新增購買紀錄
+        BigDecimal total = BigDecimal.ZERO;
+        Map<String, VirtualOrderItem> orderItemMap = new LinkedHashMap<>(); // 保序彙總
+
+        for (OfferingReplacementDto dto : payOffering) { // 已依 index 排序
+            BigDecimal unit = BigDecimal.valueOf(dto.getOffering().getPrice());
+            total = total.add(unit);
+
+            // 新增購買紀錄（每一筆付費置換都記）
             offeringService.addOfferingPurchase(
                     OfferingPurchase.builder()
-                    .id(RandomGenerator.getUUID().toLowerCase(Locale.ROOT))
-                    .externalOrderNo(paymentId)
-                    .offeringId(dto.getNewOfferingId())
-                    .godId(god.getId())
-                    .userId(user.getId())
-                    .createTime(new Date())
-                    .build());
+                            .id(RandomGenerator.getUUID().toLowerCase(Locale.ROOT))
+                            .externalOrderNo(paymentId)
+                            .offeringId(dto.getNewOfferingId())
+                            .godId(god.getId())
+                            .userId(user.getId())
+                            .createTime(new Date())
+                            .build()
+            );
 
-            // 新增訂單
+            // 訂單品項彙總（同 offeringId 合併）
             VirtualOrderItem existing = orderItemMap.get(dto.getNewOfferingId());
-            BigDecimal unit = BigDecimal.valueOf(dto.getOffering().getPrice());
             if (existing == null) {
-
                 orderItemMap.put(dto.getNewOfferingId(),
                         VirtualOrderItem.builder()
-                        .orderId(orderId)
-                        .description(String.format("%s-%s", SourceTypeEnum.OFFERING.getLabel(), dto.getOffering().getName()))
-                        .quantity(1)
-                        .unitPrice(unit)
-                        .amount(unit)
-                        .createTime(new Date())
-                        .build());
+                                .orderId(orderId)
+                                .description(String.format("%s-%s",
+                                        SourceTypeEnum.OFFERING.getLabel(),
+                                        dto.getOffering().getName()))
+                                .quantity(1)
+                                .unitPrice(unit)
+                                .amount(unit)
+                                .createTime(new Date())
+                                .build()
+                );
             } else {
                 existing.setQuantity(existing.getQuantity() + 1);
                 existing.setAmount(existing.getAmount().add(unit));
             }
         }
 
+        // 11) 建立虛擬訂單
         VirtualOrders orders = VirtualOrders.builder()
                 .id(orderId)
                 .externalOrderNo(paymentId)
@@ -376,30 +434,34 @@ public class GodService {
                 .createTime(new Date())
                 .updateTime(new Date())
                 .build();
-
         virtualOrdersMapper.insertSelective(orders);
-        List<VirtualOrderItem> itemList = new ArrayList<>(orderItemMap.values());
 
+        // 12) 建立訂單項目（按 LinkedHashMap 順序）
+        List<VirtualOrderItem> itemList = new ArrayList<>(orderItemMap.values());
         for (VirtualOrderItem item : itemList) {
             virtualOrderItemMapper.insertSelective(item);
         }
 
+        // 13) 建立付款交易
         paymentTransactionMapper.insertSelective(
                 PaymentTransaction.builder()
                         .id(paymentId)
                         .userId(user.getId())
                         .createTime(new Date())
-                        .sourceType("O")
+                        .sourceType("O") // 舊值保留
                         .amount(total)
                         .status(OrderStatus.CREATED.getValue())
                         .payMethod(param.getPaymentMethod())
                         .build()
         );
+
+        // 14) 回傳付款單號與金額
         return PaymentNoVO.builder()
                 .externalPaymentNo(paymentId)
                 .price(total)
                 .build();
     }
+
 
 
     @Transactional
