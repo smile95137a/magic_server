@@ -8,62 +8,59 @@ import java.util.Locale;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import com.qiyuan.web.dao.*;
-import com.qiyuan.web.dto.InvoiceDTO;
-import com.qiyuan.web.dto.LanternAdminRecord;
-import com.qiyuan.web.dto.response.PaymentNoVO;
-import com.qiyuan.web.entity.*;
-import com.qiyuan.web.enums.InvoiceType;
-import com.qiyuan.web.enums.SourceTypeEnum;
-import com.qiyuan.web.util.SecurityUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.qiyuan.security.exception.ApiException;
+import com.qiyuan.web.dao.LanternMapper;
+import com.qiyuan.web.dao.LanternPurchaseMapper;
+import com.qiyuan.web.dao.PaymentTransactionMapper;
+import com.qiyuan.web.dao.UserMapper;
+import com.qiyuan.web.dao.VirtualOrderItemMapper;
+import com.qiyuan.web.dao.VirtualOrdersMapper;
+import com.qiyuan.web.dto.InvoiceDTO;
+import com.qiyuan.web.dto.LanternAdminRecord;
 import com.qiyuan.web.dto.LanternBlessingDTO;
 import com.qiyuan.web.dto.request.LanternPurchaseInfo;
 import com.qiyuan.web.dto.request.LanternPurchaseRequest;
 import com.qiyuan.web.dto.request.RecordPeriodRequest;
 import com.qiyuan.web.dto.response.LanternBlessingVO;
 import com.qiyuan.web.dto.response.LanternPriceVO;
+import com.qiyuan.web.dto.response.PaymentNoVO;
 import com.qiyuan.web.dto.response.RecordVO;
+import com.qiyuan.web.entity.Lantern;
+import com.qiyuan.web.entity.LanternPurchase;
+import com.qiyuan.web.entity.LanternRecord;
+import com.qiyuan.web.entity.PaymentTransaction;
+import com.qiyuan.web.entity.User;
+import com.qiyuan.web.entity.VirtualOrderItem;
+import com.qiyuan.web.entity.VirtualOrders;
 import com.qiyuan.web.entity.example.LanternExample;
 import com.qiyuan.web.entity.example.LanternPurchaseExample;
+import com.qiyuan.web.enums.InvoiceType;
 import com.qiyuan.web.enums.OrderStatus;
 import com.qiyuan.web.enums.RecordItem;
+import com.qiyuan.web.enums.SourceTypeEnum;
 import com.qiyuan.web.util.DateUtil;
 import com.qiyuan.web.util.JsonUtil;
 import com.qiyuan.web.util.RandomGenerator;
+import com.qiyuan.web.util.SecurityUtils;
+
+import lombok.RequiredArgsConstructor;
 
 @Service
+@RequiredArgsConstructor
 public class LanternPurchaseService {
-    private LanternPurchaseMapper lanternPurchaseMapper;
-
-    private SystemConfigService systemConfigService;
-
-    private LanternMapper lanternMapper;
-
-    private UserMapper userMapper;
-
-    private PaymentService paymentService;
-
-    private PaymentTransactionMapper paymentTransactionMapper;
-
-    private VirtualOrdersMapper virtualOrdersMapper;
-    private VirtualOrderItemMapper virtualOrderItemMapper;
-
-    public LanternPurchaseService(LanternPurchaseMapper lanternPurchaseMapper, SystemConfigService systemConfigService, LanternMapper lanternMapper, UserMapper userMapper, PaymentService paymentService, PaymentTransactionMapper paymentTransactionMapper, VirtualOrdersMapper virtualOrdersMapper, VirtualOrderItemMapper virtualOrderItemMapper) {
-        this.lanternPurchaseMapper = lanternPurchaseMapper;
-        this.systemConfigService = systemConfigService;
-        this.lanternMapper = lanternMapper;
-        this.userMapper = userMapper;
-        this.paymentService = paymentService;
-        this.paymentTransactionMapper = paymentTransactionMapper;
-        this.virtualOrdersMapper = virtualOrdersMapper;
-        this.virtualOrderItemMapper = virtualOrderItemMapper;
-    }
+    private final LanternPurchaseMapper lanternPurchaseMapper;
+    private final SystemConfigService systemConfigService;
+    private final LanternMapper lanternMapper;
+    private final UserMapper userMapper;
+    private final PaymentService paymentService;
+    private final PaymentTransactionMapper paymentTransactionMapper;
+    private final VirtualOrdersMapper virtualOrdersMapper;
+    private final VirtualOrderItemMapper virtualOrderItemMapper;
 
     public List<LanternPurchase> getByLanternId(String lanternId) {
         LanternPurchaseExample e = new LanternPurchaseExample();
@@ -248,5 +245,18 @@ public class LanternPurchaseService {
                 .build());
 
         return PaymentNoVO.builder().externalPaymentNo(paymentId).price(totalAmount).build();
+    }
+    
+    @Transactional
+    public void checkin(String purchaseId) {
+        int updated = lanternPurchaseMapper.updateCheckinStatus(purchaseId, true);
+        if (updated == 0) {
+            throw new ApiException("查無此點燈紀錄或已簽到");
+        }
+    }
+
+    @Transactional
+    public void resetAllCheckins() {
+        lanternPurchaseMapper.resetAllCheckins();
     }
 }

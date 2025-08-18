@@ -42,4 +42,10 @@ public interface LanternPurchaseMapper {
     int updateByPrimaryKeySelective(LanternPurchase record);
 
     int updateByPrimaryKey(LanternPurchase record);
+    
+
+    int updateCheckinStatus(@Param("id") String id,
+                            @Param("checkedIn") Boolean checkedIn);
+    int resetAllCheckins();
+
 }

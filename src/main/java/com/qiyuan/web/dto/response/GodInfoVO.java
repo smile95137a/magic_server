@@ -29,4 +29,8 @@ public class GodInfoVO {
     private Date offshelfTime;
     @Schema(description = "擲筊冷卻結束時間", type = "string", format = "date-time", example = "2025-06-24T12:00:00Z")
     private Date cooldownTime;
+    @Schema(description = "距離金身還差多少經驗值", example = "8")
+    private int expToGolden;
+    @Schema(description = "累積總經驗值", example = "32")
+    private int totalAccumulateExp;
 }

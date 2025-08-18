@@ -12,6 +12,7 @@
     <result column="blessing_times" jdbcType="SMALLINT" property="blessingTimes" />
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
     <result column="expired_time" jdbcType="TIMESTAMP" property="expiredTime" />
+    <result column="checked_in" jdbcType="BIT" property="checkedIn"/>
   </resultMap>
   <resultMap id="LanternBlessingResultMap" type="com.qiyuan.web.dto.LanternBlessingDTO">
     <id column="id" jdbcType="CHAR" property="id" />
@@ -23,6 +24,7 @@
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
     <result column="expired_time" jdbcType="TIMESTAMP" property="expiredTime" />
     <result column="blessing_times" jdbcType="SMALLINT" property="blessingTimes" />
+    <result column="checked_in" property="checkedIn"/>
   </resultMap>
   <resultMap id="RecordJoinMap" type="com.qiyuan.web.entity.LanternRecord">
     <id column="id" jdbcType="CHAR" property="id" />
@@ -102,7 +104,7 @@
   </sql>
   <sql id="Base_Column_List">
     id, external_order_no, lantern_id, user_id, name, birthday, message, blessing_times,
-    create_time, expired_time
+    create_time, expired_time, checked_in
   </sql>
   <sql id="Bind_With_Lantern_Table">
     p.id as id, l.icon_name as lantern_code, user_id, p.name as name, birthday, message, p.create_time as create_time, expired_time, blessing_times
@@ -137,7 +139,8 @@
            lp.message as message,
            lp.create_time as create_time,
            lp.expired_time as expired_time,
-           lp.blessing_times as blessing_times
+           lp.blessing_times as blessing_times,
+           lp.checked_in as checked_in
     FROM
       lantern_purchase lp
     LEFT JOIN payment_transaction pt ON lp.external_order_no = pt.id
@@ -150,6 +153,7 @@
       lp.create_time DESC
   </select>
 
+
   <delete id="deleteByExample" parameterType="com.qiyuan.web.entity.example.LanternPurchaseExample">
     delete from lantern_purchase
     <if test="_parameter != null">
@@ -160,11 +164,11 @@
     insert into lantern_purchase (id, external_order_no, lantern_id,
                                   user_id, name, birthday,
                                   message, blessing_times, create_time,
-                                  expired_time)
+                                  expired_time, checked_in)
     values (#{id,jdbcType=CHAR}, #{externalOrderNo,jdbcType=VARCHAR}, #{lanternId,jdbcType=CHAR},
             #{userId,jdbcType=CHAR}, #{name,jdbcType=NVARCHAR}, #{birthday,jdbcType=TIMESTAMP},
             #{message,jdbcType=NVARCHAR}, #{blessingTimes,jdbcType=SMALLINT}, #{createTime,jdbcType=TIMESTAMP},
-            #{expiredTime,jdbcType=TIMESTAMP})
+            #{expiredTime,jdbcType=TIMESTAMP}, #{checkedIn,jdbcType=BIT})
   </insert>
   <insert id="insertSelective" parameterType="com.qiyuan.web.entity.LanternPurchase">
     insert into lantern_purchase
@@ -199,6 +203,7 @@
       <if test="expiredTime != null">
         expired_time,
       </if>
+      <if test="checkedIn != null">checked_in,</if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -231,6 +236,7 @@
       <if test="expiredTime != null">
         #{expiredTime,jdbcType=TIMESTAMP},
       </if>
+      <if test="checkedIn != null">#{checkedIn,jdbcType=BIT},</if>
     </trim>
   </insert>
   <select id="countByExample" parameterType="com.qiyuan.web.entity.example.LanternPurchaseExample" resultType="java.lang.Long">
@@ -323,6 +329,7 @@
       <if test="expiredTime != null">
         expired_time = #{expiredTime,jdbcType=TIMESTAMP},
       </if>
+      <if test="checkedIn != null">checked_in = #{checkedIn,jdbcType=BIT},</if>
     </set>
     where id = #{id,jdbcType=CHAR}
   </update>
@@ -336,7 +343,8 @@
         message = #{message,jdbcType=NVARCHAR},
         blessing_times = #{blessingTimes,jdbcType=SMALLINT},
         create_time = #{createTime,jdbcType=TIMESTAMP},
-        expired_time = #{expiredTime,jdbcType=TIMESTAMP}
+        expired_time = #{expiredTime,jdbcType=TIMESTAMP},
+        checked_in = #{checkedIn,jdbcType=BIT}
     where id = #{id,jdbcType=CHAR}
   </update>
 
@@ -417,4 +425,16 @@
     WHERE p.create_time BETWEEN #{startTime} AND #{endTime}
     ORDER By p.create_time ASC
   </select>
+  
+  <update id="updateCheckinStatus" parameterType="map">
+	UPDATE lantern_purchase
+	SET checked_in = #{checkedIn,jdbcType=BIT}
+	WHERE id = #{id,jdbcType=CHAR}
+  </update>
+  <update id="resetAllCheckins">
+	UPDATE lantern_purchase
+	SET checked_in = 0
+  </update>
+
+  
 </mapper>

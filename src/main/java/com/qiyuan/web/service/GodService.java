@@ -209,6 +209,19 @@ public class GodService {
 
         boolean isGolden = godInfo.getGoldenExpiration() != null
                 && godInfo.getGoldenExpiration().after(DateUtil.getCurrentDate());
+        int currentLevel = godInfo.getLevel();
+        int currentExp = godInfo.getExp();
+
+        // 總共累積的經驗（等級 -1 的所有滿級經驗 + 當前 exp）
+        int totalAccumulateExp = (currentLevel - 1) * 10 + currentExp;
+
+        // 距離金身還差多少 (假設金身需要等級 5 → 40 exp)
+        int expToGolden = 0;
+        if (!isGolden) {
+            int requiredExpForGolden = (5 - 1) * 10; // 等級 4 滿經驗 + 下一級 = 40
+            expToGolden = requiredExpForGolden - totalAccumulateExp;
+            if (expToGolden < 0) expToGolden = 0;
+        }
 
         GodInfoVO vo = GodInfoVO.builder()
                 .imageCode(god.getImageCode())
@@ -217,6 +230,8 @@ public class GodService {
                 .cooldownTime(godInfo.getCooldownTime())
                 .onshelfTime(godInfo.getOnshelfTime())
                 .offshelfTime(godInfo.getOffshelfTime())
+                .expToGolden(expToGolden)
+                .totalAccumulateExp(totalAccumulateExp)
                 .build();
 
         String offeringJson = godInfo.getOfferingList();

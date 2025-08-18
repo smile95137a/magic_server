@@ -97,5 +97,18 @@ public class LanternFrontController {
         return lanternPurchaseService.getMyActiveLanterns();
     }
 
+    
+    @Operation(summary = "每日簽到", description = "針對單一購買紀錄進行簽到")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "簽到成功"),
+            @ApiResponse(responseCode = "400", description = "簽到失敗，可能紀錄不存在或已簽到")
+    })
+    @PostMapping("/checkin/{purchaseId}")
+    public Boolean checkin(
+            @Parameter(description = "點燈購買紀錄 ID", required = true)
+            @PathVariable String purchaseId) {
+        lanternPurchaseService.checkin(purchaseId);
+        return true;
+    }
 
 }

@@ -1,10 +1,10 @@
 package com.qiyuan.web.dto;
 
+import java.util.Date;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.util.Date;
 
 @Data
 @NoArgsConstructor
@@ -27,4 +27,6 @@ public class LanternBlessingDTO {
     private Date expiredTime;
 
     private Short blessingTimes;
+
+    private Boolean checkedIn;
 }
