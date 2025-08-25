@@ -27,4 +27,7 @@ public interface GodInfoMapper {
     int updateByPrimaryKeySelective(GodInfo record);
 
     int updateByPrimaryKey(GodInfo record);
+    
+    int resetAllOfferingList();
+
 }

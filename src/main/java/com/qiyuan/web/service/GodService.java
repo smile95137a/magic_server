@@ -181,7 +181,8 @@ public class GodService {
                 godInfo.setCooldownTime(DateUtil.adjustDate(expiredDay,  1, Date.class));
             } else {
                 // 請神
-                godInfo.setOnshelfTime(now);
+            	godInfo.setOfferingList(null);
+            	godInfo.setOnshelfTime(now);
                 godInfo.setOffshelfTime(DateUtil.adjustDate(now, addDays, Date.class));
                 godInfo.setCooldownTime(DateUtil.adjustDate(now, addDays + 1, Date.class));
             }

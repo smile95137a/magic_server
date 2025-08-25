@@ -36,4 +36,9 @@ public class GodInfoService {
     public List<GodInfo> selectByExample(GodInfoExample e) {
         return godInfoMapper.selectByExample(e);
     }
+    
+    @Transactional
+    public int resetAllOfferingList() {
+        return godInfoMapper.resetAllOfferingList();
+    }
 }

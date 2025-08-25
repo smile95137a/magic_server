@@ -1,19 +1,19 @@
 package com.qiyuan.web.schedule;
 
-import com.qiyuan.web.service.LanternPurchaseService;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import com.qiyuan.web.service.LanternPurchaseService;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
 @Component
 @Slf4j
+@RequiredArgsConstructor
 public class LanternCheckinScheduler {
 
     private final LanternPurchaseService lanternPurchaseService;
-
-    public LanternCheckinScheduler(LanternPurchaseService lanternPurchaseService) {
-        this.lanternPurchaseService = lanternPurchaseService;
-    }
 
  // 每天 00:00 執行
     @Scheduled(cron = "0 0 0 * * ?")
