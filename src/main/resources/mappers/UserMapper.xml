@@ -386,4 +386,11 @@
         zip_code = #{zipCode,jdbcType=VARCHAR}
         where id = #{id,jdbcType=CHAR}
   </update>
+	<select id="selectAll" resultMap="BaseResultMap">
+	  select
+	  <include refid="Base_Column_List" />
+	  from users
+	</select>
+
+ 
 </mapper>
