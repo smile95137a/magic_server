@@ -24,7 +24,7 @@ public class JwtTokenUtil {
     private String secretKey;
 
     // Token 過期時間（小時）
-    @Value("${jwt.expiration:30}")
+    @Value("${jwt.expiration:4320}")
     private int expirationMinutes;
 
     // Refresh Token 過期時間（天）
