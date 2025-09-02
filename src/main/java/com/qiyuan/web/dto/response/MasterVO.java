@@ -46,4 +46,7 @@ public class MasterVO {
 
     @Schema(description = "老師排序", example = "10")
     private Byte sort;
+    
+    @Schema(description = "老師服務時間", example = "週一至週五 09:00-18:00")
+    private String serviceTime;
 }

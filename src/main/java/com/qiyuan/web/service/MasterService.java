@@ -7,8 +7,6 @@ import java.util.Locale;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,15 +23,14 @@ import com.qiyuan.web.util.FileUtil;
 import com.qiyuan.web.util.JsonUtil;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class MasterService {
 
-    private Logger logger = LoggerFactory.getLogger(MasterService.class);
-
-   private final MasterMapper masterMapper;
-
+    private final MasterMapper masterMapper;
 
     @Value("${upload.image-path.master}")
     private String masterDir;
@@ -42,21 +39,26 @@ public class MasterService {
         MasterExample e = new MasterExample();
         e.createCriteria().andStatusEqualTo(true);
         e.setOrderByClause("sort ASC");
-        return masterMapper.selectByExample(e).stream().map(this::convertMasterToVo).collect(Collectors.toList());
+        return masterMapper.selectByExample(e).stream()
+                .map(this::convertMasterToVo)
+                .collect(Collectors.toList());
     }
 
     public List<MasterAdminVO> getAllMasterList() {
         MasterExample e = new MasterExample();
         e.setOrderByClause("sort ASC");
-        return masterMapper.selectByExample(e).stream().map(this::convertMasterToAdminVo).collect(Collectors.toList());
+        return masterMapper.selectByExample(e).stream()
+                .map(this::convertMasterToAdminVo)
+                .collect(Collectors.toList());
     }
 
     public MasterAdminVO getMasterByCode(String code) {
         Master entity = masterMapper.selectByPrimaryKey(code);
-        if (entity == null) throw new ApiException("老師不存在");
+        if (entity == null) {
+            throw new ApiException("老師不存在");
+        }
         return convertMasterToAdminVo(entity);
     }
-
 
     @Transactional
     public boolean addMaster(MasterRequest r) {
@@ -71,7 +73,7 @@ public class MasterService {
         if (r.getImageBase64() != null) {
             String path = FileUtil.base64ToImage(r.getImageBase64(), masterDir, r.getCode());
             String fileName = Paths.get(path).getFileName().toString();
-            ext = fileName.indexOf(".") > 0 ? fileName.substring(fileName.indexOf(".") + 1) : "";
+            ext = fileName.contains(".") ? fileName.substring(fileName.indexOf(".") + 1) : "";
         }
 
         Master m = Master.builder()
@@ -85,15 +87,21 @@ public class MasterService {
                 .sort(r.getSort())
                 .status(r.getStatus())
                 .servicesJson(JsonUtil.toJson(r.getServiceItem()))
+                .serviceTime(StringUtils.defaultString(r.getServiceTime()))
                 .imageExt(ext.toLowerCase(Locale.ROOT))
                 .build();
 
-        return masterMapper.insert(m) > 0;
+        boolean inserted = masterMapper.insert(m) > 0;
+        log.info("新增老師 [{}]，結果: {}", r.getCode(), inserted ? "成功" : "失敗");
+        return inserted;
     }
 
     @Transactional
     public boolean modifyMaster(MasterRequest r) {
         Master master = masterMapper.selectByPrimaryKey(r.getCode());
+        if (master == null) {
+            throw new ApiException("老師不存在，無法修改");
+        }
 
         master.setName(r.getName());
         master.setTitle(r.getTitle());
@@ -101,27 +109,35 @@ public class MasterService {
         master.setBio(r.getBio());
         master.setExperience(r.getExperience());
         master.setPersonalItems(r.getPersonalItems());
+        master.setServiceTime(r.getServiceTime());
+
         if (r.getServiceItem() != null) {
             master.setServicesJson(JsonUtil.toJson(r.getServiceItem()));
         }
         master.setStatus(r.getStatus());
+
         try {
             if (StringUtils.isNotBlank(r.getImageBase64())) {
                 if (StringUtils.isNotBlank(master.getImageExt())) {
-                    String fileToDelete = FileUtil.concatFilePath(masterDir, String.format("%s.%s", master.getCode(), master.getImageExt()));
+                    String fileToDelete = FileUtil.concatFilePath(
+                            masterDir, String.format("%s.%s", master.getCode(), master.getImageExt()));
                     Files.deleteIfExists(Paths.get(fileToDelete));
+                    log.debug("刪除了舊照片: {}", fileToDelete);
                 }
 
                 String path = FileUtil.base64ToImage(r.getImageBase64(), masterDir, master.getCode());
                 String fileName = Paths.get(path).getFileName().toString();
-                String ext = fileName.indexOf(".") > 0 ? fileName.substring(fileName.indexOf(".") + 1) : "";
+                String ext = fileName.contains(".") ? fileName.substring(fileName.indexOf(".") + 1) : "";
                 master.setImageExt(ext.toLowerCase(Locale.ROOT));
+                log.info("老師 [{}] 新照片已上傳: {}", master.getCode(), path);
             }
         } catch (Exception ex) {
-            logger.error("刪除老師舊照片失敗", ex);
+            log.error("刪除或更新老師 [{}] 照片失敗", master.getCode(), ex);
         }
 
-        return masterMapper.updateByPrimaryKeySelective(master) > 0;
+        boolean updated = masterMapper.updateByPrimaryKeySelective(master) > 0;
+        log.info("修改老師 [{}]，結果: {}", r.getCode(), updated ? "成功" : "失敗");
+        return updated;
     }
 
     private MasterVO convertMasterToVo(Master m) {
@@ -134,9 +150,10 @@ public class MasterService {
                 .experience(m.getExperience())
                 .personalItems(m.getPersonalItems().replace(",", "、"))
                 .serviceItem(JsonUtil.fromJsonList(m.getServicesJson(), QapItemVO.class))
+                .serviceTime(m.getServiceTime())
                 .sort(m.getSort())
-                .imageBase64(FileUtil.imageToBase64(FileUtil.concatFilePath(masterDir,
-                        String.format("%s.%s", m.getCode(), m.getImageExt().toLowerCase(Locale.ROOT)))))
+                .imageBase64(FileUtil.imageToBase64(FileUtil.concatFilePath(
+                        masterDir, String.format("%s.%s", m.getCode(), m.getImageExt().toLowerCase(Locale.ROOT)))))
                 .build();
     }
 
@@ -150,11 +167,11 @@ public class MasterService {
                 .experience(m.getExperience())
                 .personalItems(m.getPersonalItems())
                 .serviceItem(JsonUtil.fromJsonList(m.getServicesJson(), QapItemVO.class))
+                .serviceTime(m.getServiceTime())
                 .sort(m.getSort())
-                .imageBase64(FileUtil.imageToBase64(FileUtil.concatFilePath(masterDir,
-                        String.format("%s.%s", m.getCode(), m.getImageExt().toLowerCase(Locale.ROOT)))))
+                .imageBase64(FileUtil.imageToBase64(FileUtil.concatFilePath(
+                        masterDir, String.format("%s.%s", m.getCode(), m.getImageExt().toLowerCase(Locale.ROOT)))))
                 .status(m.getStatus())
                 .build();
-
     }
 }
