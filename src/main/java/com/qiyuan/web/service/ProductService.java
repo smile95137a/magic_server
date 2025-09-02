@@ -1,24 +1,17 @@
 package com.qiyuan.web.service;
 
-import com.qiyuan.security.config.ImagePathMappingConfig;
-import com.qiyuan.security.exception.ApiException;
-import com.qiyuan.web.dao.*;
-import com.qiyuan.web.dto.GalleryImageVO;
-import com.qiyuan.web.dto.PageResult;
-import com.qiyuan.web.dto.ProductAdminVO;
-import com.qiyuan.web.dto.SpecInfo;
-import com.qiyuan.web.dto.request.*;
-import com.qiyuan.web.dto.response.CreateProductDraftResponse;
-import com.qiyuan.web.dto.response.ProductDetailVO;
-import com.qiyuan.web.dto.response.ProductVO;
-import com.qiyuan.web.dto.response.UploadImageResponse;
-import com.qiyuan.web.entity.*;
-import com.qiyuan.web.entity.example.ProductExample;
-import com.qiyuan.web.entity.example.ProductStockExample;
-import com.qiyuan.web.enums.ProductImageType;
-import com.qiyuan.web.util.DateUtil;
-import com.qiyuan.web.util.FileUtil;
-import jakarta.validation.Valid;
+import java.io.File;
+import java.io.IOException;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,12 +19,32 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
+import com.qiyuan.security.config.ImagePathMappingConfig;
+import com.qiyuan.security.exception.ApiException;
+import com.qiyuan.web.dao.ProductCategoryMapper;
+import com.qiyuan.web.dao.ProductImageMapper;
+import com.qiyuan.web.dao.ProductMapper;
+import com.qiyuan.web.dto.GalleryImageVO;
+import com.qiyuan.web.dto.ProductAdminVO;
+import com.qiyuan.web.dto.request.DeleteImageRequest;
+import com.qiyuan.web.dto.request.DiscardProductRequest;
+import com.qiyuan.web.dto.request.EditProductRequest;
+import com.qiyuan.web.dto.request.ProductListRequest;
+import com.qiyuan.web.dto.request.ProductPageRequest;
+import com.qiyuan.web.dto.request.UploadImageRequest;
+import com.qiyuan.web.dto.response.CreateProductDraftResponse;
+import com.qiyuan.web.dto.response.ProductDetailVO;
+import com.qiyuan.web.dto.response.ProductVO;
+import com.qiyuan.web.dto.response.UploadImageResponse;
+import com.qiyuan.web.entity.Product;
+import com.qiyuan.web.entity.ProductCategory;
+import com.qiyuan.web.entity.ProductImage;
+import com.qiyuan.web.entity.example.ProductExample;
+import com.qiyuan.web.enums.ProductImageType;
+import com.qiyuan.web.util.DateUtil;
+import com.qiyuan.web.util.FileUtil;
+
+import jakarta.validation.Valid;
 
 @Service
 public class ProductService {
@@ -215,17 +228,6 @@ public class ProductService {
                 if (img.getId() != null && !keepIds.contains(img.getId())) {
                     // 刪 DB
                     productImageMapper.deleteByPrimaryKey(img.getId());
-                    // 刪檔案
-                    String path = getProductImagePhysicalPath(
-                            img.getProductId(),
-                            ProductImageType.fromString(img.getType()),
-                            img.getFilename()
-                    );
-                    File f = new File(path);
-                    if (f.exists()) {
-                        // 忽略刪除失敗的回傳值，或依需求加上日誌/錯誤處理
-                        f.delete();
-                    }
                 }
             }
         }
@@ -364,6 +366,7 @@ public class ProductService {
         if (categoryId != null) {
             e.createCriteria().andCategoryIdEqualTo(categoryId);
         }
+        e.setOrderByClause("update_time DESC, create_time DESC");
 
 //        long total = productMapper.countByExample(e);
         List<Product> productList = productMapper.selectByExample(e);
