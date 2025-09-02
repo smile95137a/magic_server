@@ -191,7 +191,6 @@ public class ProductService {
         update.setUpdateTime(new Date());
         productMapper.updateByPrimaryKeySelective(update);
 
-        // Gallery 圖片排序更新（只 update sort，不全刪全加！）
         if (req.getGalleryImages() != null) {
             Set<Long> handledIds = new HashSet<>();
             for (GalleryImageVO img : req.getGalleryImages()) {
@@ -199,7 +198,38 @@ public class ProductService {
                     productImageMapper.updateSortById(img.getId(), img.getSort().shortValue());
                 }
             }
+
+            // === 新增：刪除前端未回傳的舊圖（差集刪除） ===
+            // 1) 取目前 DB 的 gallery 清單
+            List<ProductImage> existingGallery = productImageMapper
+                    .selectByProductIdAndType(req.getProductId(), ProductImageType.GALLERY.getFolder());
+
+            // 2) 前端保留的 id（只收有 id 的，新增未入庫的圖可能沒有 id）
+            Set<Long> keepIds = req.getGalleryImages().stream()
+                    .map(GalleryImageVO::getId)
+                    .filter(Objects::nonNull)
+                    .collect(Collectors.toSet());
+
+            // 3) 找到要刪除的（不在 keepIds 裡的）
+            for (ProductImage img : existingGallery) {
+                if (img.getId() != null && !keepIds.contains(img.getId())) {
+                    // 刪 DB
+                    productImageMapper.deleteByPrimaryKey(img.getId());
+                    // 刪檔案
+                    String path = getProductImagePhysicalPath(
+                            img.getProductId(),
+                            ProductImageType.fromString(img.getType()),
+                            img.getFilename()
+                    );
+                    File f = new File(path);
+                    if (f.exists()) {
+                        // 忽略刪除失敗的回傳值，或依需求加上日誌/錯誤處理
+                        f.delete();
+                    }
+                }
+            }
         }
+
 
         // 清理未被 description 內容引用的圖片（同時刪DB、檔案）
         cleanUnusedDescriptionImages(req.getProductId(), req.getDetailHtml());
