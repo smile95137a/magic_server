@@ -1,13 +1,14 @@
 package com.qiyuan.web.dto.response;
 
+import java.util.List;
+
 import com.qiyuan.web.dto.QapItemVO;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.util.List;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -37,6 +38,9 @@ public class MasterAdminVO {
 
     @Schema(description = "老師服務項目")
     private List<QapItemVO> serviceItem;
+
+    @Schema(description = "老師服務時間", example = "週一至週五 09:00-18:00")
+    private String serviceTime;
 
     @Schema(description = "老師是否在架上", example = "true")
     private Boolean status;

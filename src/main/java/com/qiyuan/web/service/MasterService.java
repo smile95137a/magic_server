@@ -1,16 +1,11 @@
 package com.qiyuan.web.service;
 
-import com.qiyuan.security.exception.ApiException;
-import com.qiyuan.web.dao.MasterMapper;
-import com.qiyuan.web.dto.QapItemVO;
-import com.qiyuan.web.dto.request.MasterRequest;
-import com.qiyuan.web.dto.response.MasterAdminVO;
-import com.qiyuan.web.entity.Master;
-import com.qiyuan.web.entity.example.MasterExample;
-import com.qiyuan.web.util.FileUtil;
-import com.qiyuan.web.util.JsonUtil;
-import com.qiyuan.web.dto.response.MasterVO;
-import com.qiyuan.web.dto.response.QaItemVO;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.List;
+import java.util.Locale;
+import java.util.stream.Collectors;
+
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,22 +13,27 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.List;
-import java.util.Locale;
-import java.util.stream.Collectors;
+import com.qiyuan.security.exception.ApiException;
+import com.qiyuan.web.dao.MasterMapper;
+import com.qiyuan.web.dto.QapItemVO;
+import com.qiyuan.web.dto.request.MasterRequest;
+import com.qiyuan.web.dto.response.MasterAdminVO;
+import com.qiyuan.web.dto.response.MasterVO;
+import com.qiyuan.web.entity.Master;
+import com.qiyuan.web.entity.example.MasterExample;
+import com.qiyuan.web.util.FileUtil;
+import com.qiyuan.web.util.JsonUtil;
+
+import lombok.RequiredArgsConstructor;
 
 @Service
+@RequiredArgsConstructor
 public class MasterService {
 
     private Logger logger = LoggerFactory.getLogger(MasterService.class);
 
    private final MasterMapper masterMapper;
 
-    public MasterService(MasterMapper masterMapper) {
-        this.masterMapper = masterMapper;
-    }
 
     @Value("${upload.image-path.master}")
     private String masterDir;

@@ -26,4 +26,7 @@ public class ModifyCategoryAdminRequest {
 
     @Schema(description = "啟用狀態", example = "true")
     private Boolean status;
+
+    @Schema(description = "分類順序", example = "2")
+    private Integer sortOrder;
 }

@@ -1,29 +1,33 @@
 package com.qiyuan.web.controller.admin;
 
+import java.util.List;
+
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.qiyuan.web.dto.request.CategoryAdminRequest;
 import com.qiyuan.web.dto.request.ModifyCategoryAdminRequest;
 import com.qiyuan.web.entity.ProductCategory;
 import com.qiyuan.web.security.RoleExpressions;
 import com.qiyuan.web.service.ProductCategoryService;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
+import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/admin/product/category")
 @Tag(name = "後台商品分類管理", description = "後台商品分類維護（新增、修改、查詢）")
 @PreAuthorize(RoleExpressions.ONLY_ADMIN)
+@RequiredArgsConstructor
 public class ProductCategoryAdminController {
 
     private final ProductCategoryService productCategoryService;
-
-    public ProductCategoryAdminController(ProductCategoryService productCategoryService) {
-        this.productCategoryService = productCategoryService;
-    }
 
     @Operation(summary = "新增商品分類", description = "後台新增一筆商品分類")
     @PostMapping("/add")

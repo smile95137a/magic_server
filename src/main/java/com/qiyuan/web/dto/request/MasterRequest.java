@@ -1,8 +1,6 @@
 package com.qiyuan.web.dto.request;
 
-
 import com.qiyuan.web.dto.QapItemVO;
-import com.qiyuan.web.dto.response.QaItemVO;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -60,4 +58,6 @@ public class MasterRequest {
     @NotNull
     private Byte sort;
 
+    @Schema(description = "老師服務時間", example = "週一至週五 09:00-18:00")
+    private String serviceTime;
 }

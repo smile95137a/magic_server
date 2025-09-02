@@ -1,29 +1,35 @@
 package com.qiyuan.web.controller.admin;
 
+import java.util.List;
+
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.qiyuan.web.dto.request.MasterRequest;
 import com.qiyuan.web.dto.response.MasterAdminVO;
 import com.qiyuan.web.security.RoleExpressions;
 import com.qiyuan.web.service.MasterService;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
+import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/admin/master")
 @PreAuthorize(RoleExpressions.ONLY_ADMIN)
 @Tag(name = "老師管理", description = "後台老師管理操作")
+@RequiredArgsConstructor
 public class MasterAdminController {
 
     private final MasterService masterService;
 
-    public MasterAdminController(MasterService masterService) {
-        this.masterService = masterService;
-    }
 
     @PostMapping("/list")
     @Operation(summary = "查詢老師清單", description = "取得所有老師的詳細清單")

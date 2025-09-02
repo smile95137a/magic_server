@@ -19,4 +19,10 @@ public class ProductCategoryVO {
 
     @Schema(description = "分類描述", example = "與美食相關的分類")
     private String description;
+
+    @Schema(description = "分類順序", example = "1")
+    private Integer sortOrder;
+
+    @Schema(description = "啟用狀態", example = "true")
+    private Boolean status;
 }
