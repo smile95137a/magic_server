@@ -118,37 +118,31 @@ public class LanternPurchaseService {
     }
 
     public List<LanternBlessingVO> getRecommendation(int num) {
-        LanternPurchaseExample e = new LanternPurchaseExample();
         List<String> lanternIds = systemConfigService.getLanternPromotion();
-        if (!lanternIds.isEmpty()) {
-            e.createCriteria().andLanternIdIn(lanternIds);
-        }
-        e.setOrderByClause("create_time ASC");
-        List<LanternBlessingDTO> list = lanternPurchaseMapper.selectDistinctLimitByExample(e, num);
+        if (lanternIds.isEmpty()) return Collections.emptyList();
 
-        if (list.isEmpty()) {
-            LanternPurchaseExample e3 = new LanternPurchaseExample();
-            list = lanternPurchaseMapper.selectDistinctLimitByExample(e3, num);
-        }
-
+        List<LanternBlessingDTO> list = lanternPurchaseMapper.selectRecommendationWithFallback(lanternIds, num);
         return lanternBlessingDto2VO(list);
     }
+
 
     private List<LanternBlessingVO> lanternBlessingDto2VO(List<LanternBlessingDTO> list) {
         if (!list.isEmpty()) {
             return list.stream()
                     .map(l -> LanternBlessingVO.builder()
-                            .blessing(l.getBlessingTimes())
-                            .name(l.getName())
+                            .blessing(Optional.ofNullable(l.getBlessingTimes()).orElse((short) 0))
+                            .name(Optional.ofNullable(l.getName()).orElse("尚未有人點過"))
                             .lanternCode(l.getLanternCode())
                             .createTime(l.getCreateTime())
                             .message(l.getMessage())
+                            .hasUser(l.getUserId() != null)  // 標記是否有人點過
                             .build()
                     )
                     .collect(Collectors.toList());
         }
-        return Collections.EMPTY_LIST;
+        return Collections.emptyList();
     }
+
 
     @Transactional
     public PaymentNoVO addLanternPurchaseRecord(LanternPurchaseRequest req) {

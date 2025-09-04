@@ -22,4 +22,5 @@ public class LanternBlessingVO implements Serializable {
     private Date createTime;
     private String lanternCode;
     private int blessing;
+    private boolean hasUser;
 }

@@ -29,4 +29,7 @@ public class LanternBlessingDTO {
     private Short blessingTimes;
 
     private Boolean checkedIn;
+    
+    private Boolean hasUser;
+
 }

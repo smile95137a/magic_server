@@ -435,6 +435,36 @@
 	UPDATE lantern_purchase
 	SET checked_in = 0
   </update>
+  
+  <select id="selectRecommendationWithFallback" resultMap="LanternBlessingResultMap">
+  SELECT *
+  FROM (
+    SELECT
+      p.id,
+      l.icon_name AS lantern_code,
+      p.user_id,
+      p.name,
+      p.birthday,
+      p.message,
+      p.create_time,
+      p.expired_time,
+      p.blessing_times,
+      p.checked_in,
+      ROW_NUMBER() OVER (PARTITION BY l.id ORDER BY p.create_time ASC) AS rn
+    FROM lantern l
+    LEFT JOIN lantern_purchase p ON l.id = p.lantern_id
+    WHERE l.id IN
+    <foreach collection="lanternIds" item="id" open="(" separator="," close=")">
+      #{id}
+    </foreach>
+  ) t
+  WHERE t.rn = 1 OR t.rn IS NULL
+  ORDER BY t.create_time ASC
+  <if test="limit != null">
+    OFFSET 0 ROWS FETCH NEXT #{limit} ROWS ONLY
+  </if>
+</select>
+  
 
   
 </mapper>

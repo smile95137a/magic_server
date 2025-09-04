@@ -47,5 +47,8 @@ public interface LanternPurchaseMapper {
     int updateCheckinStatus(@Param("id") String id,
                             @Param("checkedIn") Boolean checkedIn);
     int resetAllCheckins();
+    
+    List<LanternBlessingDTO> selectRecommendationWithFallback(@Param("lanternIds") List<String> lanternIds, @Param("limit") int limit);
+
 
 }
