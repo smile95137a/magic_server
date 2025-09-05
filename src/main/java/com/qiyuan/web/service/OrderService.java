@@ -37,6 +37,7 @@ import com.qiyuan.web.entity.OrderItem;
 import com.qiyuan.web.entity.Orders;
 import com.qiyuan.web.entity.PaymentTransaction;
 import com.qiyuan.web.entity.Product;
+import com.qiyuan.web.entity.ProductStock;
 import com.qiyuan.web.entity.ShippingMethod;
 import com.qiyuan.web.entity.User;
 import com.qiyuan.web.entity.example.OrderItemExample;
@@ -88,13 +89,14 @@ public class OrderService {
         // 2. 處理每個商品（驗證 + 扣庫存 + 建明細）
         for (CreateOrderItem item : items) {
             Product product = productMapper.selectByPrimaryKey(item.getProductId());
-            if (product == null || !Boolean.TRUE.equals(product.getStatus()))
-                throw new ApiException(item.getProductId() + " 商品不存在或已下架");
-
+            ProductStock stock = stockService.getByProductId(item.getProductId());
             int needQty = item.getQuantity() == null ? 1 : item.getQuantity();
-            if (product.getStock() == null || product.getStock() < needQty)
+            if (stock == null) {
+                throw new ApiException("[" + product.getName() + "] 尚未建立庫存紀錄");
+            }
+            if (stock.getTotalStock() < needQty) {
                 throw new ApiException("[" + product.getName() + "] 庫存不足");
-
+            }
             // 扣庫存
             stockService.reserveStock(product.getId(), needQty, null);
 
