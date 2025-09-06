@@ -102,20 +102,21 @@ public class LanternPurchaseService {
 
     public List<LanternBlessingVO> getLatestLanternBlessing(int num) {
         LanternPurchaseExample e = new LanternPurchaseExample();
+        e.setOrderByClause("lp.create_time DESC");
 
-        e.setOrderByClause("create_time DESC");
-
-        List<LanternBlessingDTO> list = lanternPurchaseMapper.selectLimitByExample(e, num);
+        List<LanternBlessingDTO> list = lanternPurchaseMapper.selectPaidLimitByExample(e, num);
         return lanternBlessingDto2VO(list);
     }
+
 
     public List<LanternBlessingVO> getRankLanternBlessing(int num) {
         LanternPurchaseExample e = new LanternPurchaseExample();
-        e.setOrderByClause("blessing_times DESC");
-        List<LanternBlessingDTO> list = lanternPurchaseMapper.selectLimitByExample(e, num);
+        e.setOrderByClause("lp.blessing_times DESC");
 
+        List<LanternBlessingDTO> list = lanternPurchaseMapper.selectPaidLimitByExample(e, num);
         return lanternBlessingDto2VO(list);
     }
+
 
     public List<LanternBlessingVO> getRecommendation(int num) {
         List<String> lanternIds = systemConfigService.getLanternPromotion();

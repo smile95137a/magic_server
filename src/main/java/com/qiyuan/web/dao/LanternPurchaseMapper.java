@@ -49,6 +49,10 @@ public interface LanternPurchaseMapper {
     int resetAllCheckins();
     
     List<LanternBlessingDTO> selectRecommendationWithFallback(@Param("lanternIds") List<String> lanternIds, @Param("limit") int limit);
+    
+    List<LanternBlessingDTO> selectPaidLimitByExample(
+            @Param("example") LanternPurchaseExample example,
+            @Param("limit") int limit);
 
 
 }

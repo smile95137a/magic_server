@@ -465,6 +465,27 @@
   </if>
 </select>
   
+<select id="selectPaidLimitByExample" parameterType="com.qiyuan.web.entity.example.LanternPurchaseExample" resultMap="LanternBlessingResultMap">
+    SELECT TOP ${limit}
+        lp.id,
+        l.icon_name AS lantern_code,
+        lp.user_id,
+        lp.name,
+        lp.birthday,
+        lp.message,
+        lp.create_time,
+        lp.expired_time,
+        lp.blessing_times,
+        lp.checked_in
+    FROM qiyuan.dbo.lantern_purchase lp
+    INNER JOIN qiyuan.dbo.virtual_orders vo 
+        ON lp.external_order_no = vo.external_order_no
+    INNER JOIN qiyuan.dbo.lantern l 
+        ON lp.lantern_id = l.id
+    WHERE vo.status = 'paid'
+    <if test="example.orderByClause != null">
+        ORDER BY ${example.orderByClause}
+    </if>
+</select>
 
-  
 </mapper>
