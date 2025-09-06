@@ -124,7 +124,6 @@ public class OrderService {
                 recipientCity = null, zipCode = null,
                 storeId = null, storeName = null;
         ShippingMethod shippingMethod = shippingMethodMapper.selectByPrimaryKey(request.getShippingMethodId());
-        // 宅配
         if (StringUtils.equals("SF_EXPRESS", shippingMethod.getCode())) {
             HomeDeliveryRecipientInfo r = request.getHomeDeliveryRecipient();
             if (r == null) throw new ApiException("宅配需填寫收件人資訊");
@@ -133,8 +132,19 @@ public class OrderService {
             recipientName = r.getName();
             recipientPhone = r.getPhone();
             recipientAddress = r.getAddress();
+
+        } else if (StringUtils.equals("FREE_SHIPPING", shippingMethod.getCode())) {
+            // 免運：假設走宅配免運邏輯
+            HomeDeliveryRecipientInfo r = request.getHomeDeliveryRecipient();
+            if (r == null) throw new ApiException("免運需填寫收件人資訊");
+            zipCode = r.getZipCode();
+            recipientCity = r.getCity();
+            recipientName = r.getName();
+            recipientPhone = r.getPhone();
+            recipientAddress = r.getAddress();
+
         } else {
-            // 超商
+            // 超商取貨
             StorePickupRecipientInfo r = request.getStorePickupRecipient();
             if (r == null) throw new ApiException("超商取貨需填寫收件人資訊");
             recipientName = r.getRecipientName();
@@ -143,6 +153,7 @@ public class OrderService {
             storeId = r.getStoreId();
             storeName = r.getStoreName();
         }
+
         total = total.add(BigDecimal.valueOf(shippingMethod.getFee()));
 
         // 4. 建立訂單主表

@@ -130,7 +130,9 @@ public class OrderAdminService {
 
             // 宅配
             String trackingId = null;
-            if (StringUtils.equals("SF_EXPRESS",shippingMethod.getCode())) {
+            if ("SF_EXPRESS".equals(shippingMethod.getCode())
+                    || ("FREE_SHIPPING".equals(shippingMethod.getCode()) && StringUtils.isBlank(order.getStoreId()))) {
+                // 宅配 & 宅配免運
                 ExpressDeliveryRequest target = ExpressDeliveryRequest.builder()
                         .orderId(item.getOrderId())
                         .declaredValue(order.getTotalAmount())
@@ -143,19 +145,34 @@ public class OrderAdminService {
                         .recipientMobile(order.getRecipientPhone())
                         .recipientAddress(order.getRecipientAddress())
                         .recipientRegion(order.getRecipientCity())
-                        .recipientAddress(order.getRecipientAddress())
                         .recipientZipCode(order.getZipCode())
                         .senderAddress(senderInfo.getAddress())
                         .senderName(senderInfo.getName())
                         .senderMobile(senderInfo.getPhone())
                         .senderRegion(senderInfo.getCity())
-                        .senderAddress(senderInfo.getAddress())
                         .senderZipCode(senderInfo.getZipcode())
                         .remark(item.getRemark())
                         .build();
                 trackingId = logisticsService.createExpressDeliveryOrder(target);
+
+            } else if ("FREE_SHIPPING".equals(shippingMethod.getCode()) && StringUtils.isNotBlank(order.getStoreId())) {
+                // 超商免運
+                StorePickupRequest target = StorePickupRequest.builder()
+                        .orderId(order.getId())
+                        .storeId(order.getStoreId())
+                        .amount(BigDecimal.ZERO)                 // 金額免運，可以直接填 0
+                        .orderAmount(order.getTotalAmount())
+                        .senderName(senderInfo.getName())
+                        .sendMobilePhone(senderInfo.getPhone())
+                        .receiverName(order.getRecipientName())
+                        .receiverMobilePhone(order.getRecipientPhone())
+                        .StoreCode(shippingMethod.getCode())
+                        .shipDate(item.getShippingDate())
+                        .build();
+                trackingId = logisticsService.createStorePickupOrder(target);
+
             } else {
-                // 超商取貨
+                // 一般超商取貨
                 StorePickupRequest target = StorePickupRequest.builder()
                         .orderId(order.getId())
                         .storeId(order.getStoreId())
@@ -170,6 +187,7 @@ public class OrderAdminService {
                         .build();
                 trackingId = logisticsService.createStorePickupOrder(target);
             }
+
 
             Orders record = new Orders();
             record.setId(order.getId());
@@ -287,18 +305,20 @@ public class OrderAdminService {
 
         HomeDeliveryRecipientInfo homeDeliveryRecipientInfo = null;
         StorePickupRecipientInfo storePickupRecipientInfo = null;
-        if ("SF_EXPRESS".equals(shippingMethod.getCode())) {
-            homeDeliveryRecipientInfo = HomeDeliveryRecipientInfo
-                    .builder()
+        if ("SF_EXPRESS".equals(shippingMethod.getCode())
+                || ("FREE_SHIPPING".equals(shippingMethod.getCode()) && StringUtils.isBlank(order.getStoreId()))) {
+            // 宅配 & 宅配免運
+            homeDeliveryRecipientInfo = HomeDeliveryRecipientInfo.builder()
                     .city(order.getRecipientCity())
                     .zipCode(order.getZipCode())
                     .name(order.getRecipientName())
                     .phone(order.getRecipientPhone())
                     .address(order.getRecipientAddress())
                     .build();
+
         } else {
-            storePickupRecipientInfo = StorePickupRecipientInfo
-                    .builder()
+            // 超商取貨 & 超商免運
+            storePickupRecipientInfo = StorePickupRecipientInfo.builder()
                     .recipientName(order.getRecipientName())
                     .phone(order.getRecipientPhone())
                     .storeId(order.getStoreId())
@@ -306,6 +326,7 @@ public class OrderAdminService {
                     .storeAddress(order.getRecipientAddress())
                     .build();
         }
+
         // 取得訂單明細
         Map<Integer, Product> productMap = new HashMap<>();
         List<OrderItem> orderItems = getOrderItemsByOrderId(orderId);
