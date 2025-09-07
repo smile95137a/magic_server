@@ -23,9 +23,8 @@ public class JwtTokenUtil {
     @Value("${jwt.secret:mySecretKeyForJWTTokenGenerationThatShouldBeAtLeast256BitsLong}")
     private String secretKey;
 
-    // Token 過期時間（小時）
-    @Value("${jwt.expiration:4320}")
-    private int expirationMinutes;
+    @Value("${jwt.expiration-days:30}") // 預設 30 天
+    private int expirationDays;
 
     // Refresh Token 過期時間（天）
     @Value("${jwt.refresh-expiration:7}")
@@ -57,7 +56,7 @@ public class JwtTokenUtil {
      */
     public String generateToken(String username, Map<String, Object> claims) {
         Instant now = Instant.now();
-        Instant expiration = now.plus(Duration.ofMinutes(expirationMinutes));
+        Instant expiration = now.plus(Duration.ofDays(expirationDays));
 
         JwtBuilder builder = Jwts.builder()
                 .subject(username)
